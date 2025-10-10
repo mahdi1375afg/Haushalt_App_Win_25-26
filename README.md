@@ -13,3 +13,6 @@ OS = Android
 IDE = Andriod Studio
 DB = SQL lite/Room
 
+---
+##Voraussetzung
+Android 
