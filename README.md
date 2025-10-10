@@ -8,11 +8,11 @@ Eine benutzerfreundliche mobile Anwendung, die soll Haushaltsmitglieder dabei un
 Putzmitteln und weiteren Materialien im Haushalt effizient zu verwalten.
 
 ---
-##Tools und Setup
+## Tools und Setup
 OS = Android
 IDE = Andriod Studio
 DB = SQL lite/Room
 
 ---
-##Voraussetzung
+## Voraussetzung
 Android 
