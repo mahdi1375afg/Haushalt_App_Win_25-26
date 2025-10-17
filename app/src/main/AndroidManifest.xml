@@ -12,6 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Haushalt_App_Java">
         <activity
+            android:name=".p_addActivity2"
+            android:exported="false" />
+        <activity
+            android:name=".p_addActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Haushalt_App_Java" />
+        <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity

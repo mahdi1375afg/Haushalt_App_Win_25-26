@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.content.Intent;
 
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class StartActivity extends AppCompatActivity {
@@ -48,5 +49,6 @@ public class StartActivity extends AppCompatActivity {
         }
 
     });
+
     }
 }
