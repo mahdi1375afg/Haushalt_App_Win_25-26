@@ -13,7 +13,7 @@ public class Produkt {
     private String name_lower;
     private String einheit;
     private int menge;
-    private kategorie kategorie;
+    private String kategorie;
     private int mindBestand;
     private Object timestamp;
 
@@ -22,7 +22,7 @@ public class Produkt {
         // Default-Konstruktor erforderlich für Firebase
     }
 
-    public Produkt(String produkt_id, String name, int menge, kategorie kategorie, int mindBestand, String einheit) {
+    public Produkt(String produkt_id, String name, int menge, String kategorie, int mindBestand, String einheit) {
         this.produkt_id = produkt_id;
         this.name = name;
         this.menge = menge;
@@ -78,10 +78,10 @@ public class Produkt {
     public void setMenge(int menge) {
         this.menge = menge;
     }
-    public kategorie getKategorie() {
-        return kategorie;
+    public String getKategorie() {
+        return this.kategorie;
     }
-    public void setKategorie(kategorie kategorie) {
+    public void setKategorie(String kategorie) {
         this.kategorie = kategorie;
     }
     public int getMindBestand() {

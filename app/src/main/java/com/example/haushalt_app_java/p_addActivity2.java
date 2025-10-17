@@ -136,12 +136,13 @@ public class p_addActivity2 extends AppCompatActivity {
                 }
                 String selected = pKategorie.getText().toString().trim();
                 kategorie kategorieEnum = findKategorieByDisplayName(selected);
+                String categoryToSave = (kategorieEnum == null) ? null : kategorieEnum.getDisplayName();
 
                 Produkt produkt = new Produkt(
                         null,// produkt_id wird von Firebase generiert
                         name,
                         menge,
-                        kategorieEnum, // falls Kategorie ein String ist
+                        categoryToSave, // falls Kategorie ein String ist
                         mindBestand,
                         einheit
                 );
