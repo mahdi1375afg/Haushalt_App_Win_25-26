@@ -11,7 +11,7 @@ Der Projekt wird im Rahmen von Semester Projekt im Jahr 2025/2026.
 ## Tools und Setup
 - OS = Android
 - IDE = Andriod Studio
-- DB = SQL lite/Room
+- DB = Firebase(Baum Struktur)
 
 ---
 ## Voraussetzung
