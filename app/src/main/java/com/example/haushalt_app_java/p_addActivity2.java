@@ -140,6 +140,7 @@ public class p_addActivity2 extends AppCompatActivity {
 
                 Produkt produkt = new Produkt(
                         null,// produkt_id wird von Firebase generiert
+                        null, // hausId kann später gesetzt werden
                         name,
                         menge,
                         categoryToSave, // falls Kategorie ein String ist

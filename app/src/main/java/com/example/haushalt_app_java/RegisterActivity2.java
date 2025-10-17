@@ -20,6 +20,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import android.content.Intent;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import com.example.haushalt_app_java.domain.Nutzer;
 
 public class RegisterActivity2 extends AppCompatActivity {
 
@@ -27,6 +33,8 @@ public class RegisterActivity2 extends AppCompatActivity {
     private EditText password;
     private Button register;
     private FirebaseAuth auth;
+    private EditText userName;
+    private static final String DB_URL = "https://haushalt-app-68451-default-rtdb.europe-west1.firebasedatabase.app";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +50,7 @@ public class RegisterActivity2 extends AppCompatActivity {
         password = findViewById(R.id.password);
         register = findViewById(R.id.register);
         auth = FirebaseAuth.getInstance();
+        userName = findViewById(R.id.userName);
 
         register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,28 +72,53 @@ public class RegisterActivity2 extends AppCompatActivity {
 
     }
 
-    private void registerUser(String email, String password) {
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(RegisterActivity2.this, new OnCompleteListener<AuthResult>() {
+        private void registerUser(String email, String password) {
+            String name = userName.getText().toString().trim();
+
+            if (TextUtils.isEmpty(name)) {
+                Toast.makeText(this, "Bitte Namen eingeben", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Registration success
-                            Toast.makeText(RegisterActivity2.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                            if (task.isSuccessful()) {
-                                Toast.makeText(RegisterActivity2.this, "Registration successful", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(RegisterActivity2.this, StartActivity.class);
-                                startActivity(intent);
-                                finish(); // Optional: schließt die Registrierungsseite
-                            }
-                        } else {
-                            // If registration fails, display a message to the user.
-                            Toast.makeText(RegisterActivity2.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
+                            FirebaseUser user = auth.getCurrentUser();
 
+                            // DisplayName in Firebase Auth setzen
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(name)
+                                .build();
+
+                            user.updateProfile(profileUpdates)
+                                .addOnCompleteListener(task1 -> {
+                                    if (task1.isSuccessful()) {
+                                        // Benutzer in Realtime Database speichern
+                                        String userId = user.getUid();
+
+                                         DatabaseReference userRef = FirebaseDatabase.getInstance(DB_URL)
+                                             .getReference().child("Benutzer").child(userId);
+
+                                        Nutzer nutzer = new Nutzer(userId, name);
+
+                                        userRef.setValue(nutzer)
+                                            .addOnSuccessListener(aVoid -> {
+                                                Toast.makeText(RegisterActivity2.this, "Registrierung erfolgreich!", Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(RegisterActivity2.this, StartActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(RegisterActivity2.this, "Fehler beim Speichern: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            });
+                                    }
+                                });
+                        } else {
+                            Toast.makeText(RegisterActivity2.this, "Registrierung fehlgeschlagen: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
-
-
-    }
+        }
 }
