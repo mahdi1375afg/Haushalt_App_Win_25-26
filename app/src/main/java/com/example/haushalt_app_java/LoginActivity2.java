@@ -6,16 +6,20 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import android.widget.Toast;
 import android.content.Intent;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class LoginActivity2 extends AppCompatActivity {
 
@@ -48,6 +52,7 @@ public class LoginActivity2 extends AppCompatActivity {
                 loginUser(text_email, text_password);
             }
         });
+
     }
 
     private void loginUser(String textEmail, String textPassword) {

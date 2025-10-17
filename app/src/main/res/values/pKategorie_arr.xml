@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="kategorien">
+        <item>Lebensmittel</item>
+        <item>Getraenke</item>
+        <item> Hygiene </item>
+        <item>Reinigungsmittel</item>
+        <item>Medikament</item>
+        <item>Sonstiges</item>
+    </string-array>
+</resources>
