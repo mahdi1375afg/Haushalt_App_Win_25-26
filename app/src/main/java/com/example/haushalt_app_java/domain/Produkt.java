@@ -9,7 +9,7 @@ import java.util.Locale;
 public class Produkt {
 
     private String produkt_id;
-    private String hausId;
+    private String haus_id;
     private String name;
     private String name_lower;
     private String einheit;
@@ -23,9 +23,9 @@ public class Produkt {
         // Default-Konstruktor erforderlich für Firebase
     }
 
-    public Produkt(String produkt_id,String hausId, String name, int menge, String kategorie, int mindBestand, String einheit) {
+    public Produkt(String produkt_id,String haus_id, String name, int menge, String kategorie, int mindBestand, String einheit) {
         this.produkt_id = produkt_id;
-        this.hausId = hausId;
+        this.haus_id = haus_id;
         this.name = name;
         this.menge = menge;
         this.name_lower = name.toLowerCase(); // Speichert den Namen in Kleinbuchstaben für die Suche
@@ -39,11 +39,11 @@ public class Produkt {
     public Produkt(String name, int menge, String kategorie, int mindBestand) {
     }
 
-    public String getHausId() {
-        return hausId;
+    public String getHaus_id() {
+        return haus_id;
     }
-    public void setHausId(String hausId) {
-        this.hausId = hausId;
+    public void setHaus_id(String haus_id) {
+        this.haus_id = haus_id;
     }
 
     public String getProdukt_id() {
@@ -96,9 +96,6 @@ public class Produkt {
     public void setTimestamp(Object timestamp) {
         this.timestamp = timestamp;
     }
-
-
-
 
 
 }

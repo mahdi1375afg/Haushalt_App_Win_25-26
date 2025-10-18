@@ -118,49 +118,77 @@ public class p_addActivity2 extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String einheit = pEinheit.getText().toString().trim();
-                String name = pName.getText().toString().trim();
-                int menge = 0;
-                int mindBestand = 0;
-                try {
-                    String mengeStr = pMenge.getText().toString().trim();
-                    if (!mengeStr.isEmpty()) {
-                        menge = Integer.parseInt(mengeStr);
-                    }
-                    String mindStr = pMindBestand.getText().toString().trim();
-                    if (!mindStr.isEmpty()) {
-                        mindBestand = Integer.parseInt(mindStr);
-                    }
-                } catch (NumberFormatException e) {
-                    // einfache Fehlerbehandlung: setze 0 bei ungültiger Eingabe
-                }
-                String selected = pKategorie.getText().toString().trim();
-                kategorie kategorieEnum = findKategorieByDisplayName(selected);
-                String categoryToSave = (kategorieEnum == null) ? null : kategorieEnum.getDisplayName();
+                String userId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+                com.google.firebase.database.DatabaseReference userRef = db.getReference().child("Benutzer").child(userId);
 
-                Produkt produkt = new Produkt(
-                        null,// produkt_id wird von Firebase generiert
-                        null, // hausId kann später gesetzt werden
-                        name,
-                        menge,
-                        categoryToSave, // falls Kategorie ein String ist
-                        mindBestand,
-                        einheit
-                );
+                userRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                        if (!snapshot.exists()) {
+                            Toast.makeText(p_addActivity2.this, "Benutzer nicht gefunden", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                db.getReference("Produkt").push().setValue(produkt)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(p_addActivity2.this, "Erfolgrich gespeichert", Toast.LENGTH_SHORT).show();
+                        String hausId = snapshot.child("hausId").getValue(String.class);
+                        if (hausId == null || hausId.isEmpty()) {
+                            Toast.makeText(p_addActivity2.this, "Kein Haushalt zugewiesen", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        String einheit = pEinheit.getText().toString().trim();
+                        String name = pName.getText().toString().trim();
+                        int menge = 0;
+                        int mindBestand = 0;
+                        try {
+                            String mengeStr = pMenge.getText().toString().trim();
+                            if (!mengeStr.isEmpty()) {
+                                menge = Integer.parseInt(mengeStr);
                             }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(p_addActivity2.this,"umm schief gelaufen: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            String mindStr = pMindBestand.getText().toString().trim();
+                            if (!mindStr.isEmpty()) {
+                                mindBestand = Integer.parseInt(mindStr);
                             }
-                        });
+                        } catch (NumberFormatException e) {
+                            // Fehlerbehandlung
+                        }
+                        String selected = pKategorie.getText().toString().trim();
+                        kategorie kategorieEnum = findKategorieByDisplayName(selected);
+                        String categoryToSave = (kategorieEnum == null) ? null : kategorieEnum.getDisplayName();
+
+                        String produktId = db.getReference().child("Hauser").child(hausId).child("produkte").push().getKey();
+
+                        Produkt produkt = new Produkt(
+                                produktId,
+                                hausId,
+                                name,
+                                menge,
+                                categoryToSave,
+                                mindBestand,
+                                einheit
+                        );
+
+                        db.getReference().child("Hauser").child(hausId).child("produkte").child(produktId)
+                                .setValue(produkt)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(p_addActivity2.this, "Produkt hinzugefügt", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(p_addActivity2.this, "Fehler: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
+                        Toast.makeText(p_addActivity2.this, "Fehler beim Laden", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 

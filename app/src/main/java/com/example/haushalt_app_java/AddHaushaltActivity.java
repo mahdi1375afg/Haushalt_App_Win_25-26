@@ -55,42 +55,41 @@ public class AddHaushaltActivity extends AppCompatActivity {
         hName = findViewById(R.id.hName);
         hAddName = findViewById(R.id.hAddName);
 
-            hAddName.setOnClickListener(v -> {
-                Log.d("AddHaushalt", "Button geklickt");
+        hAddName.setOnClickListener(v -> {
+            Log.d("AddHaushalt", "Button geklickt");
 
-                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                    Toast.makeText(this, "Nicht eingeloggt!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                Toast.makeText(this, "Nicht eingeloggt!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                String name = hName.getText().toString().trim();
-                if (name.isEmpty()) {
-                    Toast.makeText(this, "Bitte Namen eingeben", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            String name = hName.getText().toString().trim();
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Bitte Namen eingeben", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                Log.d("AddHaushalt", "User ID: " + userId);
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            Log.d("AddHaushalt", "User ID: " + userId);
 
-                DatabaseReference userRef = db.getReference().child("Benutzer").child(userId);
+            DatabaseReference userRef = db.getReference().child("Benutzer").child(userId);
 
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Log.d("AddHaushalt", "Firebase Snapshot erhalten");
 
+                    // WICHTIG: haushaltId HIER deklarieren (vor dem if-else)
+                    String haushaltId = db.getReference().child("Hauser").push().getKey();
+                    Log.d("AddHaushalt", "Haushalt ID generiert: " + haushaltId);
+
                     if (snapshot.exists()) {
                         String userName = snapshot.child("name").getValue(String.class);
                         Log.d("AddHaushalt", "Benutzername: " + userName);
 
-                        String haushaltId = db.getReference().child("Hauser").push().getKey();
-                        Log.d("AddHaushalt", "Haushalt ID generiert: " + haushaltId);
-
-                        List<Nutzer> mitglieder = new ArrayList<>();
-                        Nutzer currentUser = new Nutzer(userId, userName);
-                        mitglieder.add(currentUser);
-
-                        Haushalt haushalt = new Haushalt(haushaltId, name, mitglieder);
+                        // Haushalt mit nur IDs erstellen (nicht ganzes Nutzer-Objekt!)
+                        Haushalt haushalt = new Haushalt(haushaltId, name, null);
+                        haushalt.addMitglied(userId);
 
                         db.getReference().child("Hauser").child(haushaltId).setValue(haushalt)
                             .addOnSuccessListener(aVoid -> {
@@ -106,34 +105,30 @@ public class AddHaushaltActivity extends AppCompatActivity {
                     } else {
                         Log.e("AddHaushalt", "Benutzer existiert nicht - erstelle neuen Eintrag");
 
-                        // Benutzer automatisch aus Firebase Auth erstellen
                         String displayName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
                         String userName = (displayName != null && !displayName.isEmpty()) ? displayName : "Unbekannt";
 
-                        Nutzer neuerNutzer = new Nutzer(userId, userName);
+                        Nutzer neuerNutzer = new Nutzer(userId, userName, haushaltId);
                         userRef.setValue(neuerNutzer)
-                                .addOnSuccessListener(aVoid -> {
-                                    Log.d("AddHaushalt", "Benutzer erfolgreich erstellt");
-                                    Toast.makeText(AddHaushaltActivity.this, "Profil erstellt. Haushalt wird angelegt...", Toast.LENGTH_SHORT).show();
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("AddHaushalt", "Benutzer erfolgreich erstellt");
+                                Toast.makeText(AddHaushaltActivity.this, "Profil erstellt. Haushalt wird angelegt...", Toast.LENGTH_SHORT).show();
 
-                                    // Jetzt Haushalt erstellen
-                                    String haushaltId = db.getReference().child("Hauser").push().getKey();
-                                    List<Nutzer> mitglieder = new ArrayList<>();
-                                    mitglieder.add(neuerNutzer);
+                                // Haushalt mit nur IDs erstellen
+                                Haushalt haushalt = new Haushalt(haushaltId, name, null);
+                                haushalt.addMitglied(userId);
 
-                                    Haushalt haushalt = new Haushalt(haushaltId, name, mitglieder);
-
-                                    db.getReference().child("Hauser").child(haushaltId).setValue(haushalt)
-                                            .addOnSuccessListener(aVoid2 -> {
-                                                userRef.child("hausId").setValue(haushaltId);
-                                                Toast.makeText(AddHaushaltActivity.this, "Haushalt erstellt!", Toast.LENGTH_SHORT).show();
-                                                finish();
-                                            });
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e("AddHaushalt", "Fehler beim Erstellen: " + e.getMessage());
-                                    Toast.makeText(AddHaushaltActivity.this, "Fehler: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
+                                db.getReference().child("Hauser").child(haushaltId).setValue(haushalt)
+                                    .addOnSuccessListener(aVoid2 -> {
+                                        userRef.child("hausId").setValue(haushaltId);
+                                        Toast.makeText(AddHaushaltActivity.this, "Haushalt erstellt!", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("AddHaushalt", "Fehler beim Erstellen: " + e.getMessage());
+                                Toast.makeText(AddHaushaltActivity.this, "Fehler: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
                     }
                 }
 
@@ -143,7 +138,7 @@ public class AddHaushaltActivity extends AppCompatActivity {
                     Toast.makeText(AddHaushaltActivity.this, "Fehler beim Laden des Nutzers", Toast.LENGTH_SHORT).show();
                 }
             });
-            });
+        });
 
 
     }

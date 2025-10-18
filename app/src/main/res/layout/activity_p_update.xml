@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".p_addActivity2">
 
+    <Button
+        android:id="@+id/btnDelete"
+        android:layout_width="128dp"
+        android:layout_height="49dp"
+        android:layout_marginEnd="240dp"
+        android:layout_marginBottom="92dp"
+        android:text="Löschen"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <EditText
         android:id="@+id/pEinheit"
         android:layout_width="wrap_content"
@@ -143,7 +153,7 @@
         android:id="@+id/add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="124dp"
+        android:layout_marginEnd="56dp"
         android:layout_marginBottom="92dp"
         android:text="Aktualisieren"
         app:layout_constraintBottom_toBottomOf="parent"

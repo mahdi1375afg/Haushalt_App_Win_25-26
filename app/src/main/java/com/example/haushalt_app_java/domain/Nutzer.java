@@ -4,12 +4,22 @@ public class Nutzer {
 
     private String nutzerId;
     private String name;
+    private String hausId;
     public Nutzer() {
         // Default-Konstruktor erforderlich für Firebase
     }
-    public Nutzer(String nutzerId, String name) {
+    public Nutzer(String nutzerId, String name, String hausId) {
         this.nutzerId = nutzerId;
         this.name = name;
+        this.hausId = hausId;
+
+    }
+
+    public String getHausId() {
+        return hausId;
+    }
+    public void setHausId(String hausId) {
+        this.hausId = hausId;
     }
     public String getnutzerId() {
         return nutzerId;

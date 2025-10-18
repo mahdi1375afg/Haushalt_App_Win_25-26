@@ -101,7 +101,7 @@ public class RegisterActivity2 extends AppCompatActivity {
                                          DatabaseReference userRef = FirebaseDatabase.getInstance(DB_URL)
                                              .getReference().child("Benutzer").child(userId);
 
-                                        Nutzer nutzer = new Nutzer(userId, name);
+                                        Nutzer nutzer = new Nutzer(userId, name, null);
 
                                         userRef.setValue(nutzer)
                                             .addOnSuccessListener(aVoid -> {
