@@ -1,6 +1,8 @@
 package com.example.haushalt_app_java;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -46,6 +48,12 @@ public class RegisterActivity2 extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        NotificationService.sendNotification(this, "Registration", "You have opened the registration screen.", 4);
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> 
+                NotificationService.sendNotification(this, "Still there?", "Don't forget to register!", 5), 15000);
+
         eamil = findViewById(R.id.email);
         password = findViewById(R.id.password);
         register = findViewById(R.id.register);
@@ -58,67 +66,60 @@ public class RegisterActivity2 extends AppCompatActivity {
                 String text_email = eamil.getText().toString();
                 String text_password = password.getText().toString();
 
-                if (TextUtils.isEmpty(text_email)||TextUtils.isEmpty(text_password)){
+                if (TextUtils.isEmpty(text_email) || TextUtils.isEmpty(text_password)) {
                     Toast.makeText(RegisterActivity2.this, "Please enter email and password", Toast.LENGTH_SHORT).show();
-                } else if (text_password.length()<6) {
+                } else if (text_password.length() < 6) {
                     Toast.makeText(RegisterActivity2.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
                 } else {
                     registerUser(text_email, text_password);
-                    // Proceed with registration logic
                 }
             }
         });
-
-
     }
 
-        private void registerUser(String email, String password) {
-            String name = userName.getText().toString().trim();
+    private void registerUser(String email, String password) {
+        String name = userName.getText().toString().trim();
 
-            if (TextUtils.isEmpty(name)) {
-                Toast.makeText(this, "Bitte Namen eingeben", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        if (TextUtils.isEmpty(name)) {
+            Toast.makeText(this, "Bitte Namen eingeben", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            auth.createUserWithEmailAndPassword(email, password)
+        auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             FirebaseUser user = auth.getCurrentUser();
 
-                            // DisplayName in Firebase Auth setzen
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(name)
-                                .build();
+                                    .setDisplayName(name)
+                                    .build();
 
                             user.updateProfile(profileUpdates)
-                                .addOnCompleteListener(task1 -> {
-                                    if (task1.isSuccessful()) {
-                                        // Benutzer in Realtime Database speichern
-                                        String userId = user.getUid();
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            String userId = user.getUid();
+                                            DatabaseReference userRef = FirebaseDatabase.getInstance(DB_URL)
+                                                    .getReference().child("Benutzer").child(userId);
+                                            Nutzer nutzer = new Nutzer(userId, name, null);
 
-                                         DatabaseReference userRef = FirebaseDatabase.getInstance(DB_URL)
-                                             .getReference().child("Benutzer").child(userId);
-
-                                        Nutzer nutzer = new Nutzer(userId, name, null);
-
-                                        userRef.setValue(nutzer)
-                                            .addOnSuccessListener(aVoid -> {
-                                                Toast.makeText(RegisterActivity2.this, "Registrierung erfolgreich!", Toast.LENGTH_SHORT).show();
-                                                Intent intent = new Intent(RegisterActivity2.this, StartActivity.class);
-                                                startActivity(intent);
-                                                finish();
-                                            })
-                                            .addOnFailureListener(e -> {
-                                                Toast.makeText(RegisterActivity2.this, "Fehler beim Speichern: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            });
-                                    }
-                                });
+                                            userRef.setValue(nutzer)
+                                                    .addOnSuccessListener(aVoid -> {
+                                                        Toast.makeText(RegisterActivity2.this, "Registrierung erfolgreich!", Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(RegisterActivity2.this, StartActivity.class);
+                                                        startActivity(intent);
+                                                        finish();
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        Toast.makeText(RegisterActivity2.this, "Fehler beim Speichern: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    });
+                                        }
+                                    });
                         } else {
                             Toast.makeText(RegisterActivity2.this, "Registrierung fehlgeschlagen: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-        }
+    }
 }
