@@ -2,6 +2,7 @@ package com.example.haushalt_app_java;
 
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +20,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import android.widget.ImageView;
 
 public class AddUserActivity extends AppCompatActivity {
 
@@ -26,6 +28,7 @@ public class AddUserActivity extends AppCompatActivity {
     private FirebaseDatabase database;
     private EditText name_input;
     private Button add_user;
+    private ImageView back_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,8 @@ public class AddUserActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance(DB_URL);
         name_input = findViewById(R.id.name_input);
         add_user = findViewById(R.id.add_user);
+        back_button = findViewById(R.id.back_button);
+        back_button.setOnClickListener(v -> finish());
 
         add_user.setOnClickListener(v -> {
             String userName = name_input.getText().toString().trim();

@@ -1,8 +1,11 @@
 package com.example.haushalt_app_java;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,16 +24,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.example.haushalt_app_java.domain.Nutzer;
+import android.widget.ImageView;
 
 import android.util.Log;
 
-import java.util.List;
-import java.util.ArrayList;
-
-import static android.widget.Toast.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddHaushaltActivity extends AppCompatActivity {
 
@@ -38,8 +35,10 @@ public class AddHaushaltActivity extends AppCompatActivity {
     private FirebaseDatabase db; // zentrale, regionsspezifische Instanz
     private TextView hName;
     private Button hAddName;
+    private ImageView back;
 
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +53,11 @@ public class AddHaushaltActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance(DB_URL);
         hName = findViewById(R.id.hName);
         hAddName = findViewById(R.id.hAddName);
+        back = findViewById(R.id.back_button);
+
+        back.setOnClickListener(v -> {
+            finish();
+        });
 
         hAddName.setOnClickListener(v -> {
             Log.d("AddHaushalt", "Button geklickt");

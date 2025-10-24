@@ -12,11 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Haushalt_App_Java">
         <activity
-            android:name=".AddHaushaltActivity"
+            android:name=".delete_haushalt_Activity"
             android:exported="false" />
         <activity
+            android:name=".AddHaushaltActivity"
+            android:exported="false"
+            android:parentActivityName=".HaushaltActivity" />
+        <activity
             android:name=".AddUserActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".HaushaltActivity" />
         <activity
             android:name=".HaushaltActivity"
             android:exported="false" />
