@@ -1,17 +1,18 @@
-package com.example.haushalt_app_java;
+package com.example.haushalt_app_java.haushalt_activity;
 
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
+import com.example.haushalt_app_java.R;
+import com.example.haushalt_app_java.product_activity.MainActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,7 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import android.content.Intent;
 import android.widget.PopupMenu;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +29,13 @@ import java.util.Set;
 public class HaushaltActivity extends AppCompatActivity {
 
     private static final String DB_URL = "https://haushalt-app-68451-default-rtdb.europe-west1.firebasedatabase.app";
+
+    // Request Codes für alle Activities
+    private static final int REQUEST_ADD_HAUSHALT = 1;
+    private static final int REQUEST_ADD_USER = 2;
+    private static final int REQUEST_DELETE_USER = 3;
+    private static final int REQUEST_DELETE_HAUSHALT = 4;
+
     private FirebaseDatabase db;
     private ListView hList;
     private FloatingActionButton hAdd;
@@ -36,7 +43,6 @@ public class HaushaltActivity extends AppCompatActivity {
     private List<String> mitgliederNamen;
     private Set<String> geladeneIds;
     private ListView haushaltListView;
-
     private List<String> haushaltIds;
     private List<String> haushaltNamen;
     private ArrayAdapter<String> haushaltAdapter;
@@ -68,23 +74,46 @@ public class HaushaltActivity extends AppCompatActivity {
         haushaltAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, haushaltNamen);
         haushaltListView.setAdapter(haushaltAdapter);
 
+        // Bottom Navigation
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView2);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_household) {
+                return true;
+            } else if (itemId == R.id.nav_products) {
+                startActivity(new Intent(HaushaltActivity.this, MainActivity.class));
+                return true;
+            }
+            return false;
+        });
+
         loadHaushaltDaten();
 
-        // Normaler Click: Mitglieder anzeigen
+        // Click: Mitglieder anzeigen
         haushaltListView.setOnItemClickListener((parent, view, position, id) -> {
             selectedHausId = haushaltIds.get(position);
             ladeMitglieder(selectedHausId);
         });
 
-        // Long-Click: Zur Delete-Activity wechseln
+        // Long-Click: Haushalt bearbeiten/löschen
         haushaltListView.setOnItemLongClickListener((parent, view, position, id) -> {
             String hausId = haushaltIds.get(position);
             Intent intent = new Intent(HaushaltActivity.this, delete_haushalt_Activity.class);
             intent.putExtra("hausId", hausId);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_DELETE_HAUSHALT);  // ✅ Mit Request Code
             return true;
         });
 
+        // Click: Mitglied löschen
+        hList.setOnItemClickListener((parent, view, position, id) -> {
+            String mitgliedName = mitgliederNamen.get(position);
+            Intent intent = new Intent(HaushaltActivity.this, delete_mitglied_Activity.class);
+            intent.putExtra("mitgliedName", mitgliedName);
+            intent.putExtra("hausId", selectedHausId);
+            startActivityForResult(intent, REQUEST_DELETE_USER);  // ✅ Mit Request Code
+        });
+
+        // Floating Button: Menü für Haushalt/User hinzufügen
         hAdd.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(HaushaltActivity.this, v);
             popup.getMenuInflater().inflate(R.menu.add_haushalt, popup.getMenu());
@@ -93,11 +122,11 @@ public class HaushaltActivity extends AppCompatActivity {
                 int itemId = item.getItemId();
                 if (itemId == R.id.add_user) {
                     Intent intent = new Intent(HaushaltActivity.this, AddUserActivity.class);
-                    startActivity(intent);
+                    startActivityForResult(intent, REQUEST_ADD_USER);  // ✅ Mit Request Code
                     return true;
                 } else if (itemId == R.id.add_household) {
                     Intent intent = new Intent(HaushaltActivity.this, AddHaushaltActivity.class);
-                    startActivity(intent);
+                    startActivityForResult(intent, REQUEST_ADD_HAUSHALT);  // ✅ Mit Request Code
                     return true;
                 }
                 return false;
@@ -105,6 +134,34 @@ public class HaushaltActivity extends AppCompatActivity {
 
             popup.show();
         });
+    }
+
+    // ✅ WICHTIG: Auto-Reload nach jeder Änderung
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            android.util.Log.d("HaushaltActivity", "✓ Änderung erkannt - Lade Daten neu");
+
+            // Lade IMMER Haushalte neu
+            loadHaushaltDaten();
+
+            // Bei User-Operationen: Lade auch Mitglieder neu
+            if ((requestCode == REQUEST_ADD_USER || requestCode == REQUEST_DELETE_USER)
+                && selectedHausId != null) {
+                ladeMitglieder(selectedHausId);
+            }
+
+            // Bei Haushalt-Löschung: Lösche Mitglieder-Liste
+            if (requestCode == REQUEST_DELETE_HAUSHALT) {
+                selectedHausId = null;
+                mitgliederNamen.clear();
+                adapter.notifyDataSetChanged();
+            }
+
+            Toast.makeText(this, "Daten aktualisiert", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -121,45 +178,36 @@ public class HaushaltActivity extends AppCompatActivity {
 
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        db.getReference().child("Hauser").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                haushaltIds.clear();
-                haushaltNamen.clear();
+        db.getReference().child("Hauser")
+            .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    haushaltIds.clear();
+                    haushaltNamen.clear();
 
-                for (DataSnapshot haushaltSnapshot : snapshot.getChildren()) {
-                    DataSnapshot mitgliederSnapshot = haushaltSnapshot.child("mitgliederIds");
+                    for (DataSnapshot hausSnapshot : snapshot.getChildren()) {
+                        String hausId = hausSnapshot.getKey();
+                        DataSnapshot mitgliederSnapshot = hausSnapshot.child("mitgliederIds");
 
-                    for (DataSnapshot mitgliedSnapshot : mitgliederSnapshot.getChildren()) {
-                        String mitgliedId = mitgliedSnapshot.getValue(String.class);
-
-                        if (userId.equals(mitgliedId)) {
-                            String haushaltId = haushaltSnapshot.getKey();
-                            String haushaltName = haushaltSnapshot.child("name").getValue(String.class);
-
-                            haushaltIds.add(haushaltId);
-                            haushaltNamen.add(haushaltName != null ? haushaltName : "Unbenannt");
-                            break;
+                        if (mitgliederSnapshot.hasChild(userId)) {
+                            String hausName = hausSnapshot.child("name").getValue(String.class);
+                            if (hausName != null) {
+                                haushaltIds.add(hausId);
+                                haushaltNamen.add(hausName);
+                            }
                         }
                     }
+
+                    haushaltAdapter.notifyDataSetChanged();
+                    android.util.Log.d("HaushaltActivity", "✓ " + haushaltIds.size() + " Haushalte geladen");
                 }
 
-                haushaltAdapter.notifyDataSetChanged();
-
-                if (haushaltIds.isEmpty()) {
-                    mitgliederNamen.clear();
-                    adapter.notifyDataSetChanged();
-                } else if (!haushaltIds.isEmpty() && selectedHausId == null) {
-                    selectedHausId = haushaltIds.get(0);
-                    ladeMitglieder(selectedHausId);
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(HaushaltActivity.this,
+                        "Fehler beim Laden der Haushalte", Toast.LENGTH_SHORT).show();
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(HaushaltActivity.this, "Fehler beim Laden", Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
     }
 
     private void ladeMitglieder(String haushaltId) {
@@ -171,10 +219,21 @@ public class HaushaltActivity extends AppCompatActivity {
             .addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for (DataSnapshot mitgliedSnapshot : snapshot.getChildren()) {
-                        String mitgliedId = mitgliedSnapshot.getValue(String.class);
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        String mitgliedId;
 
-                        if (mitgliedId == null || geladeneIds.contains(mitgliedId)) continue;
+                        Object value = child.getValue();
+                        if (value instanceof String) {
+                            mitgliedId = (String) value;
+                        } else if (value instanceof Boolean && (Boolean) value) {
+                            mitgliedId = child.getKey();
+                        } else {
+                            continue;
+                        }
+
+                        if (mitgliedId == null || geladeneIds.contains(mitgliedId)) {
+                            continue;
+                        }
 
                         geladeneIds.add(mitgliedId);
 
@@ -190,14 +249,20 @@ public class HaushaltActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onCancelled(@NonNull DatabaseError error) {}
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    android.util.Log.e("HaushaltActivity",
+                                        "Fehler beim Laden des Benutzers: " + error.getMessage());
+                                }
                             });
                     }
+
+                    android.util.Log.d("HaushaltActivity", "✓ " + mitgliederNamen.size() + " Mitglieder geladen");
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(HaushaltActivity.this, "Fehler beim Laden der Mitglieder", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HaushaltActivity.this,
+                        "Fehler beim Laden der Mitglieder", Toast.LENGTH_SHORT).show();
                 }
             });
     }

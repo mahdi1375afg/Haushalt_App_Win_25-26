@@ -1,15 +1,14 @@
-package com.example.haushalt_app_java;
+package com.example.haushalt_app_java.haushalt_activity;
 
 import android.os.Bundle;
 import android.widget.Button;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.view.View;
-
+import com.example.haushalt_app_java.R;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import android.content.Intent;
@@ -28,7 +27,6 @@ public class delete_haushalt_Activity extends AppCompatActivity {
     private ImageView back_button;
     private EditText neu_name;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,52 +41,67 @@ public class delete_haushalt_Activity extends AppCompatActivity {
         nein_button = findViewById(R.id.nein_button);
         ja_button = findViewById(R.id.ja_button);
         back_button = findViewById(R.id.back_haus);
-        back_button.setOnClickListener(v -> finish());
         neu_name = findViewById(R.id.neu_name);
+
+        back_button.setOnClickListener(v -> finish());
 
         db = FirebaseDatabase.getInstance(DB_URL);
 
         Intent intent = getIntent();
-        if(intent == null || !intent.hasExtra("hausId")) {
-            finish(); // Beende die Aktivität, wenn keine hausId übergeben wurde
+        if (intent == null || !intent.hasExtra("hausId")) {
+            finish();
             return;
         }
 
         hausId = intent.getStringExtra("hausId");
-        hausRef=db.getReference().child("Hauser").child(hausId);
+        hausRef = db.getReference().child("Hauser").child(hausId);
 
+        // JA-Button: Haushalt löschen
         ja_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 hausRef.removeValue()
-                        .addOnSuccessListener(aVoid->{
-                            Toast.makeText(delete_haushalt_Activity.this,"Haushalt gelöscht",Toast.LENGTH_SHORT).show();
-                            setResult(RESULT_OK);
-                            finish();
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(delete_haushalt_Activity.this,"umm, Etwas schief gelaufen",Toast.LENGTH_SHORT).show();
-                            finish();
-                        });
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(delete_haushalt_Activity.this,
+                            "Haushalt gelöscht", Toast.LENGTH_SHORT).show();
 
+                        // ✅ WICHTIG: Signalisiere Erfolg
+                        setResult(RESULT_OK);
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(delete_haushalt_Activity.this,
+                            "Fehler beim Löschen", Toast.LENGTH_SHORT).show();
+                    });
             }
-
         });
+
+        // NEIN-Button: Haushalt umbenennen
         nein_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String name = neu_name.getText().toString().trim();
-                hausRef.child("name").setValue(name)
-                        .addOnSuccessListener(aVoid->{
-                            Toast.makeText(delete_haushalt_Activity.this,"Haushalt erfolgrich aktualiesiert",Toast.LENGTH_SHORT).show();
-                            setResult(RESULT_OK);
-                            finish();
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(delete_haushalt_Activity.this,"umm, Etwas schief gelaufen",Toast.LENGTH_SHORT).show();
-                            finish();
-                        });
+
+                if (name.isEmpty()) {
+                    Toast.makeText(delete_haushalt_Activity.this,
+                        "Bitte Namen eingeben", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                hausRef.child("name").setValue(name);
+                hausRef.child("lowercaseName").setValue(name.toLowerCase())
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(delete_haushalt_Activity.this,
+                            "Haushalt erfolgreich aktualisiert", Toast.LENGTH_SHORT).show();
+
+                        // ✅ WICHTIG: Signalisiere Erfolg
+                        setResult(RESULT_OK);
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(delete_haushalt_Activity.this,
+                            "Fehler beim Aktualisieren", Toast.LENGTH_SHORT).show();
+                    });
             }
         });
     }

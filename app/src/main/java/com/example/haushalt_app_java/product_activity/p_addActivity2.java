@@ -1,5 +1,5 @@
 
-package com.example.haushalt_app_java;
+package com.example.haushalt_app_java.product_activity;
 
 import android.os.Bundle;
 import android.text.InputType;
@@ -11,14 +11,13 @@ import android.content.DialogInterface;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 import android.view.View.OnApplyWindowInsetsListener;
 import androidx.annotation.NonNull;
 import android.view.WindowInsets;
 import android.widget.Toast;
 
+import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.domain.kategorie;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;

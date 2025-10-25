@@ -1,5 +1,5 @@
 
-package com.example.haushalt_app_java;
+package com.example.haushalt_app_java.product_activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -18,19 +17,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.haushalt_app_java.R;
+import com.example.haushalt_app_java.StartActivity;
 import com.example.haushalt_app_java.domain.Produkt;
+import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
-
-import java.util.HashMap;
-import java.util.Map;
 
 import android.util.Log;
 import java.util.ArrayList;
@@ -173,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
+            if (itemId == R.id.nav_products) {
                 return true;
             } else if (itemId == R.id.nav_household) {
                 Intent intent = new Intent(MainActivity.this, HaushaltActivity.class);

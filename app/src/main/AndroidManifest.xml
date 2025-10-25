@@ -12,31 +12,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Haushalt_App_Java">
         <activity
-            android:name=".delete_haushalt_Activity"
+            android:name=".haushalt_activity.delete_mitglied_Activity"
             android:exported="false" />
         <activity
-            android:name=".AddHaushaltActivity"
+            android:name=".haushalt_activity.delete_haushalt_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".haushalt_activity.AddHaushaltActivity"
             android:exported="false"
-            android:parentActivityName=".HaushaltActivity" />
+            android:parentActivityName=".haushalt_activity.HaushaltActivity" />
         <activity
-            android:name=".AddUserActivity"
+            android:name=".haushalt_activity.AddUserActivity"
             android:exported="false"
-            android:parentActivityName=".HaushaltActivity" />
+            android:parentActivityName=".haushalt_activity.HaushaltActivity" />
         <activity
-            android:name=".HaushaltActivity"
+            android:name=".haushalt_activity.HaushaltActivity"
             android:exported="false" />
         <activity
-            android:name=".pUpdateActivity"
+            android:name=".product_activity.pUpdateActivity"
             android:exported="false" />
         <activity
-            android:name=".p_addActivity2"
+            android:name=".product_activity.p_addActivity2"
             android:exported="false" />
         <activity
             android:name=".p_addActivity"
             android:exported="false"
             android:theme="@style/Theme.Haushalt_App_Java" />
         <activity
-            android:name=".MainActivity"
+            android:name=".product_activity.MainActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity2"

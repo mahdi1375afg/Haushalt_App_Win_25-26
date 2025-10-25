@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".delete_haushalt_Activity">
+    tools:context=".haushalt_activity.delete_haushalt_Activity">
 
     <Button
         android:id="@+id/ja_button"
