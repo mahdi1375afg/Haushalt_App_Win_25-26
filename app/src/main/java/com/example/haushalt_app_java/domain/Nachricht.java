@@ -10,7 +10,6 @@ public class Nachricht {
     private Object datum;
 
     public Nachricht() {
-        // Default-Konstruktor für Firebase
     }
 
     public Nachricht(String nachricht_id, String haus_id, String text) {
