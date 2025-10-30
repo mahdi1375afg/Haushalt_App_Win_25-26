@@ -1,8 +1,7 @@
-package com.example.haushalt_app_java.services;
+package com.example.haushalt_app_java.domain;
 
 import android.util.Log;
-import com.example.haushalt_app_java.domain.Einkaufsliste;
-import com.example.haushalt_app_java.domain.Produkt;
+
 import com.google.firebase.database.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

@@ -5,24 +5,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Einkaufsliste {
-
     private String einkaufslist_id;
     private String haus_id;
     private String name;
     private List<Produkt> produkte;
     private Object datum;
+
     public Einkaufsliste() {
+        // Leerer Konstruktor für Firebase
     }
 
     public Einkaufsliste(String einkaufslist_id, String haus_id, String name) {
         this.einkaufslist_id = einkaufslist_id;
         this.haus_id = haus_id;
+        this.name = name;
         this.produkte = new ArrayList<>();
         this.datum = ServerValue.TIMESTAMP;
     }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
 
     public String getEinkaufslist_id() {
         return einkaufslist_id;
@@ -40,7 +39,16 @@ public class Einkaufsliste {
         this.haus_id = haus_id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public List<Produkt> getProdukte() {
+        if (produkte == null) produkte = new ArrayList<>();
         return produkte;
     }
 
@@ -57,15 +65,11 @@ public class Einkaufsliste {
     }
 
     public void addProdukt(Produkt p) {
-        if (produkte == null) {
-            produkte = new ArrayList<>();
-        }
+        if (produkte == null) produkte = new ArrayList<>();
         produkte.add(p);
     }
 
     public void removeProdukt(Produkt p) {
-        if (produkte != null) {
-            produkte.remove(p);
-        }
+        if (produkte != null) produkte.remove(p);
     }
 }
