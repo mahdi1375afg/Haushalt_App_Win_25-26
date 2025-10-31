@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="ux_color_primary">#131641</color>
+    <color name="ux_color_on_primary">#FFFFFF</color>
+    <color name="ux_color_accent">#4E0CD1</color>
+    <color name="ux_color_accent_alt">#EE3DC9</color>
+    <color name="ux_color_surface">#1B1E4A</color>
+    <color name="ux_color_on_surface">#FFFFFF</color>
+    <color name="ux_color_outline">#36406F</color>
+    <color name="ux_color_positive">#3DD17A</color>
+    <color name="ux_color_warning">#FFC83D</color>
+    <color name="ux_color_critical">#FF507A</color>
+    <color name="ux_color_empty_bg">#F7E1B3</color>
 </resources>

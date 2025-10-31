@@ -1,52 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="24dp"
+    android:background="@color/ux_color_primary"
     tools:context=".haushalt_activity.AddUserActivity">
 
-    <Button
-        android:id="@+id/add_user"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="84dp"
-        android:text="Nutzer hinzufügen"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <EditText
-        android:id="@+id/name_input"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:ems="10"
-        android:hint="Name"
-        android:inputType="text"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:text="Nutzername:"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Zurück-Button -->
     <ImageView
         android:id="@+id/back_button"
-        android:layout_width="53dp"
-        android:layout_height="79dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:contentDescription="Zurück"
+        android:clickable="true"
+        android:focusable="true"
+        app:tint="@color/ux_color_on_primary"
+        app:srcCompat="@drawable/outline_arrow_back_24"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/outline_arrow_back_24" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Überschrift -->
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Nutzername:"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/ux_color_on_surface"
+        app:layout_constraintTop_toBottomOf="@id/back_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Eingabefeld -->
+    <EditText
+        android:id="@+id/name_input"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Name"
+        android:inputType="textCapWords|textPersonName"
+        android:importantForAutofill="yes"
+        android:autofillHints="name"
+        android:textColor="@color/ux_color_on_surface"
+        android:textColorHint="@color/ux_color_outline"
+        android:backgroundTint="@color/ux_color_outline"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/textView8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/add_user"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="32dp"
+        android:text="Nutzer hinzufügen"
+        android:textAllCaps="false"
+        android:minHeight="48dp"
+        android:textColor="@color/ux_color_on_primary"
+        app:backgroundTint="@color/ux_color_accent"
+        app:cornerRadius="12dp"
+        app:rippleColor="@color/ux_color_on_primary"
+        app:layout_constraintTop_toBottomOf="@id/name_input"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
