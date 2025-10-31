@@ -1,69 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/ux_color_primary"
+    android:padding="24dp"
     tools:context=".haushalt_activity.delete_haushalt_Activity">
 
-    <Button
-        android:id="@+id/ja_button"
-        android:layout_width="152dp"
-        android:layout_height="83dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginBottom="56dp"
-        android:text="löschen"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/nein_button"
-        android:layout_width="152dp"
-        android:layout_height="83dp"
-        android:layout_marginBottom="56dp"
-        android:text="aktualisieren"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.556"
-        app:layout_constraintStart_toEndOf="@+id/ja_button" />
-
-    <TextView
-        android:id="@+id/delteView"
-        android:layout_width="281dp"
-        android:layout_height="105dp"
-        android:text="Bitte geben Sie neue Haushaltsnamen ein:"
-        android:textSize="27sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.282" />
-
-    <EditText
-        android:id="@+id/neu_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="73dp"
-        android:layout_marginBottom="192dp"
-        android:ems="10"
-        android:inputType="text"
-        android:hint="Neuer Haushaltsname"
-        app:layout_constraintBottom_toTopOf="@+id/nein_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/delteView"
-        app:layout_constraintVertical_bias="0.562" />
-
+    <!-- Zurück-Button -->
     <ImageView
         android:id="@+id/back_haus"
-        android:layout_width="53dp"
-        android:layout_height="79dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:contentDescription="Zurück"
+        android:clickable="true"
+        android:focusable="true"
+        app:tint="@color/ux_color_on_primary"
+        app:srcCompat="@drawable/outline_arrow_back_24"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/outline_arrow_back_24" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Titel / Anweisung -->
+    <TextView
+        android:id="@+id/delteView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Bitte geben Sie den neuen Haushaltsnamen ein:"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:lineSpacingExtra="2dp"
+        android:textColor="@color/ux_color_on_surface"
+        app:layout_constraintTop_toBottomOf="@id/back_haus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Eingabefeld -->
+    <EditText
+        android:id="@+id/neu_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="Neuer Haushaltsname"
+        android:inputType="textCapWords|textPersonName"
+        android:importantForAutofill="yes"
+        android:autofillHints="name"
+        android:textColor="@color/ux_color_on_surface"
+        android:textColorHint="@color/ux_color_outline"
+        android:backgroundTint="@color/ux_color_outline"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/delteView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Buttons nebeneinander -->
+    <LinearLayout
+        android:id="@+id/button_row"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="2"
+        app:layout_constraintTop_toBottomOf="@id/neu_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ja_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Löschen"
+            android:textAllCaps="false"
+            android:minHeight="48dp"
+            android:textColor="@color/ux_color_on_primary"
+            app:backgroundTint="@color/ux_color_critical"
+            app:cornerRadius="12dp"
+            app:rippleColor="@color/ux_color_on_primary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/nein_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Aktualisieren"
+            android:textAllCaps="false"
+            android:minHeight="48dp"
+            android:textColor="@color/ux_color_on_primary"
+            app:backgroundTint="@color/ux_color_accent"
+            app:cornerRadius="12dp"
+            app:rippleColor="@color/ux_color_on_primary" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
