@@ -1,14 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ux_color_primary">#131641</color>
-    <color name="ux_color_on_primary">#FFFFFF</color>
-    <color name="ux_color_accent">#4E0CD1</color>
-    <color name="ux_color_accent_alt">#EE3DC9</color>
-    <color name="ux_color_surface">#1B1E4A</color>
-    <color name="ux_color_on_surface">#FFFFFF</color>
-    <color name="ux_color_outline">#36406F</color>
+    <!-- App Grundfarben (Dark Theme freundlich) -->
+    <color name="ux_color_primary">#131641</color>         <!-- dunkelblaues Primary -->
+    <color name="ux_color_on_primary">#FFFFFFFF</color>    <!-- Text/Icon auf Primary -->
+
+    <color name="ux_color_surface">#1B1E4A</color>         <!-- Karten/Flächen -->
+    <color name="ux_color_on_surface">#FFFFFFFF</color>    <!-- Text/Icon auf Surface -->
+    <color name="ux_color_outline">#36406F</color>         <!-- Rahmen/Divider -->
+
+    <color name="ux_color_accent">#4E60D1</color>          <!-- Interaktion/CTA -->
+    <color name="ux_color_accent_alt">#EE3DC9</color>      <!-- Sekundärer Akzent -->
+
+    <!-- Statusfarben -->
     <color name="ux_color_positive">#3DD17A</color>
     <color name="ux_color_warning">#FFC83D</color>
     <color name="ux_color_critical">#FF507A</color>
+
+    <!-- Hilfsfarbe (leere States) -->
     <color name="ux_color_empty_bg">#F7E1B3</color>
 </resources>
