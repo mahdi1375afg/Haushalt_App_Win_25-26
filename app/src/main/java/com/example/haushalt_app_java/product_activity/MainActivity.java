@@ -21,6 +21,7 @@ import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
 import com.example.haushalt_app_java.domain.Produkt;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
+import com.example.haushalt_app_java.profile.profile_Activity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -177,6 +178,12 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, HaushaltActivity.class);
                 startActivity(intent);
                 return true;
+            }
+            else if (itemId == R.id.nav_profile) {
+                Intent intent = new Intent(MainActivity.this, profile_Activity.class);
+                startActivity(intent);
+                return true;
+
             }
             return false;
         });

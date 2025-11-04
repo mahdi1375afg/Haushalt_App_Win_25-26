@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.product_activity.MainActivity;
+import com.example.haushalt_app_java.profile.profile_Activity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -83,6 +84,11 @@ public class HaushaltActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_products) {
                 startActivity(new Intent(HaushaltActivity.this, MainActivity.class));
                 return true;
+            } else if (itemId == R.id.nav_profile) {
+                Intent intent = new Intent(HaushaltActivity.this, profile_Activity.class);
+                startActivity(intent);
+                return true;
+
             }
             return false;
         });

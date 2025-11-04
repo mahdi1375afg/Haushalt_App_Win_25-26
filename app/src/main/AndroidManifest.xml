@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Haushalt_App_Java">
         <activity
+            android:name=".profile.profile_update_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".profile.profile_Activity"
+            android:exported="false" />
+        <activity
             android:name=".haushalt_activity.delete_mitglied_Activity"
             android:exported="false" />
         <activity
