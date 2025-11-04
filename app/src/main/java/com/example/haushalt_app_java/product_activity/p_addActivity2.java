@@ -74,6 +74,12 @@ public class p_addActivity2 extends AppCompatActivity {
         pKategorie.setFocusable(false);
         pKategorie.setClickable(true);
 
+        Abbrechen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         pKategorie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

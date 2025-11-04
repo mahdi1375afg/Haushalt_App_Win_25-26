@@ -12,4 +12,9 @@
         android:id="@+id/nav_household"
         android:icon="@drawable/haushalt"
         android:title="Haushalt" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/profile"
+        android:title="Konto" />
 </menu>
