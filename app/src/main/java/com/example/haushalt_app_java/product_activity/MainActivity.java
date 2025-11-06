@@ -46,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton pAddScreen;
     private ListView listView;
     private ArrayList<Produkt> produkten = new ArrayList<>();
+
+    private boolean lowStockDialogShown = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -153,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
                             items.add(txt);
                         }
                         adapter.notifyDataSetChanged();
+                        new android.os.Handler().postDelayed(() -> checkAndShowLowStockDialog(), 400);
                     }
 
                     @Override
@@ -187,9 +191,58 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
-
-
-
-
     }
+    private void checkAndShowLowStockDialog() {
+        if (lowStockDialogShown) return;
+        if (produkten == null || produkten.isEmpty()) return;
+
+        ArrayList<Produkt> low = new ArrayList<>();
+        for (Produkt p : produkten) {
+            if (p == null) continue;
+
+            int menge = 0;
+            int mind = 0;
+            try {
+                menge = Integer.parseInt(String.valueOf(p.getMenge()));
+                mind = Integer.parseInt(String.valueOf(p.getMindBestand()));
+            } catch (NumberFormatException e) {
+                Log.w("MainActivity", "Ungültige Zahlenwerte bei Produkt: " + p.getName());
+            }
+
+            if (mind > 0 && menge < mind) {
+                low.add(p);
+            }
+        }
+        String[] items = new String[low.size()];
+        for (int i = 0; i < low.size(); i++) {
+            Produkt p = low.get(i);
+            String name = (p.getName() != null) ? p.getName() : "(Ohne Name)";
+            String einheit = (p.getEinheit() != null) ? p.getEinheit() : "";
+            items[i] = name + " — " + p.getMenge() + " " + einheit + "  (min. " + p.getMindBestand() + ")";
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
+                .setTitle("Unter Mindestbestand")
+                .setMessage("Diese Produkte sind unter dem Mindestbestand:")
+                .setItems(items, null)
+                .setPositiveButton("Einkaufsliste erstellen", (d, which) -> {
+                    if (currentHausId == null || currentHausId.isEmpty()) {
+                        android.widget.Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService svc =
+                            new com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService();
+
+                    svc.automatischErstelleEinkaufsliste(
+                            currentHausId,
+                            () -> android.widget.Toast.makeText(MainActivity.this, "Einkaufsliste erstellt", android.widget.Toast.LENGTH_SHORT).show(),
+                            () -> android.widget.Toast.makeText(MainActivity.this, "Fehler beim Erstellen", android.widget.Toast.LENGTH_SHORT).show()
+                    );
+                })
+                .setNegativeButton("Später", null)
+                .show();
+
+        lowStockDialogShown = true;
+    }
+
 }
