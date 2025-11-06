@@ -47,6 +47,10 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".DatabaseChangeService"
+            android:exported="false" />
+
     </application>
 
 

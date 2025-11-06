@@ -1,4 +1,3 @@
-
 package com.example.haushalt_app_java;
 
 import android.content.Intent;
@@ -17,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import android.util.Log;
 
 import com.example.haushalt_app_java.domain.Produkt;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -59,6 +59,12 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        Log.d("MainActivity", "onCreate called");
+
+
+        // Start the DatabaseChangeService
+        startService(new Intent(this, DatabaseChangeService.class));
 
         // Firebase DB korrekt initialisieren (Region!)
         database = FirebaseDatabase.getInstance(DB_URL);
