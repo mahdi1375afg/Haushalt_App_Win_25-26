@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.domain.Haushalt;
+import com.example.haushalt_app_java.haushalt_activity.AddHaushaltActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -60,6 +61,11 @@ public class Haushalt_Auswahl_Produkt_Activity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     haushalte.clear();
 
+                    if (!snapshot.exists() || snapshot.getChildrenCount() == 0) {
+                        zeigeKeinHaushaltDialog();
+                        return;
+                    }
+
 
                     for (DataSnapshot hausIdSnapshot : snapshot.getChildren()) {
                         String hausId = hausIdSnapshot.getKey();
@@ -90,6 +96,31 @@ public class Haushalt_Auswahl_Produkt_Activity extends AppCompatActivity {
                         "Fehler beim Laden", Toast.LENGTH_SHORT).show();
                 }
             });
+
+    }
+    private void zeigeKeinHaushaltDialog() {
+        // Activity-Hintergrund auf die Farbe setzen
+        findViewById(android.R.id.content).setBackgroundColor(getResources().getColor(R.color.ux_color_primary));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Kein Haushalt")
+                .setMessage("Du bist keinem Haushalt zugewiesen. Möchtest du einen erstellen?")
+                .setPositiveButton("Erstellen", (d, which) -> {
+                    startActivity(new Intent(this, AddHaushaltActivity.class));
+                    finish();
+
+                })
+                .setNegativeButton("Abbrechen", (d, which) -> finish())
+                .setCancelable(false)
+                .create();
+
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                new android.graphics.drawable.ColorDrawable(getResources().getColor(R.color.ux_color_primary))
+            );
+        }
     }
 
 }
