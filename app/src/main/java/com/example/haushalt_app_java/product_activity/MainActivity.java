@@ -1,4 +1,5 @@
-package com.example.haushalt_app_java;
+
+package com.example.haushalt_app_java.product_activity;
 
 import android.content.Intent;
 import android.os.Build;
@@ -7,7 +8,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -19,19 +19,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.haushalt_app_java.R;
+import com.example.haushalt_app_java.StartActivity;
 import com.example.haushalt_app_java.domain.Produkt;
+import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
+import com.example.haushalt_app_java.profile.profile_Activity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
-
-import java.util.HashMap;
-import java.util.Map;
 
 import android.util.Log;
 import java.util.ArrayList;
@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton pAddScreen;
     private ListView listView;
     private ArrayList<Produkt> produkten = new ArrayList<>();
+
+    private boolean lowStockDialogShown = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -159,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
                             items.add(txt);
                         }
                         adapter.notifyDataSetChanged();
+                        new android.os.Handler().postDelayed(() -> checkAndShowLowStockDialog(), 400);
                     }
 
                     @Override
@@ -178,18 +182,73 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
+            if (itemId == R.id.nav_products) {
                 return true;
             } else if (itemId == R.id.nav_household) {
                 Intent intent = new Intent(MainActivity.this, HaushaltActivity.class);
                 startActivity(intent);
                 return true;
             }
+            else if (itemId == R.id.nav_profile) {
+                Intent intent = new Intent(MainActivity.this, profile_Activity.class);
+                startActivity(intent);
+                return true;
+
+            }
             return false;
         });
-
-
-
-
     }
+    private void checkAndShowLowStockDialog() {
+        if (lowStockDialogShown) return;
+        if (produkten == null || produkten.isEmpty()) return;
+
+        ArrayList<Produkt> low = new ArrayList<>();
+        for (Produkt p : produkten) {
+            if (p == null) continue;
+
+            int menge = 0;
+            int mind = 0;
+            try {
+                menge = Integer.parseInt(String.valueOf(p.getMenge()));
+                mind = Integer.parseInt(String.valueOf(p.getMindBestand()));
+            } catch (NumberFormatException e) {
+                Log.w("MainActivity", "Ungültige Zahlenwerte bei Produkt: " + p.getName());
+            }
+
+            if (mind > 0 && menge < mind) {
+                low.add(p);
+            }
+        }
+        String[] items = new String[low.size()];
+        for (int i = 0; i < low.size(); i++) {
+            Produkt p = low.get(i);
+            String name = (p.getName() != null) ? p.getName() : "(Ohne Name)";
+            String einheit = (p.getEinheit() != null) ? p.getEinheit() : "";
+            items[i] = name + " — " + p.getMenge() + " " + einheit + "  (min. " + p.getMindBestand() + ")";
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
+                .setTitle("Unter Mindestbestand")
+                .setMessage("Diese Produkte sind unter dem Mindestbestand:")
+                .setItems(items, null)
+                .setPositiveButton("Einkaufsliste erstellen", (d, which) -> {
+                    if (currentHausId == null || currentHausId.isEmpty()) {
+                        android.widget.Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", android.widget.Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService svc =
+                            new com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService();
+
+                    svc.automatischErstelleEinkaufsliste(
+                            currentHausId,
+                            () -> android.widget.Toast.makeText(MainActivity.this, "Einkaufsliste erstellt", android.widget.Toast.LENGTH_SHORT).show(),
+                            () -> android.widget.Toast.makeText(MainActivity.this, "Fehler beim Erstellen", android.widget.Toast.LENGTH_SHORT).show()
+                    );
+                })
+                .setNegativeButton("Später", null)
+                .show();
+
+        lowStockDialogShown = true;
+    }
+
 }

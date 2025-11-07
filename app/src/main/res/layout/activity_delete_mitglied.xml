@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ux_color_primary"
+    android:padding="24dp"
+    tools:context=".haushalt_activity.delete_mitglied_Activity">
+
+    <!-- Frage -->
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="Möchten Sie dieses Mitglied wirklich löschen?"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:lineSpacingExtra="2dp"
+        android:textColor="@color/ux_color_on_surface"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Buttons nebeneinander -->
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="2"
+        app:layout_constraintTop_toBottomOf="@id/textView9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- JA-Button (Löschen) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/delete_mitglied_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Ja"
+            android:textAllCaps="false"
+            android:minHeight="48dp"
+            android:textColor="@color/ux_color_on_primary"
+            app:backgroundTint="@color/ux_color_critical"
+            app:cornerRadius="12dp"
+            app:rippleColor="@color/ux_color_on_primary" />
+
+        <!-- NEIN-Button (Abbrechen) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancel_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Nein"
+            android:textAllCaps="false"
+            android:minHeight="48dp"
+            android:textColor="@color/ux_color_on_primary"
+            app:backgroundTint="@color/ux_color_accent"
+            app:cornerRadius="12dp"
+            app:rippleColor="@color/ux_color_on_primary" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

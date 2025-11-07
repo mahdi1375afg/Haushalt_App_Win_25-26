@@ -1,7 +1,17 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Haushalt_App_Java" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
-    </style>
+<resources>
+    <color name="ux_color_primary">#FFFFFFFF</color>
+    <color name="ux_color_on_primary">#FFFFFFFF</color>
+
+    <color name="ux_color_surface">#15183D</color>
+    <color name="ux_color_on_surface">#FFFFFFFF</color>
+    <color name="ux_color_outline">#2B3363</color>
+
+    <color name="ux_color_accent">#5C6BF0</color>
+    <color name="ux_color_accent_alt">#FF5AD6</color>
+
+    <color name="ux_color_positive">#35C56F</color>
+    <color name="ux_color_warning">#FFCA55</color>
+    <color name="ux_color_critical">#FF5C8F</color>
+
+    <color name="ux_color_empty_bg">#2B2E59</color>
 </resources>

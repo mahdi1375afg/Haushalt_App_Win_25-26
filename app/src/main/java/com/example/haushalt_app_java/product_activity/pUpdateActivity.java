@@ -1,4 +1,4 @@
-package com.example.haushalt_app_java;
+package com.example.haushalt_app_java.product_activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -6,10 +6,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.haushalt_app_java.domain.Produkt;
+import com.example.haushalt_app_java.R;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
