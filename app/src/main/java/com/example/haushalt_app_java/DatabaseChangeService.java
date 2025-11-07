@@ -1,5 +1,6 @@
 package com.example.haushalt_app_java;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -7,6 +8,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -18,6 +20,7 @@ public class DatabaseChangeService extends Service {
 
     private static final String TAG = "DatabaseChangeService";
     private static final String DB_URL = "https://haushalt-app-68451-default-rtdb.europe-west1.firebasedatabase.app";
+    private static final int FOREGROUND_SERVICE_ID = 1;
     private DatabaseReference databaseReference;
     private ValueEventListener valueEventListener;
     private boolean isFirstDataChange = true;
@@ -25,8 +28,7 @@ public class DatabaseChangeService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        // For performance, it's better to listen to a more specific path than the root.
-        databaseReference = FirebaseDatabase.getInstance(DB_URL).getReference("Benutzer");
+        databaseReference = FirebaseDatabase.getInstance(DB_URL).getReference();
         Log.d(TAG, "Service created.");
         setupValueEventListener();
     }
@@ -34,8 +36,21 @@ public class DatabaseChangeService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "Service started.");
+
+        Notification notification = createNotification();
+        startForeground(FOREGROUND_SERVICE_ID, notification);
+
         databaseReference.addValueEventListener(valueEventListener);
         return START_STICKY;
+    }
+
+    private Notification createNotification() {
+        return new NotificationCompat.Builder(this, ApplicationState.CHANNEL_ID)
+                .setContentTitle("Database Sync Active")
+                .setContentText("Listening for database changes in the background.")
+                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build();
     }
 
     private void setupValueEventListener() {

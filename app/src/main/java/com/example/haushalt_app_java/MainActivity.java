@@ -1,6 +1,7 @@
 package com.example.haushalt_app_java;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,10 +14,10 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import android.util.Log;
 
 import com.example.haushalt_app_java.domain.Produkt;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -60,11 +61,9 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        Log.d("MainActivity", "onCreate called");
-
-
-        // Start the DatabaseChangeService
-        startService(new Intent(this, DatabaseChangeService.class));
+        // Start the DatabaseChangeService as a foreground service
+        Intent serviceIntent = new Intent(this, DatabaseChangeService.class);
+        ContextCompat.startForegroundService(this, serviceIntent);
 
         // Firebase DB korrekt initialisieren (Region!)
         database = FirebaseDatabase.getInstance(DB_URL);
