@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean lowStockDialogShown = false;
 
+    private Button switchHousehold;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +79,13 @@ public class MainActivity extends AppCompatActivity {
         logout = findViewById(R.id.logout);
         pAddScreen = findViewById(R.id.pAddScreen);
         listView = findViewById(R.id.listViewp);
+        switchHousehold = findViewById(R.id.switchHousehold);
+
+        switchHousehold.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, Haushalt_Auswahl_Produkt_Activity.class);
+            startActivity(intent);
+            finish();
+        });
 
         pAddScreen.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, p_addActivity2.class);

@@ -11,21 +11,24 @@
     tools:context=".product_activity.MainActivity">
 
     <!-- Produktliste -->
+
+    <!-- Logout-Button (ID beibehalten, nur Styling) -->
     <ListView
         android:id="@+id/listViewp"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="377dp"
+        android:layout_height="545dp"
         android:background="@color/ux_color_surface"
         android:divider="@color/ux_color_outline"
         android:dividerHeight="1dp"
         android:padding="8dp"
-        tools:listitem="@android:layout/simple_list_item_1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation" />
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.048"
+        tools:listitem="@android:layout/simple_list_item_1" />
 
-    <!-- Logout-Button (ID beibehalten, nur Styling) -->
     <Button
         android:id="@+id/logout"
         android:layout_width="wrap_content"
@@ -42,21 +45,23 @@
         android:layout_marginStart="8dp"
         android:layout_marginBottom="16dp" />
 
+
+
     <!-- FAB zum Hinzufügen (ID beibehalten) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/pAddScreen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:contentDescription="Produkt hinzufügen"
-        app:srcCompat="@android:drawable/ic_input_add"
         app:backgroundTint="@color/ux_color_accent"
-        app:tint="@color/ux_color_on_primary"
-        app:elevation="8dp"
         app:borderWidth="0dp"
+        app:elevation="8dp"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp" />
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:tint="@color/ux_color_on_primary" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -66,10 +71,22 @@
         android:background="@color/ux_color_surface"
         app:itemIconTint="@color/selector_bottom_nav"
         app:itemTextColor="@color/selector_bottom_nav"
-        app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="labeled"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
+
+    <Button
+        android:id="@+id/switchHousehold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        android:text="Haushalt wechseln"
+        app:backgroundTint="@color/ux_color_outline"
+        app:rippleColor="@color/ux_color_on_primary"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintEnd_toStartOf="@+id/pAddScreen" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
