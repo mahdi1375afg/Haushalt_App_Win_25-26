@@ -1,6 +1,8 @@
 
 package com.example.haushalt_app_java.product_activity;
 
+import static com.google.android.gms.common.internal.Objects.equal;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String DB_URL = "https://haushalt-app-68451-default-rtdb.europe-west1.firebasedatabase.app";
     private static final int REQ_UPDATE = 1001;
     private Button logout;
-    private String currentHausId = null;
+    private String currentHausId = "haus_undefined";
 
     private FirebaseDatabase database;// zentrale, regionsspezifische Instanz
     private FloatingActionButton pAddScreen;
@@ -51,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        //by default activity
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -62,22 +62,28 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Firebase DB korrekt initialisieren (Region!)
         database = FirebaseDatabase.getInstance(DB_URL);
 
-        // UI-Elemente binden
+        // ✅ Hole haus_id aus Intent
+        currentHausId = getIntent().getStringExtra("haus_id");
+
+        if (currentHausId == null) {
+            Toast.makeText(this, "Bitte wähle einen Haushalt", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, Haushalt_Auswahl_Produkt_Activity.class));
+            finish();
+            return;
+        }
+
         logout = findViewById(R.id.logout);
         pAddScreen = findViewById(R.id.pAddScreen);
         listView = findViewById(R.id.listViewp);
 
-        // Add Produkt Screen öffnen
         pAddScreen.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, p_addActivity2.class);
+            intent.putExtra("haus_id", currentHausId); // ✅ Übergebe hausId
             startActivity(intent);
         });
 
-
-        // Logout Funktionalität
         logout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             Toast.makeText(MainActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
@@ -85,109 +91,75 @@ public class MainActivity extends AppCompatActivity {
             finish();
         });
 
-
-
         ArrayList<String> items = new ArrayList<>();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         listView.setAdapter(adapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (produkten == null || position < 0 || position >= produkten.size()) return;
-                Produkt p = produkten.get(position);
-                if (p == null) return;
-                Log.d("MainActivity", "Öffne Update für Produkt: " + p.getProdukt_id() + " in Haus: " + p.getHaus_id());
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            if (produkten == null || position < 0 || position >= produkten.size()) return;
+            Produkt p = produkten.get(position);
+            if (p == null) return;
 
-                Intent i = new Intent(MainActivity.this, pUpdateActivity.class);
-                i.putExtra("produkt_id", p.getProdukt_id());
-                i.putExtra("haus_id", p.getHaus_id());
-                i.putExtra("name", p.getName());
-                i.putExtra("menge", p.getMenge());
-                i.putExtra("einheit", p.getEinheit());
-                i.putExtra("kategorie", p.getKategorie());
-                i.putExtra("mindBestand", p.getMindBestand());
-                startActivityForResult(i, REQ_UPDATE);
-            }
+            Intent i = new Intent(MainActivity.this, pUpdateActivity.class);
+            i.putExtra("produkt_id", p.getProdukt_id());
+            i.putExtra("haus_id", p.getHaus_id());
+            i.putExtra("name", p.getName());
+            i.putExtra("menge", p.getMenge());
+            i.putExtra("einheit", p.getEinheit());
+            i.putExtra("kategorie", p.getKategorie());
+            i.putExtra("mindBestand", p.getMindBestand());
+            startActivityForResult(i, REQ_UPDATE);
         });
 
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference userRef = database.getReference().child("Benutzer").child(userId);
+        // ✅ Lade direkt Produkte mit der übergebenen hausId
+        DatabaseReference produkteRef = database.getReference()
+            .child("Hauser")
+            .child(currentHausId)
+            .child("produkte");
 
-        //listview von prdukte anzeigen
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        produkteRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    Toast.makeText(MainActivity.this, "Benutzer nicht gefunden", Toast.LENGTH_SHORT).show();
-                    return;
+                items.clear();
+                produkten.clear();
+
+                for (DataSnapshot snap : snapshot.getChildren()) {
+                    Produkt produkt = snap.getValue(Produkt.class);
+                    if (produkt == null) continue;
+
+                    produkt.setProdukt_id(snap.getKey());
+                    produkt.setHaus_id(currentHausId);
+                    produkten.add(produkt);
+
+                    String name = produkt.getName() != null ? produkt.getName() : "";
+                    String einheit = produkt.getEinheit() != null ? produkt.getEinheit() : "";
+                    String kategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
+                    String txt = name + " - " + produkt.getMenge() + " " + einheit + " - " + kategorie;
+                    items.add(txt);
                 }
 
-                currentHausId = snapshot.child("hausId").getValue(String.class);
-                if (currentHausId == null || currentHausId.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                adapter.notifyDataSetChanged();
 
-                // Jetzt Produkte aus dem Haushalt laden
-                DatabaseReference produkteRef = database.getReference()
-                        .child("Hauser")
-                        .child(currentHausId)
-                        .child("produkte");
-
-                produkteRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        items.clear();
-                        produkten.clear();
-
-                        for (DataSnapshot snap : snapshot.getChildren()) {
-                            Produkt produkt = snap.getValue(Produkt.class);
-                            if (produkt == null) continue;
-
-                            produkt.setProdukt_id(snap.getKey());
-                            produkt.setHaus_id(currentHausId);
-                            produkten.add(produkt);
-
-                            String name = produkt.getName() != null ? produkt.getName() : "";
-                            String einheit = produkt.getEinheit() != null ? produkt.getEinheit() : "";
-                            String kategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
-                            String txt = name + " - " + produkt.getMenge() + " " + einheit + " - " + kategorie;
-                            items.add(txt);
-                        }
-                        adapter.notifyDataSetChanged();
-                        new android.os.Handler().postDelayed(() -> checkAndShowLowStockDialog(), 400);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e("MainActivity", "Fehler beim Laden: " + error.getMessage());
-                    }
-                });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MainActivity.this, "Fehler beim Laden", Toast.LENGTH_SHORT).show();
+                Log.e("MainActivity", "Fehler beim Laden: " + error.getMessage());
             }
         });
 
-        // Bottom Navigation Setup
+        // Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_products) {
                 return true;
             } else if (itemId == R.id.nav_household) {
-                Intent intent = new Intent(MainActivity.this, HaushaltActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(MainActivity.this, HaushaltActivity.class));
                 return true;
-            }
-            else if (itemId == R.id.nav_profile) {
-                Intent intent = new Intent(MainActivity.this, profile_Activity.class);
-                startActivity(intent);
+            } else if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(MainActivity.this, profile_Activity.class));
                 return true;
-
             }
             return false;
         });

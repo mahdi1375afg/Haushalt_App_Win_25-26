@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".product_activity.p_addActivity2">
+    tools:context=".product_activity.p_addActivity2"
+    android:background="@color/ux_color_primary">
 
     <Button
         android:id="@+id/btnDelete"

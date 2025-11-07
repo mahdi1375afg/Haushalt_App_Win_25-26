@@ -76,6 +76,10 @@ public class AddHaushaltActivity extends AppCompatActivity {
         neuerHaushaltRef.child("lowercaseName").setValue(name.toLowerCase());
         neuerHaushaltRef.child("mitgliederIds").child(creatorId).setValue(true)
             .addOnSuccessListener(aVoid -> {
+                            // hausId beim Benutzer speichern
+                            db.getReference().child("Benutzer").child(creatorId).child("haushaltId")
+                                    .child(haushaltId).setValue(true);
+
                 ensureUserExists(creatorId, haushaltId);
                 Toast.makeText(AddHaushaltActivity.this,
                     "Haushalt '" + name + "' erstellt!", Toast.LENGTH_SHORT).show();

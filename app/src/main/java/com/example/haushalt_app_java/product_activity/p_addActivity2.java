@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.example.haushalt_app_java.domain.Produkt;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class p_addActivity2 extends AppCompatActivity {
@@ -120,82 +121,74 @@ public class p_addActivity2 extends AppCompatActivity {
         });
 
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String userId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
-                com.google.firebase.database.DatabaseReference userRef = db.getReference().child("Benutzer").child(userId);
+    add.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        // ✅ Hole hausId aus Intent (von MainActivity übergeben)
+        String hausId = getIntent().getStringExtra("haus_id");
 
-                userRef.addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
-                        if (!snapshot.exists()) {
-                            Toast.makeText(p_addActivity2.this, "Benutzer nicht gefunden", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
+        if (hausId == null) {
+            Toast.makeText(p_addActivity2.this,
+                "Fehler: Keine Haushalt-ID übergeben",
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                        String hausId = snapshot.child("hausId").getValue(String.class);
-                        if (hausId == null || hausId.isEmpty()) {
-                            Toast.makeText(p_addActivity2.this, "Kein Haushalt zugewiesen", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
+        String einheit = pEinheit.getText().toString().trim();
+        String name = pName.getText().toString().trim();
+        int menge = 0;
+        int mindBestand = 0;
 
-                        String einheit = pEinheit.getText().toString().trim();
-                        String name = pName.getText().toString().trim();
-                        int menge = 0;
-                        int mindBestand = 0;
-                        try {
-                            String mengeStr = pMenge.getText().toString().trim();
-                            if (!mengeStr.isEmpty()) {
-                                menge = Integer.parseInt(mengeStr);
-                            }
-                            String mindStr = pMindBestand.getText().toString().trim();
-                            if (!mindStr.isEmpty()) {
-                                mindBestand = Integer.parseInt(mindStr);
-                            }
-                        } catch (NumberFormatException e) {
-                            // Fehlerbehandlung
-                        }
-                        String selected = pKategorie.getText().toString().trim();
-                        kategorie kategorieEnum = findKategorieByDisplayName(selected);
-                        String categoryToSave = (kategorieEnum == null) ? null : kategorieEnum.getDisplayName();
-
-                        String produktId = db.getReference().child("Hauser").child(hausId).child("produkte").push().getKey();
-
-                        Produkt produkt = new Produkt(
-                                produktId,
-                                hausId,
-                                name,
-                                menge,
-                                categoryToSave,
-                                mindBestand,
-                                einheit
-                        );
-
-                        db.getReference().child("Hauser").child(hausId).child("produkte").child(produktId)
-                                .setValue(produkt)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Toast.makeText(p_addActivity2.this, "Produkt hinzugefügt", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(p_addActivity2.this, "Fehler: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
-                        Toast.makeText(p_addActivity2.this, "Fehler beim Laden", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        try {
+            String mengeStr = pMenge.getText().toString().trim();
+            if (!mengeStr.isEmpty()) {
+                menge = Integer.parseInt(mengeStr);
             }
-        });
+            String mindStr = pMindBestand.getText().toString().trim();
+            if (!mindStr.isEmpty()) {
+                mindBestand = Integer.parseInt(mindStr);
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(p_addActivity2.this, "Ungültige Zahlen", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String selected = pKategorie.getText().toString().trim();
+        kategorie kategorieEnum = findKategorieByDisplayName(selected);
+        String categoryToSave = (kategorieEnum == null) ? null : kategorieEnum.getDisplayName();
+
+        String produktId = db.getReference()
+            .child("Hauser")
+            .child(hausId)
+            .child("produkte")
+            .push()
+            .getKey();
+
+        Produkt produkt = new Produkt(
+            produktId,
+            hausId,
+            name,
+            menge,
+            categoryToSave,
+            mindBestand,
+            einheit
+        );
+
+        db.getReference()
+            .child("Hauser")
+            .child(hausId)
+            .child("produkte")
+            .child(produktId)
+            .setValue(produkt)
+            .addOnSuccessListener(aVoid -> {
+                Toast.makeText(p_addActivity2.this, "Produkt hinzugefügt", Toast.LENGTH_SHORT).show();
+                finish();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(p_addActivity2.this, "Fehler: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            });
+    }
+});
 
     }
 
