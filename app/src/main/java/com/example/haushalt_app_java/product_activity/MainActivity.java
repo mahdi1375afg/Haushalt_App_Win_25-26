@@ -19,6 +19,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.haushalt_app_java.DatabaseChangeService;
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
 import com.example.haushalt_app_java.domain.Produkt;
