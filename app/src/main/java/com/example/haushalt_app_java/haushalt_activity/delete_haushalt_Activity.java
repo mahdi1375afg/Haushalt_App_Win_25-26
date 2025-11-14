@@ -3,6 +3,7 @@ package com.example.haushalt_app_java.haushalt_activity;
 import android.os.Bundle;
 import android.widget.Button;
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -60,58 +61,45 @@ public class delete_haushalt_Activity extends AppCompatActivity {
         hausId = intent.getStringExtra("hausId");
         hausRef = db.getReference().child("Hauser").child(hausId);
 
-        // JA-Button: Haushalt löschen
+        // ✅ JA-Button: Haushalt löschen
         ja_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference benutzerRef = db.getReference().child("Benutzer");
-
-                // zuerst alle Benutzer-Einträge bereinigen
-                benutzerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                // ✅ Lösche hausId bei ALLEN Mitgliedern
+                hausRef.child("mitgliederIds").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        for (DataSnapshot userSnap : snapshot.getChildren()) {
-                            if (userSnap.child("haushaltId").hasChild(hausId)) {
-                                userSnap.getRef().child("haushaltId").child(hausId).removeValue();
-                            }
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot mitgliedSnap : snapshot.getChildren()) {
+                            String mitgliedId = mitgliedSnap.getKey();
+
+                            // ✅ Entferne hausId beim Benutzer
+                            db.getReference("Benutzer").child(mitgliedId).child("hausId").removeValue();
                         }
 
-                        // danach den Haushalt selbst löschen
+                        // ✅ Lösche den Haushalt selbst
                         hausRef.removeValue()
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(delete_haushalt_Activity.this,
-                                            "Haushalt gelöscht", Toast.LENGTH_SHORT).show();
-
-                                    setResult(RESULT_OK);
-                                    finish();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(delete_haushalt_Activity.this,
-                                            "Fehler beim Löschen", Toast.LENGTH_SHORT).show();
-                                });
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(delete_haushalt_Activity.this,
+                                    "Haushalt gelöscht", Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
+                                finish();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(delete_haushalt_Activity.this,
+                                    "Fehler beim Löschen", Toast.LENGTH_SHORT).show();
+                            });
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError error) {
-                        // Falls das Lesen der Benutzer fehlschlägt, trotzdem versuchen, Haushalt zu löschen
-                        hausRef.removeValue()
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(delete_haushalt_Activity.this,
-                                            "Haushalt gelöscht (Referenzen eventuell nicht entfernt)", Toast.LENGTH_SHORT).show();
-
-                                    setResult(RESULT_OK);
-                                    finish();
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(delete_haushalt_Activity.this,
-                                            "Fehler beim Löschen", Toast.LENGTH_SHORT).show();
-                                });
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(delete_haushalt_Activity.this,
+                            "Fehler beim Laden der Mitglieder", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
 
-        // NEIN-Button: Haushalt umbenennen
+        // ✅ NEIN-Button: Haushalt umbenennen
         nein_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,13 +111,11 @@ public class delete_haushalt_Activity extends AppCompatActivity {
                     return;
                 }
 
-                hausRef.child("name").setValue(name);
-                hausRef.child("lowercaseName").setValue(name.toLowerCase())
+                // ✅ Benenne Haushalt um
+                hausRef.child("name").setValue(name)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(delete_haushalt_Activity.this,
-                            "Haushalt erfolgreich aktualisiert", Toast.LENGTH_SHORT).show();
-
-                        // ✅ WICHTIG: Signalisiere Erfolg
+                            "Name geändert", Toast.LENGTH_SHORT).show();
                         setResult(RESULT_OK);
                         finish();
                     })

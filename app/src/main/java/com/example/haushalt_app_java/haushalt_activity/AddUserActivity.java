@@ -13,8 +13,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddUserActivity extends AppCompatActivity {
 
@@ -23,8 +21,7 @@ public class AddUserActivity extends AppCompatActivity {
     private Button addUserButton;
     private ImageView backButton;
     private FirebaseDatabase database;
-    private List<String> haushaltIds;
-    private List<String> haushaltNamen;
+    private String hausId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,47 +33,20 @@ public class AddUserActivity extends AppCompatActivity {
         backButton = findViewById(R.id.back_button);
         database = FirebaseDatabase.getInstance(DB_URL);
 
-        haushaltIds = new ArrayList<>();
-        haushaltNamen = new ArrayList<>();
+        // ✅ Hole hausId aus Intent
+        hausId = getIntent().getStringExtra("hausId");
+
+        if (hausId == null) {
+            Toast.makeText(this, "Kein Haushalt gefunden", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         backButton.setOnClickListener(v -> finish());
-        loadHaushalte();
-        addUserButton.setOnClickListener(v -> addUserToExistingHaushalt());
+        addUserButton.setOnClickListener(v -> addUserToHaushalt());
     }
 
-    private void loadHaushalte() {
-        database.getReference().child("Hauser")
-            .addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    haushaltIds.clear();
-                    haushaltNamen.clear();
-
-                    for (DataSnapshot hausSnapshot : snapshot.getChildren()) {
-                        String hausId = hausSnapshot.getKey();
-                        String hausName = hausSnapshot.child("name").getValue(String.class);
-
-                        if (hausId != null && hausName != null) {
-                            haushaltIds.add(hausId);
-                            haushaltNamen.add(hausName);
-                        }
-                    }
-
-                    if (haushaltIds.isEmpty()) {
-                        Toast.makeText(AddUserActivity.this,
-                            "Keine Haushalte gefunden", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(AddUserActivity.this,
-                        "Fehler beim Laden der Haushalte", Toast.LENGTH_SHORT).show();
-                }
-            });
-    }
-
-    private void addUserToExistingHaushalt() {
+    private void addUserToHaushalt() {
         String username = editTextUsername.getText().toString().trim();
 
         if (username.isEmpty()) {
@@ -84,14 +54,7 @@ public class AddUserActivity extends AppCompatActivity {
             return;
         }
 
-        if (haushaltIds.isEmpty()) {
-            Toast.makeText(this, "Keine Haushalte verfügbar", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String bestehendeHaushaltId = haushaltIds.get(0);
-        String haushaltName = haushaltNamen.get(0);
-
+        // ✅ Suche Benutzer nach Name
         database.getReference().child("Benutzer")
             .orderByChild("name").equalTo(username)
             .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -106,19 +69,24 @@ public class AddUserActivity extends AppCompatActivity {
                     for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                         String userId = userSnapshot.getKey();
 
-                        DatabaseReference mitgliederRef = database.getReference()
-                            .child("Hauser")
-                            .child(bestehendeHaushaltId)
-                            .child("mitgliederIds")
-                            .child(userId);
+                        // ✅ Prüfe, ob Benutzer bereits Haushalt hat
+                        if (userSnapshot.child("hausId").exists()) {
+                            Toast.makeText(AddUserActivity.this,
+                                "Benutzer ist bereits einem Haushalt zugeordnet",
+                                Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                        mitgliederRef.setValue(true)
+                        // ✅ Füge zu Haushalt hinzu
+                        database.getReference("Hauser").child(hausId)
+                            .child("mitgliederIds").child(userId).setValue(true);
+
+                        // ✅ Setze hausId beim Benutzer
+                        database.getReference("Benutzer").child(userId)
+                            .child("hausId").setValue(hausId)
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(AddUserActivity.this,
                                     username + " wurde hinzugefügt", Toast.LENGTH_SHORT).show();
-                                editTextUsername.setText("");
-
-                                // ✅ WICHTIG: Signalisiere Erfolg
                                 setResult(RESULT_OK);
                                 finish();
                             })

@@ -11,7 +11,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.haushalt_app_java.product_activity.Haushalt_Auswahl_Produkt_Activity;
 import com.example.haushalt_app_java.product_activity.MainActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
@@ -59,7 +58,7 @@ public class LoginActivity2 extends AppCompatActivity {
                     @Override
                     public void onSuccess(AuthResult authResult) {
                         Toast.makeText(LoginActivity2.this, "Login successful", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(LoginActivity2.this, Haushalt_Auswahl_Produkt_Activity.class));
+                        startActivity(new Intent(LoginActivity2.this, MainActivity.class));
                         finish();
                     }
                 });

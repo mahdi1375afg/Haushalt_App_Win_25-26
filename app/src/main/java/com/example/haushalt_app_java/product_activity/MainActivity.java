@@ -1,12 +1,8 @@
-
 package com.example.haushalt_app_java.product_activity;
-
-import static com.google.android.gms.common.internal.Objects.equal;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -25,6 +21,7 @@ import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
 import com.example.haushalt_app_java.domain.Produkt;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.profile.profile_Activity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -33,32 +30,29 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-
-import android.util.Log;
 import java.util.ArrayList;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String DB_URL = "https://haushalt-app-68451-default-rtdb.europe-west1.firebasedatabase.app";
     private static final int REQ_UPDATE = 1001;
-    private Button logout;
-    private String currentHausId = "haus_undefined";
 
-    private FirebaseDatabase database;// zentrale, regionsspezifische Instanz
+    private Button logout;
+    private String currentHausId;
+    private FirebaseDatabase database;
     private FloatingActionButton pAddScreen;
     private ListView listView;
     private ArrayList<Produkt> produkten = new ArrayList<>();
-
+    private ArrayList<String> items = new ArrayList<>();
+    private ArrayAdapter<String> adapter;
     private boolean lowStockDialogShown = false;
-
-    private Button switchHousehold;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -67,35 +61,64 @@ public class MainActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance(DB_URL);
 
-        // ✅ Hole haus_id aus Intent
-        currentHausId = getIntent().getStringExtra("haus_id");
+        // ✅ Lade hausId aus Firebase Realtime Database
+        loadHausIdAndInitialize();
+    }
 
-        if (currentHausId == null) {
-            Toast.makeText(this, "Bitte wähle einen Haushalt", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, Haushalt_Auswahl_Produkt_Activity.class));
-            finish();
-            return;
-        }
+    private void loadHausIdAndInitialize() {
+        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        com.example.haushalt_app_java.utils.HausIdManager.getInstance().setHausId(currentHausId);
+        DatabaseReference benutzerRef = database.getReference()
+            .child("Benutzer")
+            .child(currentUserId)
+            .child("hausId");
 
+        benutzerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    currentHausId = snapshot.getValue(String.class);
+
+                    if (currentHausId == null || currentHausId.isEmpty()) {
+                        Toast.makeText(MainActivity.this, "Bitte wähle einen Haushalt", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(MainActivity.this, HaushaltActivity.class));
+                        finish();
+                        return;
+                    }
+
+                    com.example.haushalt_app_java.utils.HausIdManager.getInstance().setHausId(currentHausId);
+
+                    // ✅ UI initialisieren und Produkte laden
+                    initializeUI();
+                    loadProducts();
+                } else {
+                    Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, HaushaltActivity.class));
+                    finish();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("MainActivity", "Fehler beim Laden der hausId: " + error.getMessage());
+                Toast.makeText(MainActivity.this, "Fehler beim Laden", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void initializeUI() {
         logout = findViewById(R.id.logout);
         pAddScreen = findViewById(R.id.pAddScreen);
         listView = findViewById(R.id.listViewp);
-        switchHousehold = findViewById(R.id.switchHousehold);
 
-        switchHousehold.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, Haushalt_Auswahl_Produkt_Activity.class);
-            startActivity(intent);
-            finish();
-        });
-
+        // FloatingActionButton zum Hinzufügen
         pAddScreen.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, p_addActivity2.class);
-            intent.putExtra("haus_id", currentHausId); // ✅ Übergebe hausId
+            intent.putExtra("haus_id", currentHausId);
             startActivity(intent);
         });
 
+        // Logout Button
         logout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             Toast.makeText(MainActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
@@ -103,10 +126,11 @@ public class MainActivity extends AppCompatActivity {
             finish();
         });
 
-        ArrayList<String> items = new ArrayList<>();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        // ListView Adapter
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         listView.setAdapter(adapter);
 
+        // ListView Item Click
         listView.setOnItemClickListener((parent, view, position, id) -> {
             if (produkten == null || position < 0 || position >= produkten.size()) return;
             Produkt p = produkten.get(position);
@@ -123,7 +147,29 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(i, REQ_UPDATE);
         });
 
-        // ✅ Lade direkt Produkte mit der übergebenen hausId
+        // Bottom Navigation
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_products) {
+                return true;
+            } else if (itemId == R.id.nav_household) {
+                startActivity(new Intent(MainActivity.this, HaushaltActivity.class));
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(MainActivity.this, profile_Activity.class));
+                return true;
+            } else if (itemId == R.id.nav_einkaufslisten) {
+                Intent intent = new Intent(MainActivity.this, EinkaufslistenActivity.class);
+                intent.putExtra("hausId", currentHausId);
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void loadProducts() {
         DatabaseReference produkteRef = database.getReference()
             .child("Hauser")
             .child(currentHausId)
@@ -151,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 adapter.notifyDataSetChanged();
-
+                checkAndShowLowStockDialog();
             }
 
             @Override
@@ -159,28 +205,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("MainActivity", "Fehler beim Laden: " + error.getMessage());
             }
         });
-
-        // Bottom Navigation
-        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_products) {
-                return true;
-            } else if (itemId == R.id.nav_household) {
-                startActivity(new Intent(MainActivity.this, HaushaltActivity.class));
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(MainActivity.this, profile_Activity.class));
-                return true;
-            } else if (itemId == R.id.nav_einkaufslisten) {
-                Intent intent = new Intent(MainActivity.this, EinkaufslistenActivity.class);
-                intent.putExtra("hausId", currentHausId); // hausId übergeben
-                startActivity(intent);
-                return true;
-            }
-            return false;
-        });
     }
+
     private void checkAndShowLowStockDialog() {
         if (lowStockDialogShown) return;
         if (produkten == null || produkten.isEmpty()) return;
@@ -202,6 +228,9 @@ public class MainActivity extends AppCompatActivity {
                 low.add(p);
             }
         }
+
+        if (low.isEmpty()) return;
+
         String[] items = new String[low.size()];
         for (int i = 0; i < low.size(); i++) {
             Produkt p = low.get(i);
@@ -216,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                 .setItems(items, null)
                 .setPositiveButton("Einkaufsliste erstellen", (d, which) -> {
                     if (currentHausId == null || currentHausId.isEmpty()) {
-                        android.widget.Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", android.widget.Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService svc =
@@ -224,8 +253,8 @@ public class MainActivity extends AppCompatActivity {
 
                     svc.automatischErstelleEinkaufsliste(
                             currentHausId,
-                            () -> android.widget.Toast.makeText(MainActivity.this, "Einkaufsliste erstellt", android.widget.Toast.LENGTH_SHORT).show(),
-                            () -> android.widget.Toast.makeText(MainActivity.this, "Fehler beim Erstellen", android.widget.Toast.LENGTH_SHORT).show()
+                            () -> Toast.makeText(MainActivity.this, "Einkaufsliste erstellt", Toast.LENGTH_SHORT).show(),
+                            () -> Toast.makeText(MainActivity.this, "Fehler beim Erstellen", Toast.LENGTH_SHORT).show()
                     );
                 })
                 .setNegativeButton("Später", null)
@@ -233,5 +262,4 @@ public class MainActivity extends AppCompatActivity {
 
         lowStockDialogShown = true;
     }
-
 }

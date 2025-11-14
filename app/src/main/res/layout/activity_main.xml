@@ -77,16 +77,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/bottom_nav_menu" />
 
-    <Button
-        android:id="@+id/switchHousehold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="16dp"
-        android:text="Haushalt wechseln"
-        app:backgroundTint="@color/ux_color_outline"
-        app:rippleColor="@color/ux_color_on_primary"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
-        app:layout_constraintEnd_toStartOf="@+id/pAddScreen" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
