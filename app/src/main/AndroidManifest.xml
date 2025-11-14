@@ -51,6 +51,12 @@
             android:name=".LoginActivity2"
             android:exported="false" />
         <activity
+            android:name=".domain.EinkaufslistenActivity"
+            android:exported="false" />
+        <activity
+            android:name=".domain.EinkaufslisteDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegisterActivity2"
             android:exported="false" />
         <activity

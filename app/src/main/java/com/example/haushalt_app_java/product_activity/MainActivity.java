@@ -21,6 +21,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
+import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
 import com.example.haushalt_app_java.domain.Produkt;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.profile.profile_Activity;
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        com.example.haushalt_app_java.utils.HausIdManager.getInstance().setHausId(currentHausId);
 
         logout = findViewById(R.id.logout);
         pAddScreen = findViewById(R.id.pAddScreen);
@@ -168,6 +171,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.nav_profile) {
                 startActivity(new Intent(MainActivity.this, profile_Activity.class));
+                return true;
+            } else if (itemId == R.id.nav_einkaufslisten) {
+                Intent intent = new Intent(MainActivity.this, EinkaufslistenActivity.class);
+                intent.putExtra("hausId", currentHausId); // hausId übergeben
+                startActivity(intent);
                 return true;
             }
             return false;

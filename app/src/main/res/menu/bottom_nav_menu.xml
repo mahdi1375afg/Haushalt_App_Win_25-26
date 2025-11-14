@@ -14,7 +14,14 @@
         android:title="Haushalt" />
 
     <item
+        android:id="@+id/nav_einkaufslisten"
+        android:icon="@drawable/outline_checklist_24"
+        android:title="Einkaufliste" />
+
+    <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/profile"
         android:title="Konto" />
+
+
 </menu>

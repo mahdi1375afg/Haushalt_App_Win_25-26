@@ -1,5 +1,9 @@
 package com.example.haushalt_app_java.domain;
 
+import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
+import com.example.haushalt_app_java.product_activity.MainActivity;
+import com.example.haushalt_app_java.profile.profile_Activity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,9 +11,6 @@ import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.haushalt_app_java.R;
-import com.example.haushalt_app_java.domain.Einkaufsliste;
-import com.example.haushalt_app_java.domain.EinkaufslisteService;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 
 import java.util.ArrayList;
@@ -40,6 +41,13 @@ public class EinkaufslistenActivity extends AppCompatActivity {
         service = new EinkaufslisteService();
         hausId = getIntent().getStringExtra("hausId");
 
+        // ✅ Null-Check für hausId
+        if (hausId == null || hausId.isEmpty()) {
+            Toast.makeText(this, "Fehler: Keine Haushalt-ID gefunden", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         loadEinkaufslisten();
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
@@ -52,16 +60,50 @@ public class EinkaufslistenActivity extends AppCompatActivity {
 
         listView.setOnItemLongClickListener((parent, view, position, id) -> {
             String listeId = listIds.get(position);
-            service.deleteEinkaufsliste(hausId, listeId,
-                    () -> {
-                        Toast.makeText(this, "Liste gelöscht", Toast.LENGTH_SHORT).show();
-                        loadEinkaufslisten();
-                    },
-                    () -> Toast.makeText(this, "Fehler beim Löschen", Toast.LENGTH_SHORT).show());
+            String listeName = listNames.get(position);
+
+            // ✅ Bestätigungsdialog vor dem Löschen
+            new android.app.AlertDialog.Builder(this)
+                .setTitle("Liste löschen?")
+                .setMessage("Möchten Sie '" + listeName + "' wirklich löschen?")
+                .setPositiveButton("Löschen", (dialog, which) -> {
+                    service.deleteEinkaufsliste(hausId, listeId,
+                        () -> {
+                            Toast.makeText(this, "Liste gelöscht", Toast.LENGTH_SHORT).show();
+                            loadEinkaufslisten();
+                        },
+                        () -> Toast.makeText(this, "Fehler beim Löschen", Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Abbrechen", null)
+                .show();
             return true;
         });
 
         fabAdd.setOnClickListener(v -> showAddDialog());
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_einkaufslisten); // ✅ Aktuellen Tab markieren
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_einkaufslisten) {
+                return true;
+            } else if (itemId == R.id.nav_household) {
+                Intent intent = new Intent(EinkaufslistenActivity.this, HaushaltActivity.class);
+                intent.putExtra("hausId", hausId); // ✅ hausId weitergeben
+                startActivity(intent);
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(EinkaufslistenActivity.this, profile_Activity.class));
+                return true;
+            } else if (itemId == R.id.nav_products) {
+                Intent intent = new Intent(EinkaufslistenActivity.this, MainActivity.class);
+                intent.putExtra("hausId", hausId); // ✅ hausId weitergeben
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        });
     }
 
     private void loadEinkaufslisten() {
@@ -70,11 +112,15 @@ public class EinkaufslistenActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listNames.clear();
                 listIds.clear();
+
+                // ✅ Korrekte Iteration ohne Deserialisierung in Einkaufsliste-Objekt
                 for (DataSnapshot s : snapshot.getChildren()) {
-                    Einkaufsliste liste = s.getValue(Einkaufsliste.class);
-                    if (liste != null) {
-                        listIds.add(liste.getEinkaufslist_id());
-                        listNames.add(liste.getName());
+                    String listeId = s.getKey();
+                    String listeName = s.child("name").getValue(String.class);
+
+                    if (listeId != null && listeName != null) {
+                        listIds.add(listeId);
+                        listNames.add(listeName);
                     }
                 }
                 adapter.notifyDataSetChanged();
@@ -82,26 +128,51 @@ public class EinkaufslistenActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(EinkaufslistenActivity.this, "Fehler beim Laden", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EinkaufslistenActivity.this,
+                    "Fehler beim Laden: " + error.getMessage(),
+                    Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void showAddDialog() {
+        // ✅ Verbesserter Dialog mit Validierung
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 10);
+
         EditText input = new EditText(this);
         input.setHint("Name der Einkaufsliste");
+        layout.addView(input);
 
         new android.app.AlertDialog.Builder(this)
                 .setTitle("Neue Einkaufsliste")
-                .setView(input)
+                .setView(layout)
                 .setPositiveButton("Erstellen", (dialog, which) -> {
                     String name = input.getText().toString().trim();
-                    if (name.isEmpty()) return;
+
+                    // ✅ Validierung
+                    if (name.isEmpty()) {
+                        Toast.makeText(this, "Bitte einen Namen eingeben", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     String id = FirebaseDatabase.getInstance().getReference()
                             .child("Hauser").child(hausId)
                             .child("einkaufslisten").push().getKey();
+
+                    if (id == null) {
+                        Toast.makeText(this, "Fehler beim Erstellen der ID", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     Einkaufsliste neueListe = new Einkaufsliste(id, hausId, name);
-                    service.addEinkaufsliste(neueListe, this::loadEinkaufslisten, null);
+                    service.addEinkaufsliste(neueListe,
+                        () -> {
+                            loadEinkaufslisten();
+                            Toast.makeText(this, "Liste erstellt", Toast.LENGTH_SHORT).show();
+                        },
+                        () -> Toast.makeText(this, "Fehler beim Erstellen", Toast.LENGTH_SHORT).show());
                 })
                 .setNegativeButton("Abbrechen", null)
                 .show();

@@ -11,6 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import com.example.haushalt_app_java.R;
+import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
 import com.example.haushalt_app_java.product_activity.MainActivity;
 import com.example.haushalt_app_java.profile.profile_Activity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -48,6 +49,7 @@ public class HaushaltActivity extends AppCompatActivity {
     private List<String> haushaltNamen;
     private ArrayAdapter<String> haushaltAdapter;
     private String selectedHausId = null;
+    private String currentHausId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,23 +77,43 @@ public class HaushaltActivity extends AppCompatActivity {
         haushaltAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, haushaltNamen);
         haushaltListView.setAdapter(haushaltAdapter);
 
+
+        // ✅ Hole hausId aus Intent oder Manager
+        currentHausId = getIntent().getStringExtra("hausId");
+        if (currentHausId == null) {
+            currentHausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
+        }
+
+        // ✅ Speichere hausId falls noch nicht gesetzt
+        if (currentHausId != null) {
+            com.example.haushalt_app_java.utils.HausIdManager.getInstance().setHausId(currentHausId);
+        }
         // Bottom Navigation
+
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView2);
+        bottomNav.setSelectedItemId(R.id.nav_household);
+
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_household) {
                 return true;
             } else if (itemId == R.id.nav_products) {
-                startActivity(new Intent(HaushaltActivity.this, MainActivity.class));
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                Intent intent = new Intent(HaushaltActivity.this, profile_Activity.class);
+                Intent intent = new Intent(HaushaltActivity.this, MainActivity.class);
+                intent.putExtra("haus_id", currentHausId);
                 startActivity(intent);
                 return true;
-
+            } else if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(HaushaltActivity.this, profile_Activity.class));
+                return true;
+            } else if (itemId == R.id.nav_einkaufslisten) {
+                Intent intent = new Intent(HaushaltActivity.this, EinkaufslistenActivity.class);
+                intent.putExtra("hausId", currentHausId);
+                startActivity(intent);
+                return true;
             }
             return false;
         });
+
 
         loadHaushaltDaten();
 
