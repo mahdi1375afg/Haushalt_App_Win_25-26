@@ -27,6 +27,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import com.example.haushalt_app_java.domain.Nutzer;
 
+import java.util.HashMap;
+
 public class RegisterActivity2 extends AppCompatActivity {
 
     private EditText eamil;
@@ -101,7 +103,7 @@ public class RegisterActivity2 extends AppCompatActivity {
                                          DatabaseReference userRef = FirebaseDatabase.getInstance(DB_URL)
                                              .getReference().child("Benutzer").child(userId);
 
-                                        Nutzer nutzer = new Nutzer(userId, name, null);
+                                        Nutzer nutzer = new Nutzer(userId, name, new HashMap<>());
 
                                         userRef.setValue(nutzer)
                                             .addOnSuccessListener(aVoid -> {

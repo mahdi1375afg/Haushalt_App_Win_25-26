@@ -11,6 +11,7 @@ public class Haushalt {
 
     public Haushalt() {
         // Default-Konstruktor erforderlich für Firebase
+        this.mitgliederIds = new ArrayList<>();
     }
 
     public Haushalt(String haushalt_id, String name, List<String> mitglieder) {

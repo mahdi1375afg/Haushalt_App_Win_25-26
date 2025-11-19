@@ -1,75 +1,33 @@
 package com.example.haushalt_app_java.domain;
 
-import com.google.firebase.database.ServerValue;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Einkaufsliste {
     private String einkaufslist_id;
     private String haus_id;
     private String name;
-    private List<Produkt> produkte;
-    private Object datum;
+    private Map<String, Produkt> produkte;  // ✅ ÄNDERUNG: List → Map
 
-    public Einkaufsliste() {
-        // Leerer Konstruktor für Firebase
-    }
+    public Einkaufsliste() {}
 
     public Einkaufsliste(String einkaufslist_id, String haus_id, String name) {
         this.einkaufslist_id = einkaufslist_id;
         this.haus_id = haus_id;
         this.name = name;
-        this.produkte = new ArrayList<>();
-        this.datum = ServerValue.TIMESTAMP;
+        this.produkte = new HashMap<>();  // ✅ HashMap statt ArrayList
     }
 
-    public String getEinkaufslist_id() {
-        return einkaufslist_id;
-    }
+    // Getter und Setter
+    public String getEinkaufslist_id() { return einkaufslist_id; }
+    public void setEinkaufslist_id(String einkaufslist_id) { this.einkaufslist_id = einkaufslist_id; }
 
-    public void setEinkaufslist_id(String einkaufslist_id) {
-        this.einkaufslist_id = einkaufslist_id;
-    }
+    public String getHaus_id() { return haus_id; }
+    public void setHaus_id(String haus_id) { this.haus_id = haus_id; }
 
-    public String getHaus_id() {
-        return haus_id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setHaus_id(String haus_id) {
-        this.haus_id = haus_id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Produkt> getProdukte() {
-        if (produkte == null) produkte = new ArrayList<>();
-        return produkte;
-    }
-
-    public void setProdukte(List<Produkt> produkte) {
-        this.produkte = produkte;
-    }
-
-    public Object getDatum() {
-        return datum;
-    }
-
-    public void setDatum(Object datum) {
-        this.datum = datum;
-    }
-
-    public void addProdukt(Produkt p) {
-        if (produkte == null) produkte = new ArrayList<>();
-        produkte.add(p);
-    }
-
-    public void removeProdukt(Produkt p) {
-        if (produkte != null) produkte.remove(p);
-    }
+    public Map<String, Produkt> getProdukte() { return produkte; }
+    public void setProdukte(Map<String, Produkt> produkte) { this.produkte = produkte; }
 }

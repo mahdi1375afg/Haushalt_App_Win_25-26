@@ -4,13 +4,10 @@ plugins {
 
 android {
     namespace = "com.example.haushalt_app_java"
-    compileSdk {
-        version = release(36)
-    }
-
+    compileSdk = 36
     defaultConfig {
         applicationId = "com.example.haushalt_app_java"
-        minSdk = 24
+        minSdk = 23
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -27,6 +24,13 @@ android {
             )
         }
     }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -52,6 +56,17 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.google.android.material:material:1.12.0")
+    // Unit Test Abhängigkeiten
+    testImplementation("junit:junit:4.13.2")
+
+    testImplementation("org.mockito:mockito-core:5.3.1") // <— für mockStatic
+    testImplementation("org.robolectric:robolectric:4.11.1")
+    testImplementation("androidx.test:core:1.5.0")
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnit()
+    systemProperty("robolectric.ignoreAppTargetSdkVersion", "true")
 }
 
 apply(plugin = "com.google.gms.google-services")

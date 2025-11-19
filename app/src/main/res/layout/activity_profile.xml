@@ -8,6 +8,8 @@
     android:background="@color/ux_color_primary"
     android:padding="16dp"
     tools:context=".profile.profile_Activity">
+    tools:context=".profile.profile_Activity"
+    android:background="@color/ux_color_primary">
 
     <!-- Titel "Konto" -->
     <TextView
@@ -19,6 +21,9 @@
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/kontoListe"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"

@@ -18,11 +18,11 @@
         <ListView
             android:id="@+id/produkt_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:divider="@color/ux_color_outline"
             android:dividerHeight="1dp"
             android:background="@color/ux_color_surface"
-            android:layout_marginBottom="70dp"
             android:padding="8dp" />
     </LinearLayout>
 
@@ -31,16 +31,15 @@
         android:id="@+id/fab_add_produkt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_margin="20dp"
         android:contentDescription="Produkt hinzufügen"
+        android:focusable="true"
+        android:clickable="true"
         app:backgroundTint="@color/ux_color_accent"
         app:tint="@color/ux_color_on_primary"
         app:srcCompat="@drawable/baseline_add_24"
         app:elevation="8dp"
-        app:layout_anchorGravity="bottom|end"
-        app:borderWidth="0dp"
-        android:focusable="true"
-        android:clickable="true"
-        app:layout_anchor="@id/main" />
+        app:borderWidth="0dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

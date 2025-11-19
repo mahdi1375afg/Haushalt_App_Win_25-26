@@ -1,13 +1,14 @@
 package com.example.haushalt_app_java.domain;
 
 import android.util.Log;
-
 import com.google.firebase.database.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class AutomatischeEinkaufslisteService {
 
@@ -59,6 +60,7 @@ public class AutomatischeEinkaufslisteService {
                     return;
                 }
 
+                // ✅ Einkaufsliste erstellen
                 String listeId = db.getReference()
                         .child("Hauser")
                         .child(hausId)
@@ -66,24 +68,44 @@ public class AutomatischeEinkaufslisteService {
                         .push()
                         .getKey();
 
+                if (listeId == null) {
+                    Log.e("EinkaufslisteService", "Fehler beim Generieren der Listen-ID");
+                    if (onFehler != null) onFehler.run();
+                    return;
+                }
+
                 String datum = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
                         .format(new Date());
                 String listenName = "Automatische Liste vom " + datum;
 
-                Einkaufsliste liste = new Einkaufsliste(listeId, hausId, listenName);
+                // ✅ Einkaufsliste ohne Produkte erstellen
+                Map<String, Object> listeData = new HashMap<>();
+                listeData.put("einkaufslist_id", listeId);
+                listeData.put("haus_id", hausId);
+                listeData.put("name", listenName);
 
-                for (Produkt prod : einkaufsProdukte) {
-                    liste.addProdukt(prod);
-                }
-
-                db.getReference()
+                DatabaseReference listeRef = db.getReference()
                         .child("Hauser")
                         .child(hausId)
                         .child("einkaufslisten")
-                        .child(listeId)
-                        .setValue(liste)
+                        .child(listeId);
+
+                // ✅ Zuerst die Liste erstellen, dann Produkte hinzufügen
+                listeRef.setValue(listeData)
                         .addOnSuccessListener(aVoid -> {
-                            Log.d("EinkaufslisteService", "Einkaufsliste erfolgreich erstellt!");
+                            // ✅ Produkte zur Liste hinzufügen
+                            DatabaseReference produkteRef = listeRef.child("produkte");
+
+                            for (Produkt prod : einkaufsProdukte) {
+                                String produktId = produkteRef.push().getKey();
+                                if (produktId != null) {
+                                    prod.setProdukt_id(produktId);
+                                    produkteRef.child(produktId).setValue(prod);
+                                }
+                            }
+
+                            Log.d("EinkaufslisteService",
+                                "Einkaufsliste mit " + einkaufsProdukte.size() + " Produkten erstellt!");
                             if (onFertig != null) onFertig.run();
                         })
                         .addOnFailureListener(e -> {

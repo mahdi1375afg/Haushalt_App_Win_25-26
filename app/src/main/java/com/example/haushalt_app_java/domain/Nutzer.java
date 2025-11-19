@@ -1,25 +1,29 @@
 package com.example.haushalt_app_java.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Nutzer {
 
     private String nutzerId;
     private String name;
-    private String hausId;
+    private Map<String, Boolean> haushalte;
     public Nutzer() {
         // Default-Konstruktor erforderlich für Firebase
+        this.haushalte = new HashMap<>();
     }
-    public Nutzer(String nutzerId, String name, String hausId) {
+    public Nutzer(String nutzerId, String name, Map<String, Boolean> haushalte) {
         this.nutzerId = nutzerId;
         this.name = name;
-        this.hausId = hausId;
+        this.haushalte = haushalte;
 
     }
 
-    public String getHausId() {
-        return hausId;
+    public Map<String, Boolean> getHausId() {
+        return haushalte;
     }
-    public void setHausId(String hausId) {
-        this.hausId = hausId;
+    public void setHausId(Map<String, Boolean> hausId) {
+        this.haushalte= hausId;
     }
     public String getnutzerId() {
         return nutzerId;

@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Haushalt_App_Java">
         <activity
+            android:name=".product_activity.Haushalt_Auswahl_Produkt_Activity"
+            android:exported="false" />
+        <activity
             android:name=".profile.profile_update_Activity"
             android:exported="false" />
         <activity
@@ -40,15 +43,18 @@
         <activity
             android:name=".product_activity.p_addActivity2"
             android:exported="false" />
-        <activity
-            android:name=".p_addActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Haushalt_App_Java" />
+
         <activity
             android:name=".product_activity.MainActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity2"
+            android:exported="false" />
+        <activity
+            android:name=".domain.EinkaufslistenActivity"
+            android:exported="false" />
+        <activity
+            android:name=".domain.EinkaufslisteDetailActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity2"

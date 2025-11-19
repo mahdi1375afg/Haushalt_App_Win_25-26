@@ -8,6 +8,8 @@
     android:background="@color/ux_color_primary"
     android:padding="20dp"
     tools:context=".product_activity.p_addActivity2">
+    tools:context=".product_activity.p_addActivity2"
+    android:background="@color/ux_color_primary">
 
     <!-- NAME -->
     <TextView
