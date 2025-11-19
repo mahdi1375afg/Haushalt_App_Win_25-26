@@ -1,14 +1,29 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Haushalt_App_Java" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Textfarben im ganzen App-Theme -->
         <item name="android:textColor">@color/ux_color_on_surface</item>
         <item name="android:textColorPrimary">@color/ux_color_on_surface</item>
         <item name="android:textColorSecondary">@color/ux_color_on_surface</item>
         <item name="android:textColorHint">@color/ux_color_outline</item>
 
+        <!--Popup-Style für Menüs -->
+        <item name="popupMenuStyle">@style/Widget.Haushalt.PopupMenu</item>
+        <!-- optional zusätzlich -->
+        <item name="android:popupMenuStyle">@style/Widget.Haushalt.PopupMenu</item>
     </style>
 
     <style name="Theme.Haushalt_App_Java" parent="Base.Theme.Haushalt_App_Java" />
+
+    <!--Definition des Popup-Menü-Styles -->
+    <style name="Widget.Haushalt.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <!-- Hintergrund des Popups -->
+        <item name="android:popupBackground">@color/ux_color_surface</item>
+
+        <!-- Textfarbe der Einträge -->
+        <item name="android:textColor">@color/ux_color_on_surface</item>
+
+        <!-- Icon-Farbe (für baseline_add_24, haushalt etc.) -->
+        <item name="colorControlNormal">@color/ux_color_on_surface</item>
+    </style>
 </resources>

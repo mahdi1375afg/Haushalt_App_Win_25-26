@@ -3,54 +3,78 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:background="@color/ux_color_primary">
 
+    <!-- Titel -->
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Konto bearbeiten"
         android:textSize="24sp"
-        android:textColor="#000000"
-        android:layout_marginBottom="20dp"/>
+        android:textStyle="bold"
+        android:textColor="@color/ux_color_on_surface"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
 
+    <!-- Name -->
     <EditText
         android:id="@+id/nameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Name"
-        android:textColor="#000000"
-        android:textColorHint="#808080"
-        android:layout_marginBottom="10dp"/>
+        android:padding="14dp"
+        android:backgroundTint="@color/ux_color_outline"
+        android:textColor="@color/ux_color_on_surface"
+        android:textColorHint="@color/ux_color_outline"
+        android:layout_marginBottom="16dp" />
 
+    <!-- Email -->
     <EditText
         android:id="@+id/emailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
-        android:textColor="#000000"
-        android:textColorHint="#808080"
+        android:hint="E-Mail"
+        android:padding="14dp"
         android:inputType="textEmailAddress"
-        android:layout_marginBottom="10dp"/>
+        android:backgroundTint="@color/ux_color_outline"
+        android:textColor="@color/ux_color_on_surface"
+        android:textColorHint="@color/ux_color_outline"
+        android:layout_marginBottom="16dp" />
 
+    <!-- Passwort -->
     <EditText
         android:id="@+id/passwortEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000000"
-        android:textColorHint="#808080"
         android:hint="Neues Passwort (optional)"
+        android:padding="14dp"
         android:inputType="textPassword"
-        android:layout_marginBottom="20dp"/>
+        android:backgroundTint="@color/ux_color_outline"
+        android:textColor="@color/ux_color_on_surface"
+        android:textColorHint="@color/ux_color_outline"
+        android:layout_marginBottom="24dp" />
 
+    <!-- Speichern -->
     <Button
         android:id="@+id/speichernButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Speichern" />
+        android:layout_height="50dp"
+        android:text="Speichern"
+        android:textAllCaps="false"
+        android:textColor="@color/ux_color_on_primary"
+        android:backgroundTint="@color/ux_color_accent"
+        android:layout_marginBottom="12dp" />
 
+    <!-- Abbrechen -->
     <Button
         android:id="@+id/abbrechenButton"
-        android:layout_width="372dp"
-        android:layout_height="wrap_content"
-        android:text="Abbrechen" />
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Abbrechen"
+        android:textAllCaps="false"
+        android:textColor="@color/ux_color_on_primary"
+        android:backgroundTint="@color/ux_color_critical" />
+
 </LinearLayout>
