@@ -12,9 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Haushalt_App_Java">
         <activity
-            android:name=".product_activity.Haushalt_Auswahl_Produkt_Activity"
-            android:exported="false" />
-        <activity
             android:name=".profile.profile_update_Activity"
             android:exported="false" />
         <activity
@@ -66,6 +63,18 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.JoinHouseholdActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="haushaltapp"
+                    android:host="join" />
             </intent-filter>
         </activity>
     </application>
