@@ -41,7 +41,6 @@ public class EinkaufslistenActivity extends AppCompatActivity {
         service = new EinkaufslisteService();
         hausId = getIntent().getStringExtra("hausId");
 
-        // ✅ Null-Check für hausId
         if (hausId == null || hausId.isEmpty()) {
             Toast.makeText(this, "Fehler: Keine Haushalt-ID gefunden", Toast.LENGTH_SHORT).show();
             finish();
@@ -52,7 +51,8 @@ public class EinkaufslistenActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
             String listeId = listIds.get(position);
-            Intent intent = new Intent(EinkaufslistenActivity.this, EinkaufslisteDetailActivity.class);
+            Intent intent = new Intent(EinkaufslistenActivity.this,
+                    EinkaufslisteDetailActivity.class);
             intent.putExtra("hausId", hausId);
             intent.putExtra("listeId", listeId);
             startActivity(intent);
@@ -62,43 +62,52 @@ public class EinkaufslistenActivity extends AppCompatActivity {
             String listeId = listIds.get(position);
             String listeName = listNames.get(position);
 
-            // ✅ Bestätigungsdialog vor dem Löschen
             new android.app.AlertDialog.Builder(this)
-                .setTitle("Liste löschen?")
-                .setMessage("Möchten Sie '" + listeName + "' wirklich löschen?")
-                .setPositiveButton("Löschen", (dialog, which) -> {
-                    service.deleteEinkaufsliste(hausId, listeId,
-                        () -> {
-                            Toast.makeText(this, "Liste gelöscht", Toast.LENGTH_SHORT).show();
-                            loadEinkaufslisten();
-                        },
-                        () -> Toast.makeText(this, "Fehler beim Löschen", Toast.LENGTH_SHORT).show());
-                })
-                .setNegativeButton("Abbrechen", null)
-                .show();
+                    .setTitle("Liste löschen?")
+                    .setMessage("Möchten Sie '" + listeName + "' wirklich löschen?")
+                    .setPositiveButton("Löschen", (dialog, which) -> {
+                        service.deleteEinkaufsliste(
+                                hausId,
+                                listeId,
+                                () -> {
+                                    Toast.makeText(this, "Liste gelöscht",
+                                            Toast.LENGTH_SHORT).show();
+                                    loadEinkaufslisten();
+                                },
+                                () -> Toast.makeText(this,
+                                        "Fehler beim Löschen",
+                                        Toast.LENGTH_SHORT).show()
+                        );
+                    })
+                    .setNegativeButton("Abbrechen", null)
+                    .show();
             return true;
         });
 
         fabAdd.setOnClickListener(v -> showAddDialog());
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
-        bottomNav.setSelectedItemId(R.id.nav_einkaufslisten); // ✅ Aktuellen Tab markieren
+        bottomNav.setSelectedItemId(R.id.nav_einkaufslisten);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+
             if (itemId == R.id.nav_einkaufslisten) {
                 return true;
-            } else if (itemId == R.id.nav_household) {
-                Intent intent = new Intent(EinkaufslistenActivity.this, HaushaltActivity.class);
-                intent.putExtra("hausId", hausId); // ✅ hausId weitergeben
+            }
+            if (itemId == R.id.nav_household) {
+                Intent intent = new Intent(this, HaushaltActivity.class);
+                intent.putExtra("hausId", hausId);
                 startActivity(intent);
                 return true;
-            } else if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(EinkaufslistenActivity.this, profile_Activity.class));
+            }
+            if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(this, profile_Activity.class));
                 return true;
-            } else if (itemId == R.id.nav_products) {
-                Intent intent = new Intent(EinkaufslistenActivity.this, MainActivity.class);
-                intent.putExtra("hausId", hausId); // ✅ hausId weitergeben
+            }
+            if (itemId == R.id.nav_products) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("hausId", hausId);
                 startActivity(intent);
                 return true;
             }
@@ -113,7 +122,6 @@ public class EinkaufslistenActivity extends AppCompatActivity {
                 listNames.clear();
                 listIds.clear();
 
-                // ✅ Korrekte Iteration ohne Deserialisierung in Einkaufsliste-Objekt
                 for (DataSnapshot s : snapshot.getChildren()) {
                     String listeId = s.getKey();
                     String listeName = s.child("name").getValue(String.class);
@@ -123,20 +131,20 @@ public class EinkaufslistenActivity extends AppCompatActivity {
                         listNames.add(listeName);
                     }
                 }
+
                 adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(EinkaufslistenActivity.this,
-                    "Fehler beim Laden: " + error.getMessage(),
-                    Toast.LENGTH_SHORT).show();
+                        "Fehler beim Laden: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void showAddDialog() {
-        // ✅ Verbesserter Dialog mit Validierung
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(50, 40, 50, 10);
@@ -151,9 +159,9 @@ public class EinkaufslistenActivity extends AppCompatActivity {
                 .setPositiveButton("Erstellen", (dialog, which) -> {
                     String name = input.getText().toString().trim();
 
-                    // ✅ Validierung
                     if (name.isEmpty()) {
-                        Toast.makeText(this, "Bitte einen Namen eingeben", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Bitte einen Namen eingeben",
+                                Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -162,19 +170,33 @@ public class EinkaufslistenActivity extends AppCompatActivity {
                             .child("einkaufslisten").push().getKey();
 
                     if (id == null) {
-                        Toast.makeText(this, "Fehler beim Erstellen der ID", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Fehler beim Erstellen der ID",
+                                Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    Einkaufsliste neueListe = new Einkaufsliste(id, hausId, name);
-                    service.addEinkaufsliste(neueListe,
-                        () -> {
-                            loadEinkaufslisten();
-                            Toast.makeText(this, "Liste erstellt", Toast.LENGTH_SHORT).show();
-                        },
-                        () -> Toast.makeText(this, "Fehler beim Erstellen", Toast.LENGTH_SHORT).show());
+                    Einkaufsliste neueListe =
+                            new Einkaufsliste(id, hausId, name);
+
+                    service.addEinkaufsliste(
+                            neueListe,
+                            () -> {
+                                loadEinkaufslisten();
+                                Toast.makeText(this, "Liste erstellt",
+                                        Toast.LENGTH_SHORT).show();
+                            },
+                            () -> Toast.makeText(this,
+                                    "Fehler beim Erstellen",
+                                    Toast.LENGTH_SHORT).show());
                 })
                 .setNegativeButton("Abbrechen", null)
                 .show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_einkaufslisten);
     }
 }

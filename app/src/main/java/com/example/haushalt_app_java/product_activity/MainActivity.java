@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance(DB_URL);
 
-        // ✅ Lade hausId aus Firebase Realtime Database
+        // Lade hausId und danach UI
         loadHausIdAndInitialize();
     }
 
@@ -69,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DatabaseReference benutzerRef = database.getReference()
-            .child("Benutzer")
-            .child(currentUserId)
-            .child("hausId");
+                .child("Benutzer")
+                .child(currentUserId)
+                .child("hausId");
 
         benutzerRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
                     com.example.haushalt_app_java.utils.HausIdManager.getInstance().setHausId(currentHausId);
 
-                    // ✅ UI initialisieren und Produkte laden
                     initializeUI();
                     loadProducts();
                 } else {
@@ -111,14 +110,14 @@ public class MainActivity extends AppCompatActivity {
         pAddScreen = findViewById(R.id.pAddScreen);
         listView = findViewById(R.id.listViewp);
 
-        // FloatingActionButton zum Hinzufügen
+        // Produkt hinzufügen
         pAddScreen.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, p_addActivity2.class);
             intent.putExtra("haus_id", currentHausId);
             startActivity(intent);
         });
 
-        // Logout Button
+        // Logout
         logout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             Toast.makeText(MainActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
@@ -126,11 +125,10 @@ public class MainActivity extends AppCompatActivity {
             finish();
         });
 
-        // ListView Adapter
+        // ListView
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         listView.setAdapter(adapter);
 
-        // ListView Item Click
         listView.setOnItemClickListener((parent, view, position, id) -> {
             if (produkten == null || position < 0 || position >= produkten.size()) return;
             Produkt p = produkten.get(position);
@@ -149,17 +147,25 @@ public class MainActivity extends AppCompatActivity {
 
         // Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+
+        // WICHTIG: aktuellen Tab markieren
+        bottomNav.setSelectedItemId(R.id.nav_products);
+
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+
             if (itemId == R.id.nav_products) {
                 return true;
-            } else if (itemId == R.id.nav_household) {
+            }
+            if (itemId == R.id.nav_household) {
                 startActivity(new Intent(MainActivity.this, HaushaltActivity.class));
                 return true;
-            } else if (itemId == R.id.nav_profile) {
+            }
+            if (itemId == R.id.nav_profile) {
                 startActivity(new Intent(MainActivity.this, profile_Activity.class));
                 return true;
-            } else if (itemId == R.id.nav_einkaufslisten) {
+            }
+            if (itemId == R.id.nav_einkaufslisten) {
                 Intent intent = new Intent(MainActivity.this, EinkaufslistenActivity.class);
                 intent.putExtra("hausId", currentHausId);
                 startActivity(intent);
@@ -171,9 +177,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadProducts() {
         DatabaseReference produkteRef = database.getReference()
-            .child("Hauser")
-            .child(currentHausId)
-            .child("produkte");
+                .child("Hauser")
+                .child(currentHausId)
+                .child("produkte");
 
         produkteRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -192,8 +198,7 @@ public class MainActivity extends AppCompatActivity {
                     String name = produkt.getName() != null ? produkt.getName() : "";
                     String einheit = produkt.getEinheit() != null ? produkt.getEinheit() : "";
                     String kategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
-                    String txt = name + " - " + produkt.getMenge() + " " + einheit + " - " + kategorie;
-                    items.add(txt);
+                    items.add(name + " - " + produkt.getMenge() + " " + einheit + " - " + kategorie);
                 }
 
                 adapter.notifyDataSetChanged();
@@ -215,16 +220,7 @@ public class MainActivity extends AppCompatActivity {
         for (Produkt p : produkten) {
             if (p == null) continue;
 
-            int menge = 0;
-            int mind = 0;
-            try {
-                menge = Integer.parseInt(String.valueOf(p.getMenge()));
-                mind = Integer.parseInt(String.valueOf(p.getMindBestand()));
-            } catch (NumberFormatException e) {
-                Log.w("MainActivity", "Ungültige Zahlenwerte bei Produkt: " + p.getName());
-            }
-
-            if (mind > 0 && menge < mind) {
+            if (p.getMindBestand() > 0 && p.getMenge() < p.getMindBestand()) {
                 low.add(p);
             }
         }
@@ -234,9 +230,8 @@ public class MainActivity extends AppCompatActivity {
         String[] items = new String[low.size()];
         for (int i = 0; i < low.size(); i++) {
             Produkt p = low.get(i);
-            String name = (p.getName() != null) ? p.getName() : "(Ohne Name)";
-            String einheit = (p.getEinheit() != null) ? p.getEinheit() : "";
-            items[i] = name + " — " + p.getMenge() + " " + einheit + "  (min. " + p.getMindBestand() + ")";
+            items[i] = p.getName() + " — " + p.getMenge() + " " + p.getEinheit()
+                    + "  (min. " + p.getMindBestand() + ")";
         }
 
         new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
@@ -244,10 +239,6 @@ public class MainActivity extends AppCompatActivity {
                 .setMessage("Diese Produkte sind unter dem Mindestbestand:")
                 .setItems(items, null)
                 .setPositiveButton("Einkaufsliste erstellen", (d, which) -> {
-                    if (currentHausId == null || currentHausId.isEmpty()) {
-                        Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
                     com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService svc =
                             new com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService();
 
@@ -261,5 +252,12 @@ public class MainActivity extends AppCompatActivity {
                 .show();
 
         lowStockDialogShown = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_products);
     }
 }
