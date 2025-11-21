@@ -1,7 +1,6 @@
 package com.example.haushalt_app_java.profile;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -40,7 +39,6 @@ public class profile_Activity extends AppCompatActivity {
     private ListView kontoListe;
     private Button konto_delete;
     private Button konto_bearbeiten;
-    private Button invite_button;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private FirebaseDatabase db;
@@ -65,22 +63,8 @@ public class profile_Activity extends AppCompatActivity {
         kontoListe = findViewById(R.id.kontoListe);
         konto_delete = findViewById(R.id.konot_delete);
         konto_bearbeiten = findViewById(R.id.konto_bearbeiten);
-        invite_button = findViewById(R.id.invite_button);
 
         loadKontoInfo();
-
-        invite_button.setOnClickListener(v -> {
-            String hausId = HausIdManager.getInstance().getHausId();
-            if (hausId != null && !hausId.isEmpty()) {
-                String deepLink = "haushaltapp://join?hausId=" + hausId;
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_TEXT, "Trete meinem Haushalt bei: " + deepLink);
-                startActivity(Intent.createChooser(shareIntent, "Einladung senden via"));
-            } else {
-                Toast.makeText(this, "Keine Haus ID gefunden", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         konto_bearbeiten.setOnClickListener(v -> {
             Intent intent = new Intent(profile_Activity.this, profile_update_Activity.class);

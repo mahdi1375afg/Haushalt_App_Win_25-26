@@ -35,22 +35,9 @@
         app:layout_constraintTop_toBottomOf="@id/textView12"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/invite_button"
+        app:layout_constraintBottom_toTopOf="@+id/konot_delete"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp" />
-
-    <Button
-        android:id="@+id/invite_button"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/ux_color_accent"
-        android:text="Einladen"
-        android:textAllCaps="false"
-        android:textColor="@color/ux_color_on_primary"
-        app:layout_constraintBottom_toTopOf="@id/konot_delete"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Konto löschen -->
     <Button
