@@ -1,7 +1,9 @@
 package com.example.haushalt_app_java.profile;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -17,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
+import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.product_activity.MainActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -26,6 +29,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.example.haushalt_app_java.utils.HausIdManager;
+import HausIdManager
 
 import java.util.ArrayList;
 
@@ -37,6 +42,7 @@ public class profile_Activity extends AppCompatActivity {
     private ListView kontoListe;
     private Button konto_delete;
     private Button konto_bearbeiten;
+    private Button backgroundSettingsButton;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private FirebaseDatabase db;
@@ -61,8 +67,18 @@ public class profile_Activity extends AppCompatActivity {
         kontoListe = findViewById(R.id.kontoListe);
         konto_delete = findViewById(R.id.konot_delete);
         konto_bearbeiten = findViewById(R.id.konto_bearbeiten);
+        backgroundSettingsButton = findViewById(R.id.background_settings_button);
 
         loadKontoInfo();
+
+        // Set a click listener to open the app's system settings
+        backgroundSettingsButton.setOnClickListener(v -> {
+            Toast.makeText(this, "Systemeinstellungen für die App öffnen...", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+        });
 
         konto_bearbeiten.setOnClickListener(v -> {
             Intent intent = new Intent(profile_Activity.this, profile_update_Activity.class);
@@ -72,20 +88,43 @@ public class profile_Activity extends AppCompatActivity {
         konto_delete.setOnClickListener(v -> kontoLoeschen());
 
         // Bottom Navigation
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setSelectedItemId(R.id.nav_profile);
+
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_profile) {
                 return true;
-            } else if (itemId == R.id.nav_household) {
-                startActivity(new Intent(profile_Activity.this, HaushaltActivity.class));
-                return true;
             } else if (itemId == R.id.nav_products) {
-                startActivity(new Intent(profile_Activity.this, MainActivity.class));
+                // ✅ Übergebe hausId
+                String hausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
+                Intent intent = new Intent(profile_Activity.this, MainActivity.class);
+                intent.putExtra("haus_id", hausId);
+                startActivity(intent);
+                return true;
+            } else if (itemId == R.id.nav_household) {
+                // ✅ Übergebe hausId
+                String hausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
+                Intent intent = new Intent(profile_Activity.this, HaushaltActivity.class);
+                intent.putExtra("hausId", hausId);
+                startActivity(intent);
+                return true;
+            } else if (itemId == R.id.nav_einkaufsliste) {
+                // ✅ Übergebe hausId
+                String hausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
+                Intent intent = new Intent(profile_Activity.this, EinkaufslistenActivity.class);
+                intent.putExtra("hausId", hausId);
+                startActivity(intent);
                 return true;
             }
             return false;
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void loadKontoInfo() {
@@ -198,10 +237,5 @@ public class profile_Activity extends AppCompatActivity {
         if (requestCode == REQUEST_UPDATE_PROFILE && resultCode == RESULT_OK) {
             loadKontoInfo();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 }
