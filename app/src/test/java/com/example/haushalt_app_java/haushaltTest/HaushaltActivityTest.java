@@ -6,6 +6,7 @@ import static org.robolectric.Shadows.shadowOf;
 
 import android.os.Looper;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -101,16 +102,19 @@ public class HaushaltActivityTest {
             verify(hauserRef, times(2)).addListenerForSingleValueEvent(any());
             System.out.println("  → Listener wurde 2x aufgerufen ✓");
 
-            ListView haushaltListView = activity.findViewById(
-                com.example.haushalt_app_java.R.id.haushalt_listview);
-            int count = haushaltListView.getAdapter().getCount();
+            TextView haushaltListView = activity.findViewById(
+                com.example.haushalt_app_java.R.id.haushalt_name);
 
-            assertEquals("1 Haushalt sollte angezeigt werden", 1, count);
-            System.out.println("  → 1 Haushalt angezeigt ✓");
+            assertNotNull("TextView sollte existieren", haushaltListView);
 
-            String hausName = (String) haushaltListView.getAdapter().getItem(0);
-            assertEquals("Haus Alpha", hausName);
-            System.out.println("  → Name: 'Haus Alpha' ✓");
+            String displayedText = haushaltListView.getText().toString();
+            assertNotNull("TextView sollte Text enthalten", displayedText);
+            assertFalse("TextView sollte nicht leer sein", displayedText.isEmpty());
+
+            assertTrue("TextView sollte 'Haus Alpha' enthalten",
+                    displayedText.contains("Haus Alpha"));
+            System.out.println("  → TextView zeigt: '" + displayedText + "' ✓");
+
 
             System.out.println("=== TEST ERFOLGREICH ===\n");
         }
