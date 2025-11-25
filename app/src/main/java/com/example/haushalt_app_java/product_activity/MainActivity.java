@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +20,7 @@ import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
 import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
 import com.example.haushalt_app_java.domain.Produkt;
+import com.example.haushalt_app_java.domain.kategorie;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.profile.profile_Activity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -46,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> items = new ArrayList<>();
     private ArrayAdapter<String> adapter;
     private boolean lowStockDialogShown = false;
-
+    private Spinner spinnerKategorie;
+    private ArrayList<Produkt> alleProdukten = new ArrayList<>();
+    private String selectedKategorie = "Alle";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
         logout = findViewById(R.id.logout);
         pAddScreen = findViewById(R.id.pAddScreen);
         listView = findViewById(R.id.listViewp);
+        spinnerKategorie = findViewById(R.id.spinnerKategorie);
+        setupKategorieSpinner();
 
         // FloatingActionButton zum Hinzufügen
         pAddScreen.setOnClickListener(v -> {
@@ -169,17 +175,49 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setupKategorieSpinner() {
+        ArrayList<String> kategorien = new ArrayList<>();
+        kategorien.add("Alle");
+        kategorien.add(kategorie.LEBENSMITTEL.getDisplayName());
+        kategorien.add(kategorie.GETRAENKE.getDisplayName());
+        kategorien.add(kategorie.HYGIENE.getDisplayName());
+        kategorien.add(kategorie.HAUSHALT.getDisplayName());
+        kategorien.add(kategorie.SONSTIGES.getDisplayName());
+
+        ArrayAdapter<String> kategorieAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.spinner_item,  // ✅ Dein eigenes Layout
+                kategorien
+        );
+        kategorieAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);  // ✅ Für Dropdown
+        spinnerKategorie.setAdapter(kategorieAdapter);
+
+        spinnerKategorie.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                selectedKategorie = kategorien.get(position);
+                filterProdukte();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                selectedKategorie = "Alle";
+                filterProdukte();
+            }
+        });
+    }
+
+
     private void loadProducts() {
         DatabaseReference produkteRef = database.getReference()
-            .child("Hauser")
-            .child(currentHausId)
-            .child("produkte");
+                .child("Hauser")
+                .child(currentHausId)
+                .child("produkte");
 
         produkteRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                items.clear();
-                produkten.clear();
+                alleProdukten.clear();
 
                 for (DataSnapshot snap : snapshot.getChildren()) {
                     Produkt produkt = snap.getValue(Produkt.class);
@@ -187,16 +225,10 @@ public class MainActivity extends AppCompatActivity {
 
                     produkt.setProdukt_id(snap.getKey());
                     produkt.setHaus_id(currentHausId);
-                    produkten.add(produkt);
-
-                    String name = produkt.getName() != null ? produkt.getName() : "";
-                    String einheit = produkt.getEinheit() != null ? produkt.getEinheit() : "";
-                    String kategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
-                    String txt = name + " - " + produkt.getMenge() + " " + einheit + " - " + kategorie;
-                    items.add(txt);
+                    alleProdukten.add(produkt);
                 }
 
-                adapter.notifyDataSetChanged();
+                filterProdukte();
                 checkAndShowLowStockDialog();
             }
 
@@ -205,6 +237,27 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("MainActivity", "Fehler beim Laden: " + error.getMessage());
             }
         });
+    }
+
+    private void filterProdukte() {
+        items.clear();
+        produkten.clear();
+
+        for (Produkt produkt : alleProdukten) {
+            String produktKategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
+
+            if (selectedKategorie.equals("Alle") || produktKategorie.equals(selectedKategorie)) {
+                produkten.add(produkt);
+
+                String name = produkt.getName() != null ? produkt.getName() : "";
+                String einheit = produkt.getEinheit() != null ? produkt.getEinheit() : "";
+                String kategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
+                String txt = name + " - " + produkt.getMenge() + " " + einheit + " - " + kategorie;
+                items.add(txt);
+            }
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     private void checkAndShowLowStockDialog() {
