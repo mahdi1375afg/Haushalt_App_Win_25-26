@@ -1,6 +1,8 @@
 package com.example.haushalt_app_java.domain;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.*;
@@ -54,7 +56,6 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
     }
 
     private void loadProdukte() {
-        //  Korrekte Firebase-Instanz mit URL
         DatabaseReference ref = FirebaseDatabase.getInstance(DB_URL)
                 .getReference("Hauser")
                 .child(hausId)
@@ -62,7 +63,6 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
                 .child(listeId)
                 .child("produkte");
 
-        //  Logging des Pfads
         Log.d(TAG, "Firebase Pfad: " + ref.toString());
 
         ref.addValueEventListener(new ValueEventListener() {
@@ -71,32 +71,23 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
                 adapter.clear();
                 produkte.clear();
 
-                Log.d(TAG, "Anzahl Produkte: " + snapshot.getChildrenCount());
-
                 if (!snapshot.exists()) {
-                    Log.d(TAG, "Keine Produkte gefunden!");
                     Toast.makeText(EinkaufslisteDetailActivity.this,
-                        "Keine Produkte vorhanden",
-                        Toast.LENGTH_SHORT).show();
+                            "Keine Produkte vorhanden",
+                            Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 for (DataSnapshot s : snapshot.getChildren()) {
-                    try {
-                        Produkt p = s.getValue(Produkt.class);
-                        if (p != null) {
-                            p.setProdukt_id(s.getKey());
-                            produkte.add(p);
+                    Produkt p = s.getValue(Produkt.class);
+                    if (p != null) {
+                        p.setProdukt_id(s.getKey());
+                        produkte.add(p);
 
-                            String displayText = p.getName() + " - " +
-                                                p.getMenge() + " " +
-                                                p.getEinheit();
-                            adapter.add(displayText);
-
-                            Log.d(TAG, "Produkt geladen: " + displayText);
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "Fehler beim Deserialisieren: " + e.getMessage());
+                        String displayText = p.getName() + " - " +
+                                p.getMenge() + " " +
+                                p.getEinheit();
+                        adapter.add(displayText);
                     }
                 }
                 adapter.notifyDataSetChanged();
@@ -104,11 +95,49 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Firebase Fehler: " + error.getMessage());
                 Toast.makeText(EinkaufslisteDetailActivity.this,
-                    "Fehler beim Laden: " + error.getMessage(),
-                    Toast.LENGTH_SHORT).show();
+                        "Fehler beim Laden: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
+        });
+
+        produktList.setOnItemLongClickListener((parent, view, position, id) -> {
+            Produkt selected = produkte.get(position);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Aktion wählen");
+            builder.setMessage("Was möchtest du mit diesem Produkt tun?");
+            builder.setPositiveButton("Bearbeiten", (dialog, which) -> showEditProduktDialog(selected));
+            builder.setNegativeButton("Löschen", (dialog, which) -> {
+                service.deleteProduktInListe(
+                        hausId,
+                        listeId,
+                        selected.getProdukt_id(),
+                        () -> {
+                            Toast.makeText(this, "Produkt gelöscht", Toast.LENGTH_SHORT).show();
+                            loadProdukte();
+                        },
+                        () -> Toast.makeText(this, "Fehler beim Löschen", Toast.LENGTH_SHORT).show()
+                );
+            });
+            builder.setNeutralButton("Abbrechen", null);
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            // Hintergrund im Surface-Dark-Theme
+            dialog.getWindow().setBackgroundDrawableResource(R.color.ux_color_surface);
+
+            // Text & Titel in deiner hellen Surface-Textfarbe
+            int textColor = getResources().getColor(R.color.ux_color_on_surface);
+
+            TextView title = dialog.findViewById(android.R.id.title);
+            TextView message = dialog.findViewById(android.R.id.message);
+
+            if (title != null) title.setTextColor(textColor);
+            if (message != null) message.setTextColor(textColor);
+
+            return true;
         });
     }
 
@@ -177,4 +206,71 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
         builder.setNegativeButton("Abbrechen", null);
         builder.show();
     }
+
+    private void showEditProduktDialog(Produkt produkt) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Produkt bearbeiten");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 40, 50, 10);
+
+        EditText name = new EditText(this);
+        name.setHint("Produktname");
+        name.setText(produkt.getName());
+        layout.addView(name);
+
+        EditText menge = new EditText(this);
+        menge.setHint("Menge");
+        menge.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        menge.setText(String.valueOf(produkt.getMenge()));
+        layout.addView(menge);
+
+        EditText einheit = new EditText(this);
+        einheit.setHint("Einheit (z. B. Stück)");
+        einheit.setText(produkt.getEinheit());
+        layout.addView(einheit);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Speichern", (dialogInterface, which) -> {
+            try {
+                produkt.setName(name.getText().toString());
+                produkt.setMenge(Integer.parseInt(menge.getText().toString()));
+                produkt.setEinheit(einheit.getText().toString());
+
+                service.updateProduktInListe(
+                        hausId,
+                        listeId,
+                        produkt.getProdukt_id(),
+                        produkt,
+                        () -> {
+                            Toast.makeText(this, "Produkt aktualisiert", Toast.LENGTH_SHORT).show();
+                            loadProdukte();
+                        },
+                        () -> Toast.makeText(this, "Fehler beim Speichern", Toast.LENGTH_SHORT).show()
+                );
+
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Ungültige Menge", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Abbrechen", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getWindow().setBackgroundDrawableResource(R.color.ux_color_surface);
+
+        name.setTextColor(getResources().getColor(R.color.ux_color_on_surface));
+        menge.setTextColor(getResources().getColor(R.color.ux_color_on_surface));
+        einheit.setTextColor(getResources().getColor(R.color.ux_color_on_surface));
+
+        name.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
+        menge.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
+        einheit.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
+    }
+
+
 }
