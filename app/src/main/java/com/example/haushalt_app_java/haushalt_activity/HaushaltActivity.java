@@ -53,6 +53,7 @@ public class HaushaltActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_haushalt);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -69,25 +70,27 @@ public class HaushaltActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mitgliederNamen);
         hList.setAdapter(adapter);
 
-        // ✅ Lade den EINEN Haushalt des Benutzers
         loadBenutzerHaushalt();
 
-        // Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView2);
         bottomNav.setSelectedItemId(R.id.nav_household);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+
             if (itemId == R.id.nav_household) {
                 return true;
-            } else if (itemId == R.id.nav_products) {
-                startActivity(new Intent(HaushaltActivity.this, MainActivity.class));
+            }
+            if (itemId == R.id.nav_products) {
+                startActivity(new Intent(this, MainActivity.class));
                 return true;
-            } else if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(HaushaltActivity.this, profile_Activity.class));
+            }
+            if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(this, profile_Activity.class));
                 return true;
-            } else if (itemId == R.id.nav_einkaufslisten) {
-                Intent intent = new Intent(HaushaltActivity.this, EinkaufslistenActivity.class);
+            }
+            if (itemId == R.id.nav_einkaufslisten) {
+                Intent intent = new Intent(this, EinkaufslistenActivity.class);
                 intent.putExtra("hausId", currentHausId);
                 startActivity(intent);
                 return true;
@@ -95,50 +98,54 @@ public class HaushaltActivity extends AppCompatActivity {
             return false;
         });
 
-        // Long-Click: Haushalt bearbeiten/löschen
         haushaltNameTextView.setOnLongClickListener(v -> {
             if (currentHausId != null) {
-                Intent intent = new Intent(HaushaltActivity.this, delete_haushalt_Activity.class);
+                Intent intent = new Intent(this, delete_haushalt_Activity.class);
                 intent.putExtra("hausId", currentHausId);
                 startActivityForResult(intent, REQUEST_DELETE_HAUSHALT);
             }
             return true;
         });
 
-        // Click: Mitglied löschen
         hList.setOnItemClickListener((parent, view, position, id) -> {
             if (currentHausId == null) return;
             String mitgliedName = mitgliederNamen.get(position);
-            Intent intent = new Intent(HaushaltActivity.this, delete_mitglied_Activity.class);
+            Intent intent = new Intent(this, delete_mitglied_Activity.class);
             intent.putExtra("mitgliedName", mitgliedName);
             intent.putExtra("hausId", currentHausId);
             startActivityForResult(intent, REQUEST_DELETE_USER);
         });
 
-        // Floating Button: Menü für Haushalt/User hinzufügen
         hAdd.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(HaushaltActivity.this, v);
+            PopupMenu popup = new PopupMenu(this, v);
             popup.getMenuInflater().inflate(R.menu.add_haushalt, popup.getMenu());
 
             popup.setOnMenuItemClickListener(item -> {
                 int itemId = item.getItemId();
+
                 if (itemId == R.id.add_user) {
-                    // ✅ Nur wenn bereits Haushalt vorhanden
                     if (currentHausId == null) {
-                        Toast.makeText(this, "Bitte erst Haushalt erstellen", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this,
+                                "Bitte erst Haushalt erstellen",
+                                Toast.LENGTH_SHORT).show();
                         return false;
                     }
-                    Intent intent = new Intent(HaushaltActivity.this, AddUserActivity.class);
+                    Intent intent = new Intent(this, AddUserActivity.class);
                     intent.putExtra("hausId", currentHausId);
                     startActivityForResult(intent, REQUEST_ADD_USER);
                     return true;
-                } else if (itemId == R.id.add_household) {
-                    // ✅ Nur wenn noch kein Haushalt vorhanden
+                }
+
+                if (itemId == R.id.add_household) {
                     if (currentHausId != null) {
-                        Toast.makeText(this, "Sie haben bereits einen Haushalt", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this,
+                                "Sie haben bereits einen Haushalt",
+                                Toast.LENGTH_SHORT).show();
                         return false;
                     }
-                    startActivityForResult(new Intent(HaushaltActivity.this, AddHaushaltActivity.class), REQUEST_ADD_HAUSHALT);
+                    startActivityForResult(
+                            new Intent(this, AddHaushaltActivity.class),
+                            REQUEST_ADD_HAUSHALT);
                     return true;
                 } else if (itemId == R.id.invite_user) {
                     String hausId = HausIdManager.getInstance().getHausId();
@@ -153,6 +160,7 @@ public class HaushaltActivity extends AppCompatActivity {
                     }
                     return true;
                 }
+
                 return false;
             });
 
@@ -165,7 +173,6 @@ public class HaushaltActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK) {
-            android.util.Log.d("HaushaltActivity", "✓ Änderung erkannt - Lade Daten neu");
             loadBenutzerHaushalt();
             Toast.makeText(this, "Daten aktualisiert", Toast.LENGTH_SHORT).show();
         }
@@ -174,53 +181,64 @@ public class HaushaltActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Wichtig: Tab wieder markieren
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView2);
+        bottomNav.setSelectedItemId(R.id.nav_household);
+
         loadBenutzerHaushalt();
     }
 
     private void loadBenutzerHaushalt() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // ✅ Lade hausId des Benutzers
-        db.getReference("Benutzer").child(userId).child("hausId")
-            .addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        currentHausId = snapshot.getValue(String.class);
+        db.getReference("Benutzer")
+                .child(userId)
+                .child("hausId")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            currentHausId = snapshot.getValue(String.class);
 
-                        if (currentHausId != null) {
-                            // ✅ Lade Haushaltsdaten
-                            db.getReference("Hauser").child(currentHausId)
-                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot hausSnapshot) {
-                                        String hausName = hausSnapshot.child("name").getValue(String.class);
-                                        haushaltNameTextView.setText(hausName != null ? hausName : "Haushalt");
+                            if (currentHausId != null) {
+                                db.getReference("Hauser")
+                                        .child(currentHausId)
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot hausSnapshot) {
+                                                String hausName =
+                                                        hausSnapshot.child("name")
+                                                                .getValue(String.class);
+                                                haushaltNameTextView.setText(
+                                                        hausName != null ? hausName : "Haushalt"
+                                                );
 
-                                        // ✅ Speichere hausId global
-                                        com.example.haushalt_app_java.utils.HausIdManager.getInstance().setHausId(currentHausId);
+                                                com.example.haushalt_app_java.utils
+                                                        .HausIdManager.getInstance()
+                                                        .setHausId(currentHausId);
 
-                                        // ✅ Lade Mitglieder
-                                        ladeMitglieder(currentHausId);
-                                    }
+                                                ladeMitglieder(currentHausId);
+                                            }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {}
-                                });
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {}
+                                        });
+                            }
+                        } else {
+                            currentHausId = null;
+                            haushaltNameTextView.setText("Kein Haushalt");
+                            mitgliederNamen.clear();
+                            adapter.notifyDataSetChanged();
+                            Toast.makeText(HaushaltActivity.this,
+                                    "Bitte erstellen Sie einen Haushalt",
+                                    Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        // ✅ Kein Haushalt vorhanden
-                        currentHausId = null;
-                        haushaltNameTextView.setText("Kein Haushalt");
-                        mitgliederNamen.clear();
-                        adapter.notifyDataSetChanged();
-                        Toast.makeText(HaushaltActivity.this, "Bitte erstellen Sie einen Haushalt", Toast.LENGTH_SHORT).show();
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 
     private void ladeMitglieder(String haushaltId) {
@@ -228,38 +246,45 @@ public class HaushaltActivity extends AppCompatActivity {
         geladeneIds.clear();
         adapter.notifyDataSetChanged();
 
-        db.getReference().child("Hauser").child(haushaltId).child("mitgliederIds")
-            .addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for (DataSnapshot child : snapshot.getChildren()) {
-                        String mitgliedId = child.getKey();
+        db.getReference()
+                .child("Hauser")
+                .child(haushaltId)
+                .child("mitgliederIds")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot child : snapshot.getChildren()) {
+                            String mitgliedId = child.getKey();
 
-                        if (mitgliedId == null || geladeneIds.contains(mitgliedId)) {
-                            continue;
+                            if (mitgliedId == null || geladeneIds.contains(mitgliedId)) {
+                                continue;
+                            }
+
+                            geladeneIds.add(mitgliedId);
+
+                            db.getReference()
+                                    .child("Benutzer")
+                                    .child(mitgliedId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                            String name = userSnapshot.child("name")
+                                                    .getValue(String.class);
+
+                                            if (name != null && !mitgliederNamen.contains(name)) {
+                                                mitgliederNamen.add(name);
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {}
+                                    });
                         }
-
-                        geladeneIds.add(mitgliedId);
-
-                        db.getReference().child("Benutzer").child(mitgliedId)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot userSnapshot) {
-                                    String name = userSnapshot.child("name").getValue(String.class);
-                                    if (name != null && !mitgliederNamen.contains(name)) {
-                                        mitgliederNamen.add(name);
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {}
-                            });
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {}
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
     }
 }
