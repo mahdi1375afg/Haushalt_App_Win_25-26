@@ -1,7 +1,11 @@
 package com.example.haushalt_app_java.profile;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -9,7 +13,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -21,6 +24,7 @@ import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.product_activity.MainActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,12 +43,15 @@ public class profile_Activity extends AppCompatActivity {
     private ListView kontoListe;
     private Button konto_delete;
     private Button konto_bearbeiten;
+    private Button backgroundSettingsButton;
+
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private FirebaseDatabase db;
     private ArrayAdapter<String> adapter;
     private ArrayList<String> kontoInfoList;
 
+    @SuppressLint("BatteryLife")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,8 +70,41 @@ public class profile_Activity extends AppCompatActivity {
         kontoListe = findViewById(R.id.kontoListe);
         konto_delete = findViewById(R.id.konot_delete);
         konto_bearbeiten = findViewById(R.id.konto_bearbeiten);
+        backgroundSettingsButton = findViewById(R.id.backgroundSettingsButton);
 
         loadKontoInfo();
+
+        // Set a click listener to manage battery optimization settings
+        backgroundSettingsButton.setOnClickListener(v -> {
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
+                // App is NOT exempt, request exemption
+                new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.battery_opt_allow_title)
+                    .setMessage(R.string.battery_opt_allow_message)
+                    .setPositiveButton(R.string.yes, (dialog, which) -> {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                        intent.setData(Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    })
+                    .setNegativeButton(R.string.no, null)
+                    .show();
+            } else {
+                // App is already exempt, offer to open settings to re-enable
+                new MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.battery_opt_manage_title)
+                    .setMessage(R.string.battery_opt_manage_message)
+                    .setPositiveButton(R.string.continue_text, (dialog, which) -> {
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
+            }
+        });
 
         konto_bearbeiten.setOnClickListener(v -> {
             Intent intent = new Intent(profile_Activity.this, profile_update_Activity.class);
@@ -162,7 +202,7 @@ public class profile_Activity extends AppCompatActivity {
     }
 
     private void kontoLoeschen() {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
             .setTitle("Konto löschen")
             .setMessage("Möchten Sie Ihr Konto wirklich dauerhaft löschen?")
             .setPositiveButton("Löschen", (dialog, which) -> {
@@ -223,5 +263,15 @@ public class profile_Activity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        updateButtonText();
+    }
+
+    private void updateButtonText() {
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        if (pm.isIgnoringBatteryOptimizations(getPackageName())) {
+            backgroundSettingsButton.setText(R.string.battery_opt_disable);
+        } else {
+            backgroundSettingsButton.setText(R.string.battery_opt_enable);
+        }
     }
 }

@@ -46,4 +46,24 @@
     <string name="ja">Ja</string>
     <string name="nein">Nein</string>
     <string name="delete_confirmation">Möchten Sie diesen Haushalt wirklich löschen?</string>
+
+    <string name="title_activity_add_user">AddUserActivity</string>
+    <string name="title_activity_add_haushalt">AddHaushaltActivity</string>
+    <string name="title_activity_delete_haushalt">delete_haushalt_Activity</string>
+    <string name="title_activity_delete_mitglied">delete_mitglied_Activity</string>
+    <string name="title_activity_profile">profile_Activity</string>
+    <string name="title_activity_profile_update">profile_update_Activity</string>
+
+    <!-- Battery Optimization Dialog -->
+    <string name="battery_opt_allow_title">Hintergrundaktivität erlauben</string>
+    <string name="battery_opt_allow_message">Damit die App im Hintergrund ordnungsgemäß funktioniert und Benachrichtigungen zuverlässig ankommen, empfehlen wir, die Akku-Optimierung für diese App zu deaktivieren. Möchten Sie die Einstellung jetzt ändern?</string>
+    <string name="battery_opt_manage_title">Hintergrundaktivität verwalten</string>
+    <string name="battery_opt_manage_message">Die App ist bereits von der Akku-Optimierung ausgenommen. Um diese Einstellung zu ändern, werden Sie zu den Systemeinstellungen weitergeleitet.</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="continue_text">Weiter</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="battery_opt_disable">Hintergrundaktivitäten deaktivieren</string>
+    <string name="battery_opt_enable">Hintergrundaktivitäten erlauben</string>
+
 </resources>
