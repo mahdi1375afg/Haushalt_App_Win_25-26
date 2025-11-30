@@ -1,5 +1,6 @@
 package com.example.haushalt_app_java.haushalt_activity;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
@@ -14,6 +15,7 @@ import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
 import com.example.haushalt_app_java.product_activity.MainActivity;
 import com.example.haushalt_app_java.profile.profile_Activity;
+import com.example.haushalt_app_java.utils.HausIdManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -144,6 +146,18 @@ public class HaushaltActivity extends AppCompatActivity {
                     startActivityForResult(
                             new Intent(this, AddHaushaltActivity.class),
                             REQUEST_ADD_HAUSHALT);
+                    return true;
+                } else if (itemId == R.id.invite_user) {
+                    String hausId = HausIdManager.getInstance().getHausId();
+                    if (hausId != null && !hausId.isEmpty()) {
+                        String deepLink = "haushaltapp://join?hausId=" + hausId;
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("text/plain");
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, "Trete meinem Haushalt bei: " + deepLink);
+                        startActivity(Intent.createChooser(shareIntent, "Einladung senden via"));
+                    } else {
+                        Toast.makeText(this, "Keine Haus ID gefunden", Toast.LENGTH_SHORT).show();
+                    }
                     return true;
                 }
 

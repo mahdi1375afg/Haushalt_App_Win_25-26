@@ -11,4 +11,9 @@
         android:icon="@drawable/haushalt"
         android:title="Haushalt hinzufügen"
         android:iconTint="@color/ux_color_on_surface" />
+
+    <item
+        android:id="@+id/invite_user"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="Einladen" />
 </menu>

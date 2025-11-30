@@ -2,6 +2,7 @@ package com.example.haushalt_app_java.product_activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -22,6 +24,7 @@ import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
 import com.example.haushalt_app_java.domain.Produkt;
 import com.example.haushalt_app_java.domain.kategorie;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
+import com.example.haushalt_app_java.notification.DatabaseChangeService;
 import com.example.haushalt_app_java.profile.profile_Activity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -62,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        if (pm.isIgnoringBatteryOptimizations(getPackageName())) {
+            // Start the DatabaseChangeService as a foreground service
+            Intent serviceIntent = new Intent(this, DatabaseChangeService.class);
+            ContextCompat.startForegroundService(this, serviceIntent);
+        }
 
         database = FirebaseDatabase.getInstance(DB_URL);
 

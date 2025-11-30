@@ -46,4 +46,24 @@
     <string name="ja">Ja</string>
     <string name="nein">Nein</string>
     <string name="delete_confirmation">Möchten Sie diesen Haushalt wirklich löschen?</string>
+
+    <string name="title_activity_add_user">AddUserActivity</string>
+    <string name="title_activity_add_haushalt">AddHaushaltActivity</string>
+    <string name="title_activity_delete_haushalt">delete_haushalt_Activity</string>
+    <string name="title_activity_delete_mitglied">delete_mitglied_Activity</string>
+    <string name="title_activity_profile">profile_Activity</string>
+    <string name="title_activity_profile_update">profile_update_Activity</string>
+
+    <!-- Battery Optimization Dialog -->
+    <string name="battery_opt_allow_title">Benachrichtigungen aktivieren</string>
+    <string name="battery_opt_allow_message">Um Benachrichtigungen zu erhalten muss die Akku-Optimierung deaktiviert werden. Dies kann zu erhöhtem Akku-Verbrauch. Möchten Sie die Einstellung jetzt ändern?</string>
+    <string name="battery_opt_manage_title">Benachrichtigungen deaktivieren</string>
+    <string name="battery_opt_manage_message">Die Akku-Optimierung ist nicht aktiv. Um diese Einstellung zu ändern, werden Sie zu den Systemeinstellungen weitergeleitet. Um die Akku-Optimierung (und damit auch Benachrichtigungen) zu deaktivieren müssen Sie im Menü Batterie-Einstellungen die Ausführung der App im Hintergrund deaktivieren.</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="continue_text">Weiter</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="battery_opt_disable">Benachrichtigungen deaktivieren</string>
+    <string name="battery_opt_enable">Benachrichtigungen aktivieren</string>
+
 </resources>
