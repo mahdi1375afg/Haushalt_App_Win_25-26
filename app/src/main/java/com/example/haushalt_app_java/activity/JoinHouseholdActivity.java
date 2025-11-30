@@ -8,11 +8,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.utils.HausIdManager;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -72,7 +72,7 @@ public class JoinHouseholdActivity extends AppCompatActivity {
                     }
 
                     // User is in another household, show confirmation dialog
-                    new AlertDialog.Builder(JoinHouseholdActivity.this)
+                    new MaterialAlertDialogBuilder(JoinHouseholdActivity.this)
                             .setTitle("Haushalt wechseln?")
                             .setMessage("Du bist bereits in einem anderen Haushalt. Möchtest du ihn verlassen und diesem neuen Haushalt beitreten?")
                             .setPositiveButton("Beitreten", (dialog, which) -> {
