@@ -2,6 +2,7 @@ package com.example.haushalt_app_java.product_activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -65,9 +66,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Start the DatabaseChangeService as a foreground service
-        Intent serviceIntent = new Intent(this, DatabaseChangeService.class);
-        ContextCompat.startForegroundService(this, serviceIntent);
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        if (pm.isIgnoringBatteryOptimizations(getPackageName())) {
+            // Start the DatabaseChangeService as a foreground service
+            Intent serviceIntent = new Intent(this, DatabaseChangeService.class);
+            ContextCompat.startForegroundService(this, serviceIntent);
+        }
 
         database = FirebaseDatabase.getInstance(DB_URL);
 

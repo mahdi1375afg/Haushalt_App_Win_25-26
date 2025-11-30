@@ -68,11 +68,7 @@ public class StartActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
-            } else {
-                NotificationService.sendNotification(this, "Welcome!", "Thank you for using our app. Permission for Notifications has already been given.", 2);
             }
-        } else {
-            NotificationService.sendNotification(this, "Welcome!", "Thank you for using our app. Permission for Notifications has already been given.", 2);
         }
     }
 
@@ -81,9 +77,9 @@ public class StartActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                NotificationService.sendNotification(this, "Welcome!", "Thank you for using our app.", 2);
+                Toast.makeText(this, "Berechtigung für Benachrichtigungen wurde erteilt.", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "Notification permission is required to show notifications in the background.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Berechtigung für Benachrichtigungen ist erforderlich um über Änderungen per Benachrichtigung informiert zu werden.", Toast.LENGTH_LONG).show();
             }
         }
     }

@@ -12,7 +12,12 @@ import androidx.annotation.Nullable;
 
 public class ApplicationState extends Application implements Application.ActivityLifecycleCallbacks {
 
-    public static final String CHANNEL_ID = "haushalt_app_channel";
+
+    // Channel for the persistent foreground service notification
+    public static final String FOREGROUND_SERVICE_CHANNEL_ID = "DatabaseSyncChannel";
+
+    // Channel for informational notifications
+    public static final String GENERAL_NOTIFICATIONS_CHANNEL_ID = "GeneralNotificationChannel";
     private static boolean isAppInForeground = false;
     private int runningActivities = 0;
 
@@ -25,14 +30,26 @@ public class ApplicationState extends Application implements Application.Activit
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Haushalt App Benachrichtigungen",
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-            channel.setDescription("Kanal für Benachrichtigungen der Haushalt App");
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
+
+            // 1. Configure the Foreground Service Channel
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    FOREGROUND_SERVICE_CHANNEL_ID,
+                    "Background-Sync", // "Background Sync"
+                    NotificationManager.IMPORTANCE_MIN // Use MIN to be unobtrusive
+            );
+            serviceChannel.setDescription("Required for Background-Data-Synchronisation. Should be as unobtrusive as possible.");
+            manager.createNotificationChannel(serviceChannel);
+
+
+            // 2. Configure the General Notifications Channel
+            NotificationChannel generalChannel = new NotificationChannel(
+                    GENERAL_NOTIFICATIONS_CHANNEL_ID,
+                    "General-Notifications",
+                    NotificationManager.IMPORTANCE_DEFAULT // Use DEFAULT to make them noticeable
+            );
+            generalChannel.setDescription("Channel for all standard nofications.");
+            manager.createNotificationChannel(generalChannel);
         }
     }
 
