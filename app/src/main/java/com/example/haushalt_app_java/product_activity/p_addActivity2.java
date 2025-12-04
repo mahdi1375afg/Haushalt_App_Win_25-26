@@ -183,6 +183,8 @@ public class p_addActivity2 extends AppCompatActivity {
             .addOnSuccessListener(aVoid -> {
                 Toast.makeText(p_addActivity2.this, "Produkt hinzugefügt", Toast.LENGTH_SHORT).show();
                 finish();
+                new com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService()
+                        .aktualisiereAutomatischeListe(hausId);
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(p_addActivity2.this, "Fehler: " + e.getMessage(), Toast.LENGTH_LONG).show();

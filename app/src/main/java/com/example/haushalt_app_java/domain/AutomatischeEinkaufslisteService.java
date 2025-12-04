@@ -19,6 +19,79 @@ public class AutomatischeEinkaufslisteService {
         this.db = FirebaseDatabase.getInstance(DB_URL);
     }
 
+    public void aktualisiereAutomatischeListe(String hausId) {
+        DatabaseReference produkteRef = db.getReference()
+                .child("Hauser")
+                .child(hausId)
+                .child("produkte");
+
+        DatabaseReference listenRef = db.getReference()
+                .child("Hauser")
+                .child(hausId)
+                .child("einkaufslisten");
+
+        listenRef.orderByChild("name").equalTo("Automatische Einkaufsliste")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot listeSnap) {
+                        if (!listeSnap.exists()) return;
+
+                        DataSnapshot listeNode = listeSnap.getChildren().iterator().next();
+                        String listeId = listeNode.getKey();
+
+                        produkteRef.get().addOnSuccessListener(productSnap -> {
+
+                            DatabaseReference autoProdukteRef =
+                                    listenRef.child(listeId).child("produkte");
+
+                            autoProdukteRef.get().addOnSuccessListener(autoSnap -> {
+
+                                Map<String, Boolean> autoListeVorher = new HashMap<>();
+                                for (DataSnapshot s : autoSnap.getChildren()) {
+                                    autoListeVorher.put(s.getKey(), true);
+                                }
+
+                                for (DataSnapshot s : productSnap.getChildren()) {
+                                    Produkt p = s.getValue(Produkt.class);
+                                    if (p == null) continue;
+
+                                    int menge = p.getMenge();
+                                    int mind = p.getMindBestand();
+
+                                    if (menge < mind) {
+                                        int nachkaufMenge = 2 * mind - menge;
+
+                                        Produkt einkaufProdukt = new Produkt(
+                                                p.getProdukt_id(),
+                                                p.getHaus_id(),
+                                                p.getName(),
+                                                nachkaufMenge,
+                                                p.getKategorie(),
+                                                p.getMindBestand(),
+                                                p.getEinheit()
+                                        );
+
+                                        autoProdukteRef.child(p.getProdukt_id()).setValue(einkaufProdukt);
+
+                                        autoListeVorher.remove(p.getProdukt_id());
+
+                                    } else {
+                                        autoListeVorher.remove(p.getProdukt_id());
+                                        autoProdukteRef.child(p.getProdukt_id()).removeValue();
+                                    }
+                                }
+
+                                Log.d("AutoListe", "Automatische Liste aktualisiert 🔄");
+                            });
+                        });
+                    }
+
+                    @Override public void onCancelled(DatabaseError error) {}
+                });
+    }
+
+
+
     public void automatischErstelleEinkaufsliste(String hausId, Runnable onFertig, Runnable onFehler) {
         DatabaseReference produkteRef = db.getReference()
                 .child("Hauser")

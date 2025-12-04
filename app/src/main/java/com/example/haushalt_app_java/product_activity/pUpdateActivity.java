@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.haushalt_app_java.R;
+import com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -111,6 +112,8 @@ public class pUpdateActivity extends AppCompatActivity {
         produktRef.updateChildren(updates)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(pUpdateActivity.this, "Produkt aktualisiert", Toast.LENGTH_SHORT).show();
+                    new AutomatischeEinkaufslisteService().aktualisiereAutomatischeListe(hausId);
+
                     setResult(RESULT_OK);
                     finish();
                 })
@@ -133,6 +136,10 @@ public class pUpdateActivity extends AppCompatActivity {
                 .removeValue()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(pUpdateActivity.this, "Produkt gelöscht", Toast.LENGTH_SHORT).show();
+
+                    new AutomatischeEinkaufslisteService()
+                            .aktualisiereAutomatischeListe(hausId);
+
                     setResult(RESULT_OK);
                     finish();
                 })
@@ -140,4 +147,5 @@ public class pUpdateActivity extends AppCompatActivity {
                     Toast.makeText(pUpdateActivity.this, "Fehler: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 }

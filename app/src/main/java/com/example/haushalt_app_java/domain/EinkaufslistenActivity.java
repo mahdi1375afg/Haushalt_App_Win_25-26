@@ -5,6 +5,8 @@ import com.example.haushalt_app_java.product_activity.MainActivity;
 import com.example.haushalt_app_java.profile.profile_Activity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.*;
@@ -25,6 +27,8 @@ public class EinkaufslistenActivity extends AppCompatActivity {
     private List<String> listIds;
     private EinkaufslisteService service;
     private String hausId;
+    private static final String DB_URL = "https://haushalt-app-68451-default-rtdb.europe-west1.firebasedatabase.app";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,26 +66,32 @@ public class EinkaufslistenActivity extends AppCompatActivity {
             String listeId = listIds.get(position);
             String listeName = listNames.get(position);
 
-            new android.app.AlertDialog.Builder(this)
-                    .setTitle("Liste löschen?")
-                    .setMessage("Möchten Sie '" + listeName + "' wirklich löschen?")
-                    .setPositiveButton("Löschen", (dialog, which) -> {
-                        service.deleteEinkaufsliste(
-                                hausId,
-                                listeId,
-                                () -> {
-                                    Toast.makeText(this, "Liste gelöscht",
-                                            Toast.LENGTH_SHORT).show();
-                                    loadEinkaufslisten();
-                                },
-                                () -> Toast.makeText(this,
-                                        "Fehler beim Löschen",
-                                        Toast.LENGTH_SHORT).show()
-                        );
-                    })
-                    .setNegativeButton("Abbrechen", null)
-                    .show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Aktion auswählen");
+            builder.setMessage("Was möchten Sie mit '" + listeName + "' tun?");
+
+            builder.setPositiveButton("Umbenennen", (dialog, which) -> showRenameDialog(listeId, listeName));
+            builder.setNegativeButton("Löschen", (dialog, which) -> showDeleteDialog(listeId, listeName));
+            builder.setNeutralButton("Abbrechen", null);
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+
+            dialog.getWindow().setBackgroundDrawableResource(R.color.ux_color_surface);
+            int textColor = getResources().getColor(R.color.ux_color_on_surface);
+
+            TextView title = dialog.findViewById(android.R.id.title);
+            TextView message = dialog.findViewById(android.R.id.message);
+            if (title != null) title.setTextColor(textColor);
+            if (message != null) message.setTextColor(textColor);
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(textColor);
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(textColor);
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(textColor);
+
             return true;
+
         });
 
         fabAdd.setOnClickListener(v -> showAddDialog());
@@ -116,33 +126,156 @@ public class EinkaufslistenActivity extends AppCompatActivity {
     }
 
     private void loadEinkaufslisten() {
-        service.getEinkaufslisten(hausId, new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                listNames.clear();
-                listIds.clear();
+        FirebaseDatabase.getInstance(DB_URL)
+                .getReference("Hauser")
+                .child(hausId)
+                .child("einkaufslisten")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        listNames.clear();
+                        listIds.clear();
 
-                for (DataSnapshot s : snapshot.getChildren()) {
-                    String listeId = s.getKey();
-                    String listeName = s.child("name").getValue(String.class);
+                        boolean autoListeExistiert = false;
 
-                    if (listeId != null && listeName != null) {
-                        listIds.add(listeId);
-                        listNames.add(listeName);
+                        for (DataSnapshot s : snapshot.getChildren()) {
+                            String listeId = s.getKey();
+                            String listeName = s.child("name").getValue(String.class);
+
+                            if (listeId != null && listeName != null) {
+                                listIds.add(listeId);
+                                listNames.add(listeName);
+
+                                if (listeName.equals(AUTO_LISTE_NAME)) {
+                                    autoListeExistiert = true;
+                                }
+                            }
+                        }
+
+                        if (!autoListeExistiert) {
+                            ensureAutoListeExistiert();
+                        }
+
+                        for (int i = 0; i < listNames.size(); i++) {
+                            if (listNames.get(i).equals(AUTO_LISTE_NAME)) {
+                                String name = listNames.remove(i);
+                                String id = listIds.remove(i);
+                                listNames.add(0, name);
+                                listIds.add(0, id);
+                                break;
+                            }
+                        }
+
+                        adapter.notifyDataSetChanged();
                     }
-                }
 
-                adapter.notifyDataSetChanged();
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+    }
+
+
+    private static final String AUTO_LISTE_NAME = "Automatische Einkaufsliste";
+
+    private void ensureAutoListeExistiert() {
+        DatabaseReference ref = FirebaseDatabase.getInstance(DB_URL)
+                .getReference("Hauser")
+                .child(hausId)
+                .child("einkaufslisten");
+
+        ref.get().addOnSuccessListener(snapshot -> {
+            boolean exists = false;
+
+            for (DataSnapshot s : snapshot.getChildren()) {
+                String listeName = s.child("name").getValue(String.class);
+
+                if (AUTO_LISTE_NAME.equals(listeName)) {
+                    exists = true;
+                    break;
+                }
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(EinkaufslistenActivity.this,
-                        "Fehler beim Laden: " + error.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+            if (!exists) {
+                String id = ref.push().getKey();
+                Einkaufsliste liste = new Einkaufsliste(id, hausId, AUTO_LISTE_NAME);
+                ref.child(id).setValue(liste);
             }
         });
     }
+
+
+    private void showRenameDialog(String listeId, String oldName) {
+        EditText input = new EditText(this);
+        input.setText(oldName);
+        input.requestFocus();
+        input.selectAll();
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Liste umbenennen")
+                .setView(input)
+                .setPositiveButton("Speichern", (d, w) -> {
+                    String newName = input.getText().toString().trim();
+                    if (!newName.isEmpty()) {
+                        FirebaseDatabase.getInstance(DB_URL)
+                                .getReference("Hauser")
+                                .child(hausId)
+                                .child("einkaufslisten")
+                                .child(listeId)
+                                .child("name")
+                                .setValue(newName)
+                                .addOnSuccessListener(unused -> {
+                                    loadEinkaufslisten(); // 🔥 Wichtig für UI!
+                                    Toast.makeText(this, "Name geändert", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Fehler beim Aktualisieren", Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                })
+                .setNegativeButton("Abbrechen", null)
+                .create();
+
+        dialog.show();
+
+        dialog.getWindow().setBackgroundDrawableResource(R.color.ux_color_surface);
+        int textColor = getResources().getColor(R.color.ux_color_on_surface);
+        input.setTextColor(textColor);
+        input.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(textColor);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(textColor);
+    }
+
+    private void showDeleteDialog(String listeId, String listeName) {
+        if (listeName.equals(AUTO_LISTE_NAME)) {
+            Toast.makeText(this, "Diese Liste kann nicht gelöscht werden!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Liste löschen?")
+                .setMessage("Möchten Sie '" + listeName + "' wirklich löschen?")
+                .setPositiveButton("Löschen", (d, w) -> {
+                    service.deleteEinkaufsliste(
+                            hausId,
+                            listeId,
+                            () -> {
+                                Toast.makeText(this, "Liste gelöscht", Toast.LENGTH_SHORT).show();
+                                loadEinkaufslisten();
+                            },
+                            () -> Toast.makeText(this, "Fehler beim Löschen", Toast.LENGTH_SHORT).show()
+                    );
+                })
+                .setNegativeButton("Abbrechen", null)
+                .create();
+
+        dialog.show();
+
+        dialog.getWindow().setBackgroundDrawableResource(R.color.ux_color_surface);
+        int textColor = getResources().getColor(R.color.ux_color_on_surface);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(textColor);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(textColor);
+    }
+
+
 
     private void showAddDialog() {
         LinearLayout layout = new LinearLayout(this);

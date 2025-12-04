@@ -24,6 +24,8 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
     private List<Produkt> produkte;
     private EinkaufslisteService service;
     private FloatingActionButton fabAddProdukt;
+    private List<Produkt> hausProdukte = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
         service = new EinkaufslisteService();
 
         loadProdukte();
+        loadHausProdukte();
 
         fabAddProdukt.setOnClickListener(v -> showAddProduktDialog());
     }
@@ -65,7 +68,7 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
 
         Log.d(TAG, "Firebase Pfad: " + ref.toString());
 
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 adapter.clear();
@@ -141,71 +144,137 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
         });
     }
 
+    private void loadHausProdukte() {
+        DatabaseReference ref = FirebaseDatabase.getInstance(DB_URL)
+                .getReference("Hauser")
+                .child(hausId)
+                .child("produkte");
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                hausProdukte.clear();
+                for (DataSnapshot s : snapshot.getChildren()) {
+                    Produkt p = s.getValue(Produkt.class);
+                    if (p != null) {
+                        p.setProdukt_id(s.getKey());
+                        hausProdukte.add(p);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
+
     private void showAddProduktDialog() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Produkt hinzufügen");
+        if (hausProdukte.isEmpty()) {
+            Toast.makeText(this, "Keine Produkte im Haushalt!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Produkt auswählen");
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(50, 40, 50, 10);
 
-        EditText name = new EditText(this);
-        name.setHint("Produktname");
-        layout.addView(name);
+        Spinner spinner = new Spinner(this);
+        List<String> namen = new ArrayList<>();
+        for (Produkt p : hausProdukte) {
+            namen.add(p.getName());
+        }
+
+        ArrayAdapter<String> spinAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.spinner_item_dark,
+                namen
+        );
+        spinAdapter.setDropDownViewResource(R.layout.spinner_item_dark);
+        spinner.setAdapter(spinAdapter);
+        spinner.setPopupBackgroundResource(R.color.ux_color_surface);
+        layout.addView(spinner);
 
         EditText menge = new EditText(this);
-        menge.setHint("Menge");
+        menge.setHint("Menge eingeben");
         menge.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         layout.addView(menge);
 
-        EditText einheit = new EditText(this);
-        einheit.setHint("Einheit (z.B. Stück)");
-        layout.addView(einheit);
-
         builder.setView(layout);
         builder.setPositiveButton("Hinzufügen", (dialog, which) -> {
-            String pname = name.getText().toString().trim();
-            String mengeStr = menge.getText().toString().trim();
-            String peinheit = einheit.getText().toString().trim();
+            int pos = spinner.getSelectedItemPosition();
+            Produkt selected = hausProdukte.get(pos);
 
-            if (pname.isEmpty() || mengeStr.isEmpty() || peinheit.isEmpty()) {
-                Toast.makeText(this, "Bitte alle Felder ausfüllen", Toast.LENGTH_SHORT).show();
+            int pMenge;
+            try {
+                pMenge = Integer.parseInt(menge.getText().toString().trim());
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Ungültige Menge!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            int pmenge;
-            try {
-                pmenge = Integer.parseInt(mengeStr);
-                if (pmenge <= 0) {
-                    Toast.makeText(this, "Menge muss größer als 0 sein", Toast.LENGTH_SHORT).show();
+            for (Produkt existing : produkte) {
+                if (existing.getName().equalsIgnoreCase(selected.getName())) {
+                    int newMenge = existing.getMenge() + pMenge;
+                    existing.setMenge(newMenge);
+
+                    service.updateProduktInListe(
+                            hausId,
+                            listeId,
+                            existing.getProdukt_id(),
+                            existing,
+                            () -> {
+                                Toast.makeText(this, "Menge aktualisiert!", Toast.LENGTH_SHORT).show();
+                                loadProdukte();
+                            },
+                            () -> Toast.makeText(this, "Fehler beim Aktualisieren!", Toast.LENGTH_SHORT).show()
+                    );
                     return;
                 }
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Ungültige Mengenangabe", Toast.LENGTH_SHORT).show();
-                return;
             }
 
-            Produkt p = new Produkt(
+            Produkt newProd = new Produkt(
                     null,
                     hausId,
-                    pname,
-                    pmenge,
-                    "Sonstiges",
-                    0,
-                    peinheit
+                    selected.getName(),
+                    pMenge,
+                    selected.getKategorie(),
+                    selected.getMindBestand(),
+                    selected.getEinheit()
             );
 
-            service.addProduktZuListe(hausId, listeId, p,
-                () -> {
-                    Toast.makeText(this, "Produkt hinzugefügt", Toast.LENGTH_SHORT).show();
-                    loadProdukte();
-                },
-                () -> Toast.makeText(this, "Fehler beim Hinzufügen", Toast.LENGTH_SHORT).show()
+            service.addProduktZuListe(
+                    hausId,
+                    listeId,
+                    newProd,
+                    () -> {
+                        Toast.makeText(this, "Produkt hinzugefügt!", Toast.LENGTH_SHORT).show();
+                        loadProdukte();
+                    },
+                    () -> Toast.makeText(this, "Fehler beim Hinzufügen!", Toast.LENGTH_SHORT).show()
             );
         });
+
         builder.setNegativeButton("Abbrechen", null);
-        builder.show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getWindow().setBackgroundDrawableResource(R.color.ux_color_surface);
+
+        menge.setTextColor(getResources().getColor(R.color.ux_color_on_surface));
+        menge.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
+
+        TextView selectedView = (TextView) spinner.getSelectedView();
+        if (selectedView != null) {
+            selectedView.setTextColor(getResources().getColor(R.color.ux_color_on_surface));
+        }
+
     }
+
+
 
     private void showEditProduktDialog(Produkt produkt) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -263,14 +332,23 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
 
         dialog.getWindow().setBackgroundDrawableResource(R.color.ux_color_surface);
 
-        name.setTextColor(getResources().getColor(R.color.ux_color_on_surface));
-        menge.setTextColor(getResources().getColor(R.color.ux_color_on_surface));
-        einheit.setTextColor(getResources().getColor(R.color.ux_color_on_surface));
+        int textColor = getResources().getColor(R.color.ux_color_on_surface);
+
+        name.setTextColor(textColor);
+        menge.setTextColor(textColor);
+        einheit.setTextColor(textColor);
 
         name.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
         menge.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
         einheit.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
+
+        TextView title = dialog.findViewById(android.R.id.title);
+        if (title != null) title.setTextColor(textColor);
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(textColor);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(textColor);
     }
+
 
 
 }

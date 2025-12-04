@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 filterProdukte();
-                checkAndShowLowStockDialog();
+                //checkAndShowLowStockDialog();
             }
 
             @Override
