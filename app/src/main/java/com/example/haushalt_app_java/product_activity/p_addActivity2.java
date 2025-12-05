@@ -18,6 +18,7 @@ import android.view.WindowInsets;
 import android.widget.Toast;
 
 import com.example.haushalt_app_java.R;
+import com.example.haushalt_app_java.domain.Einheit;
 import com.example.haushalt_app_java.domain.kategorie;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -75,6 +76,12 @@ public class p_addActivity2 extends AppCompatActivity {
         pKategorie.setFocusable(false);
         pKategorie.setClickable(true);
 
+
+
+        pEinheit.setInputType(InputType.TYPE_NULL);
+        pEinheit.setFocusable(false);
+        pEinheit.setClickable(true);
+
         Abbrechen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,6 +112,45 @@ public class p_addActivity2 extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (selectedIndex[0] >= 0) {
                                     pKategorie.setText(items[selectedIndex[0]]);
+                                }
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                builder.show();
+            }
+        });
+
+        pEinheit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Einheit[] values = Einheit.values();
+                String[] items = new String[values.length];
+                for (int i = 0; i < values.length; i++) {
+                    items[i] = values[i].getDisplayName();
+                }
+
+                final int[] selectedIndex = new int[]{-1};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(p_addActivity2.this)
+                        .setTitle("Einheit wählen")
+                        .setSingleChoiceItems(items, selectedIndex[0], new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                selectedIndex[0] = which;
+                            }
+                        })
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (selectedIndex[0] >= 0) {
+                                    pEinheit.setText(items[selectedIndex[0]]);
                                 }
                                 dialog.dismiss();
                             }
