@@ -93,7 +93,7 @@ public class AddUserActivity extends AppCompatActivity {
 
                     // ✅ Füge Benutzer zum Haushalt hinzu
                     String finalUserId = targetUserId;
-                    DatabaseReference hausRef = database.getReference("Hauser")
+                    DatabaseReference hausRef = database.getReference("Haushalte")
                         .child(hausId).child("mitgliederIds").child(finalUserId);
 
                     hausRef.setValue(true)

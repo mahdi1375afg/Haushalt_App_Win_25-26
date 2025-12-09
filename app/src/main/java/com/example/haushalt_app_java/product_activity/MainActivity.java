@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -20,9 +19,9 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
-import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
+import com.example.haushalt_app_java.activity.EinkaufslisteActivity;
 import com.example.haushalt_app_java.domain.Produkt;
-import com.example.haushalt_app_java.domain.kategorie;
+import com.example.haushalt_app_java.domain.Kategorie;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.notification.DatabaseChangeService;
 import com.example.haushalt_app_java.profile.profile_Activity;
@@ -34,6 +33,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import android.widget.ArrayAdapter;
+
 
 import java.util.ArrayList;
 
@@ -48,8 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton pAddScreen;
     private ListView listView;
     private ArrayList<Produkt> produkten = new ArrayList<>();
-    private ArrayList<String> items = new ArrayList<>();
-    private ArrayAdapter<String> adapter;
+    private ProductAdapter productAdapter;
     private boolean lowStockDialogShown = false;
     private Spinner spinnerKategorie;
     private ArrayList<Produkt> alleProdukten = new ArrayList<>();
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
         // FloatingActionButton zum Hinzufügen
         pAddScreen.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, p_addActivity2.class);
+            Intent intent = new Intent(MainActivity.this, AddProductActivity.class);
             intent.putExtra("haus_id", currentHausId);
             startActivity(intent);
         });
@@ -143,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // ListView Adapter
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
-        listView.setAdapter(adapter);
+        productAdapter = new ProductAdapter(this, produkten, currentHausId);
+        listView.setAdapter(productAdapter);
 
         // ListView Item Click
         listView.setOnItemClickListener((parent, view, position, id) -> {
@@ -156,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
             i.putExtra("produkt_id", p.getProdukt_id());
             i.putExtra("haus_id", p.getHaus_id());
             i.putExtra("name", p.getName());
-            i.putExtra("menge", p.getMenge());
             i.putExtra("einheit", p.getEinheit());
             i.putExtra("kategorie", p.getKategorie());
             i.putExtra("mindBestand", p.getMindBestand());
@@ -176,8 +175,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, profile_Activity.class));
                 return true;
             } else if (itemId == R.id.nav_einkaufslisten) {
-                Intent intent = new Intent(MainActivity.this, EinkaufslistenActivity.class);
-                intent.putExtra("hausId", currentHausId);
+                Intent intent = new Intent(MainActivity.this, EinkaufslisteActivity.class);
+                intent.putExtra("HAUSHALT_ID", currentHausId);
                 startActivity(intent);
                 return true;
             }
@@ -188,11 +187,11 @@ public class MainActivity extends AppCompatActivity {
     private void setupKategorieSpinner() {
         ArrayList<String> kategorien = new ArrayList<>();
         kategorien.add("Alle");
-        kategorien.add(kategorie.LEBENSMITTEL.getDisplayName());
-        kategorien.add(kategorie.GETRAENKE.getDisplayName());
-        kategorien.add(kategorie.HYGIENE.getDisplayName());
-        kategorien.add(kategorie.HAUSHALT.getDisplayName());
-        kategorien.add(kategorie.SONSTIGES.getDisplayName());
+        kategorien.add(Kategorie.LEBENSMITTEL.getDisplayName());
+        kategorien.add(Kategorie.GETRAENKE.getDisplayName());
+        kategorien.add(Kategorie.HYGIENE.getDisplayName());
+        kategorien.add(Kategorie.HAUSHALT.getDisplayName());
+        kategorien.add(Kategorie.SONSTIGES.getDisplayName());
 
         ArrayAdapter<String> kategorieAdapter = new ArrayAdapter<>(
                 this,
@@ -220,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadProducts() {
         DatabaseReference produkteRef = database.getReference()
-                .child("Hauser")
+                .child("Haushalte")
                 .child(currentHausId)
                 .child("produkte");
 
@@ -239,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 filterProdukte();
-                checkAndShowLowStockDialog();
+//                checkAndShowLowStockDialog();
             }
 
             @Override
@@ -250,7 +249,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void filterProdukte() {
-        items.clear();
         produkten.clear();
 
         for (Produkt produkt : alleProdukten) {
@@ -258,71 +256,63 @@ public class MainActivity extends AppCompatActivity {
 
             if (selectedKategorie.equals("Alle") || produktKategorie.equals(selectedKategorie)) {
                 produkten.add(produkt);
-
-                String name = produkt.getName() != null ? produkt.getName() : "";
-                String einheit = produkt.getEinheit() != null ? produkt.getEinheit() : "";
-                String kategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
-                String txt = name + " - " + produkt.getMenge() + " " + einheit + " - " + kategorie;
-                items.add(txt);
             }
         }
 
-        adapter.notifyDataSetChanged();
+        productAdapter.notifyDataSetChanged();
     }
 
-    private void checkAndShowLowStockDialog() {
-        if (lowStockDialogShown) return;
-        if (produkten == null || produkten.isEmpty()) return;
-
-        ArrayList<Produkt> low = new ArrayList<>();
-        for (Produkt p : produkten) {
-            if (p == null) continue;
-
-            int menge = 0;
-            int mind = 0;
-            try {
-                menge = Integer.parseInt(String.valueOf(p.getMenge()));
-                mind = Integer.parseInt(String.valueOf(p.getMindBestand()));
-            } catch (NumberFormatException e) {
-                Log.w("MainActivity", "Ungültige Zahlenwerte bei Produkt: " + p.getName());
-            }
-
-            if (mind > 0 && menge < mind) {
-                low.add(p);
-            }
-        }
-
-        if (low.isEmpty()) return;
-
-        String[] items = new String[low.size()];
-        for (int i = 0; i < low.size(); i++) {
-            Produkt p = low.get(i);
-            String name = (p.getName() != null) ? p.getName() : "(Ohne Name)";
-            String einheit = (p.getEinheit() != null) ? p.getEinheit() : "";
-            items[i] = name + " — " + p.getMenge() + " " + einheit + "  (min. " + p.getMindBestand() + ")";
-        }
-
-        new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
-                .setTitle("Unter Mindestbestand")
-                .setMessage("Diese Produkte sind unter dem Mindestbestand:")
-                .setItems(items, null)
-                .setPositiveButton("Einkaufsliste erstellen", (d, which) -> {
-                    if (currentHausId == null || currentHausId.isEmpty()) {
-                        Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService svc =
-                            new com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService();
-
-                    svc.automatischErstelleEinkaufsliste(
-                            currentHausId,
-                            () -> Toast.makeText(MainActivity.this, "Einkaufsliste erstellt", Toast.LENGTH_SHORT).show(),
-                            () -> Toast.makeText(MainActivity.this, "Fehler beim Erstellen", Toast.LENGTH_SHORT).show()
-                    );
-                })
-                .setNegativeButton("Später", null)
-                .show();
-
-        lowStockDialogShown = true;
-    }
+//    private void checkAndShowLowStockDialog() {
+//        if (lowStockDialogShown) return;
+//        if (produkten == null || produkten.isEmpty()) return;
+//
+//        ArrayList<Produkt> low = new ArrayList<>();
+//        for (Produkt p : produkten) {
+//            if (p == null) continue;
+//
+//            int mind = 0;
+//            try {
+//                mind = p.getMindBestand();
+//            } catch (NumberFormatException e) {
+//                Log.w("MainActivity", "Ungültige Zahlenwerte bei Produkt: " + p.getName());
+//            }
+//
+//            if (mind > 0) {
+//                low.add(p);
+//            }
+//        }
+//
+//        if (low.isEmpty()) return;
+//
+//        String[] items = new String[low.size()];
+//        for (int i = 0; i < low.size(); i++) {
+//            Produkt p = low.get(i);
+//            String name = (p.getName() != null) ? p.getName() : "(Ohne Name)";
+//            String einheit = (p.getEinheit() != null) ? p.getEinheit() : "";
+//            items[i] = name + " — " + einheit + "  (min. " + p.getMindBestand() + ")";
+//        }
+//
+//        new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
+//                .setTitle("Unter Mindestbestand")
+//                .setMessage("Diese Produkte sind unter dem Mindestbestand:")
+//                .setItems(items, null)
+//                .setPositiveButton("Einkaufsliste erstellen", (d, which) -> {
+//                    if (currentHausId == null || currentHausId.isEmpty()) {
+//                        Toast.makeText(MainActivity.this, "Kein Haushalt zugewiesen", Toast.LENGTH_SHORT).show();
+//                        return;
+//                    }
+//                    com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService svc =
+//                            new com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService();
+//
+//                    svc.automatischErstelleEinkaufsliste(
+//                            currentHausId,
+//                            () -> Toast.makeText(MainActivity.this, "Einkaufsliste erstellt", Toast.LENGTH_SHORT).show(),
+//                            () -> Toast.makeText(MainActivity.this, "Fehler beim Erstellen", Toast.LENGTH_SHORT).show()
+//                    );
+//                })
+//                .setNegativeButton("Später", null)
+//                .show();
+//
+//        lowStockDialogShown = true;
+//    }
 }

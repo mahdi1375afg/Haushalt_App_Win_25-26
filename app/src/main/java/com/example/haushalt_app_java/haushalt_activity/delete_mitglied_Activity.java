@@ -50,7 +50,7 @@ public class delete_mitglied_Activity extends AppCompatActivity {
 
                             // Normal löschen
                             database.getReference()
-                                .child("Hauser")
+                                .child("Haushalte")
                                 .child(hausId)
                                 .child("mitgliederIds")
                                 .child(targetUserId)

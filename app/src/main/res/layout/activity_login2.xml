@@ -51,7 +51,7 @@
         android:textColorHint="@color/ux_color_outline"
         android:padding="14dp"
         android:elevation="1dp"
-        android:text="admin@gmail.com" />
+        android:text="jonas@gmail.com" />
 
     <!-- Eingabefeld: Passwort (ID bleibt: password) -->
     <EditText

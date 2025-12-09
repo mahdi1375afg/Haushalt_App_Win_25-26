@@ -77,7 +77,7 @@ public class AddHaushaltActivity extends AppCompatActivity {
                         return;
                     }
 
-                    String hausId = db.getReference("Hauser").push().getKey();
+                    String hausId = db.getReference("Haushalte").push().getKey();
                     if (hausId == null) return;
 
                     Map<String, Object> haushalt = new HashMap<>();
@@ -89,7 +89,7 @@ public class AddHaushaltActivity extends AppCompatActivity {
                     mitglieder.put(userId, true);
                     haushalt.put("mitgliederIds", mitglieder);
 
-                    db.getReference("Hauser").child(hausId).setValue(haushalt)
+                    db.getReference("Haushalte").child(hausId).setValue(haushalt)
                         .addOnSuccessListener(aVoid -> {
                             db.getReference("Benutzer").child(userId).child("hausId")
                                 .setValue(hausId)

@@ -43,7 +43,7 @@
             android:name=".product_activity.pUpdateActivity"
             android:exported="false" />
         <activity
-            android:name=".product_activity.p_addActivity2"
+            android:name=".product_activity.AddProductActivity"
             android:exported="false" />
 
         <activity
@@ -53,10 +53,7 @@
             android:name=".LoginActivity2"
             android:exported="false" />
         <activity
-            android:name=".domain.EinkaufslistenActivity"
-            android:exported="false" />
-        <activity
-            android:name=".domain.EinkaufslisteDetailActivity"
+            android:name=".activity.EinkaufslisteActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity2"

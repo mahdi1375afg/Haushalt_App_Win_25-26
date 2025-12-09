@@ -59,7 +59,7 @@ public class delete_haushalt_Activity extends AppCompatActivity {
         }
 
         hausId = intent.getStringExtra("hausId");
-        hausRef = db.getReference().child("Hauser").child(hausId);
+        hausRef = db.getReference().child("Haushalte").child(hausId);
 
         // ✅ JA-Button: Haushalt löschen
         ja_button.setOnClickListener(new View.OnClickListener() {

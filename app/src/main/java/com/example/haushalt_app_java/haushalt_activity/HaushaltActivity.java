@@ -1,6 +1,5 @@
 package com.example.haushalt_app_java.haushalt_activity;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
@@ -12,7 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import com.example.haushalt_app_java.R;
-import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
+import com.example.haushalt_app_java.activity.EinkaufslisteActivity;
 import com.example.haushalt_app_java.product_activity.MainActivity;
 import com.example.haushalt_app_java.profile.profile_Activity;
 import com.example.haushalt_app_java.utils.HausIdManager;
@@ -90,7 +89,7 @@ public class HaushaltActivity extends AppCompatActivity {
                 return true;
             }
             if (itemId == R.id.nav_einkaufslisten) {
-                Intent intent = new Intent(this, EinkaufslistenActivity.class);
+                Intent intent = new Intent(this, EinkaufslisteActivity.class);
                 intent.putExtra("hausId", currentHausId);
                 startActivity(intent);
                 return true;
@@ -202,7 +201,7 @@ public class HaushaltActivity extends AppCompatActivity {
                             currentHausId = snapshot.getValue(String.class);
 
                             if (currentHausId != null) {
-                                db.getReference("Hauser")
+                                db.getReference("Haushalte")
                                         .child(currentHausId)
                                         .addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -247,7 +246,7 @@ public class HaushaltActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
 
         db.getReference()
-                .child("Hauser")
+                .child("Haushalte")
                 .child(haushaltId)
                 .child("mitgliederIds")
                 .addListenerForSingleValueEvent(new ValueEventListener() {

@@ -20,7 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
-import com.example.haushalt_app_java.domain.EinkaufslistenActivity;
+import com.example.haushalt_app_java.activity.EinkaufslisteActivity;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.product_activity.MainActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -31,7 +31,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.example.haushalt_app_java.utils.HausIdManager;
 
 import java.util.ArrayList;
 
@@ -139,7 +138,7 @@ public class profile_Activity extends AppCompatActivity {
             } else if (itemId == R.id.nav_einkaufslisten) {
                 // ✅ Übergebe hausId
                 String hausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
-                Intent intent = new Intent(profile_Activity.this, EinkaufslistenActivity.class);
+                Intent intent = new Intent(profile_Activity.this, EinkaufslisteActivity.class);
                 intent.putExtra("hausId", hausId);
                 startActivity(intent);
                 return true;

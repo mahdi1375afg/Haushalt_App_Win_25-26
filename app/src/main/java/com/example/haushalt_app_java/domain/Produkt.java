@@ -1,21 +1,18 @@
 package com.example.haushalt_app_java.domain;
 
-import com.google.firebase.database.ServerValue;
+import static java.util.UUID.randomUUID;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.google.firebase.database.ServerValue;
 
 public class Produkt {
 
     private String produkt_id;
     private String haus_id;
     private String name;
-    private String name_lower;
     private String einheit;
-    private int menge;
     private String kategorie;
     private int mindBestand;
+    private int zielbestand;
     private Object timestamp;
 
 
@@ -23,20 +20,15 @@ public class Produkt {
         // Default-Konstruktor erforderlich für Firebase
     }
 
-    public Produkt(String produkt_id,String haus_id, String name, int menge, String kategorie, int mindBestand, String einheit) {
-        this.produkt_id = produkt_id;
+    public Produkt(String haus_id, String name, String kategorie, int mindBestand, int zielbestand, String einheit) {
+        this.produkt_id = randomUUID().toString();
         this.haus_id = haus_id;
         this.name = name;
-        this.menge = menge;
-        this.name_lower = name.toLowerCase(); // Speichert den Namen in Kleinbuchstaben für die Suche
         this.einheit = einheit;
         this.kategorie = kategorie;
         this.mindBestand = mindBestand;
-
+        this.zielbestand = zielbestand;
         this.timestamp = ServerValue.TIMESTAMP;
-    }
-
-    public Produkt(String name, int menge, String kategorie, int mindBestand) {
     }
 
     public String getHaus_id() {
@@ -67,18 +59,6 @@ public class Produkt {
         this.einheit = einheit;
     }
 
-    public String getName_lower() {
-        return name_lower;
-    }
-    public void setName_lower(String name_lower) {
-        this.name_lower = name_lower;
-    }
-    public int getMenge() {
-        return this.menge;
-    }
-    public void setMenge(int menge) {
-        this.menge = menge;
-    }
     public String getKategorie() {
         return this.kategorie;
     }
@@ -91,6 +71,13 @@ public class Produkt {
     public void setMindBestand(int mindBestand) {
         this.mindBestand = mindBestand;
     }
+    public int getZielbestand() {
+        return zielbestand;
+    }
+
+    public void setZielbestand(int zielbestand) {
+        this.zielbestand = zielbestand;
+    }
     public Object getTimestamp() {
         return timestamp;}
     public void setTimestamp(Object timestamp) {
@@ -99,4 +86,3 @@ public class Produkt {
 
 
 }
-
