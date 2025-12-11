@@ -28,28 +28,29 @@ public class EinkaufslisteService {
                 });
     }
 
-    public void addProduktZuListe(String hausId, String listeId, Produkt produkt, Runnable onSuccess, Runnable onError) {
+    public void addProduktZuListe(String hausId, String listeId, Produkt produkt,
+                                  Runnable onSuccess, Runnable onError) {
+
+        String produktId = produkt.getProdukt_id();
+
         DatabaseReference ref = db.getReference()
                 .child("Hauser")
                 .child(hausId)
                 .child("einkaufslisten")
                 .child(listeId)
                 .child("produkte")
-                .push();
+                .child(produktId);
 
         ref.setValue(produkt)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("EinkaufslisteService", "Produkt hinzugefügt");
                     if (onSuccess != null) onSuccess.run();
-                    new AutomatischeEinkaufslisteService()
-                            .aktualisiereAutomatischeListe(hausId);
-
+                    new AutomatischeEinkaufslisteService().aktualisiereAutomatischeListe(hausId);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("EinkaufslisteService", "Fehler beim Hinzufügen des Produkts: " + e.getMessage());
                     if (onError != null) onError.run();
                 });
     }
+
 /*    public void getEinkaufslisten(String hausId, ValueEventListener listener) {
         db.getReference()
                 .child("Hauser")

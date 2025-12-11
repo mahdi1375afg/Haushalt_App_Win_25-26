@@ -237,7 +237,7 @@ public class EinkaufslisteDetailActivity extends AppCompatActivity {
             }
 
             Produkt newProd = new Produkt(
-                    null,
+                    selected.getProdukt_id(),
                     hausId,
                     selected.getName(),
                     pMenge,

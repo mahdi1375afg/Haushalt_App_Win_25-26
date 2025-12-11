@@ -58,7 +58,7 @@ public class AutomatischeEinkaufslisteService {
                                     int menge = p.getMenge();
                                     int mind = p.getMindBestand();
 
-                                    if (menge < mind) {
+                                    if (menge <= mind) {
                                         int nachkaufMenge = 2 * mind - menge;
 
                                         Produkt einkaufProdukt = new Produkt(
@@ -110,7 +110,7 @@ public class AutomatischeEinkaufslisteService {
                     int menge = p.getMenge();
                     int mind = p.getMindBestand();
 
-                    if (menge < mind) {
+                    if (menge <= mind) {
                         int nachkaufMenge = 2 * mind - menge;
 
                         Produkt einkaufProdukt = new Produkt(

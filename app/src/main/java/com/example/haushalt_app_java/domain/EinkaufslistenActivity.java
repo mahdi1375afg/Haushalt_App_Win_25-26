@@ -8,6 +8,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.widget.*;
 import androidx.annotation.NonNull;
@@ -286,10 +287,10 @@ public class EinkaufslistenActivity extends AppCompatActivity {
         input.setHint("Name der Einkaufsliste");
         layout.addView(input);
 
-        new android.app.AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Neue Einkaufsliste")
                 .setView(layout)
-                .setPositiveButton("Erstellen", (dialog, which) -> {
+                .setPositiveButton("Erstellen", (dialogInterface, which) -> {
                     String name = input.getText().toString().trim();
 
                     if (name.isEmpty()) {
@@ -323,8 +324,25 @@ public class EinkaufslistenActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show());
                 })
                 .setNegativeButton("Abbrechen", null)
-                .show();
+                .create();
+
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawableResource(R.color.ux_color_surface);
+        int textColor = getResources().getColor(R.color.ux_color_on_surface);
+
+        input.setTextColor(textColor);
+        input.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
+        input.setBackgroundTintList(ColorStateList.valueOf(
+                getResources().getColor(R.color.ux_color_outline)
+        ));
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(textColor);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(textColor);
+
+        TextView title = dialog.findViewById(android.R.id.title);
+        if (title != null) title.setTextColor(textColor);
     }
+
 
     @Override
     protected void onResume() {

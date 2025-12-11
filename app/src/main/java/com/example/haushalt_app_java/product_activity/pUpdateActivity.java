@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService;
 import com.example.haushalt_app_java.domain.Einheit;
+import com.example.haushalt_app_java.domain.Produkt;
 import com.example.haushalt_app_java.domain.kategorie;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -195,19 +196,26 @@ public class pUpdateActivity extends AppCompatActivity {
                 .child("produkte")
                 .child(produktId);
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("name", name);
-        updates.put("name_lower", name.toLowerCase());
-        updates.put("menge", menge);
-        updates.put("einheit", einheit);
-        updates.put("kategorie", kategorie);
-        updates.put("mindBestand", mindBestand);
+        Produkt neuesProdukt = new Produkt(
+                produktId,
+                hausId,
+                name,
+                menge,
+                kategorie,
+                mindBestand,
+                einheit
+        );
 
-        produktRef.updateChildren(updates)
+        neuesProdukt.setName_lower(name.toLowerCase());
+
+        produktRef.setValue(neuesProdukt)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(pUpdateActivity.this, "Produkt aktualisiert", Toast.LENGTH_SHORT).show();
-                    new AutomatischeEinkaufslisteService().aktualisiereAutomatischeListe(hausId);
 
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                        new AutomatischeEinkaufslisteService().aktualisiereAutomatischeListe(hausId);
+                    }, 150);
+
+                    Toast.makeText(pUpdateActivity.this, "Produkt aktualisiert", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();
                 })
@@ -215,6 +223,7 @@ public class pUpdateActivity extends AppCompatActivity {
                     Toast.makeText(pUpdateActivity.this, "Fehler: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     private void deleteProdukt() {
         if (produktId == null || hausId == null) {
