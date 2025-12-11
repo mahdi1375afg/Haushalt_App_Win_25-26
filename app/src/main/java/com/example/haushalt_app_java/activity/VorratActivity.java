@@ -2,7 +2,6 @@ package com.example.haushalt_app_java.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -17,8 +16,6 @@ import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
 import com.example.haushalt_app_java.adapter.ProductListAdapter;
 import com.example.haushalt_app_java.domain.EinkaufslisteEintrag;
-import com.example.haushalt_app_java.domain.EinkaufslisteRepository;
-import com.example.haushalt_app_java.domain.Produkt;
 import com.example.haushalt_app_java.domain.VorratRepository;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
 import com.example.haushalt_app_java.product_activity.MainActivity;
@@ -30,11 +27,10 @@ import com.google.firebase.database.DatabaseError;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EinkaufslisteActivity extends AppCompatActivity implements ProductListAdapter.OnItemClickListener, EinkaufslisteRepository.OnEinkaufslisteDataChangedListener {
+public class VorratActivity extends AppCompatActivity implements ProductListAdapter.OnItemClickListener, VorratRepository.OnVorratDataChangedListener {
 
-    private EinkaufslisteRepository einkaufslisteRepository;
     private VorratRepository vorratRepository;
-    private ProductListAdapter einkaufslisteAdapter;
+    private ProductListAdapter vorratAdapter;
     private String currentHaushaltId;
 
     @Override
@@ -44,57 +40,56 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Einkaufsliste"); // Set the title on the Toolbar
+        getSupportActionBar().setTitle("Vorrat"); // Set the title on the Toolbar
 
         RecyclerView recyclerView = findViewById(R.id.einkaufslisteRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        einkaufslisteAdapter = new ProductListAdapter(new ArrayList<>(), this, true); // Pass true for isShoppingList
-        recyclerView.setAdapter(einkaufslisteAdapter);
+        vorratAdapter = new ProductListAdapter(new ArrayList<>(), this, false); // Pass false for isShoppingList
+        recyclerView.setAdapter(vorratAdapter);
 
-        einkaufslisteRepository = new EinkaufslisteRepository();
         vorratRepository = new VorratRepository();
 
         currentHaushaltId = getIntent().getStringExtra("HAUSHALT_ID");
 
         if (currentHaushaltId != null && !currentHaushaltId.isEmpty()) {
-            einkaufslisteRepository.getEinkaufsliste(currentHaushaltId, this);
+            vorratRepository.getVorrat(currentHaushaltId, this);
         } else {
             Toast.makeText(this, "Haushalts-ID nicht gefunden.", Toast.LENGTH_LONG).show();
             finish();
         }
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation_einkaufsliste_vorrat);
-        bottomNav.setSelectedItemId(R.id.nav_einkaufslisten);
+        bottomNav.setSelectedItemId(R.id.nav_vorrat);
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
-                Intent intent = new Intent(EinkaufslisteActivity.this, StartActivity.class);
+                Intent intent = new Intent(VorratActivity.this, StartActivity.class);
                 intent.putExtra("HAUSHALT_ID", currentHaushaltId);
                 startActivity(intent);
                 finish();
                 return true;
             } else if (itemId == R.id.nav_products) {
-                Intent intent = new Intent(EinkaufslisteActivity.this, MainActivity.class);
+                Intent intent = new Intent(VorratActivity.this, MainActivity.class);
                 intent.putExtra("HAUSHALT_ID", currentHaushaltId);
                 startActivity(intent);
                 finish();
                 return true;
             } else if (itemId == R.id.nav_household) {
-                Intent intent = new Intent(EinkaufslisteActivity.this, HaushaltActivity.class);
+                Intent intent = new Intent(VorratActivity.this, HaushaltActivity.class);
                 intent.putExtra("HAUSHALT_ID", currentHaushaltId);
                 startActivity(intent);
                 finish();
                 return true;
             } else if (itemId == R.id.nav_einkaufslisten) {
-                return true; // Already on this page
-            } else if (itemId == R.id.nav_vorrat) {
-                Intent intent = new Intent(EinkaufslisteActivity.this, VorratActivity.class);
+                Intent intent = new Intent(VorratActivity.this, EinkaufslisteActivity.class);
                 intent.putExtra("HAUSHALT_ID", currentHaushaltId);
                 startActivity(intent);
                 finish();
                 return true;
+            } else if (itemId == R.id.nav_vorrat) {
+                return true; // Already on this page
             } else if (itemId == R.id.nav_profile) {
-                Intent intent = new Intent(EinkaufslisteActivity.this, profile_Activity.class);
+                Intent intent = new Intent(VorratActivity.this, profile_Activity.class);
                 intent.putExtra("HAUSHALT_ID", currentHaushaltId);
                 startActivity(intent);
                 finish();
@@ -111,38 +106,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
     @Override
     public void onMoveToVorratClick(EinkaufslisteEintrag eintrag) {
-        // Convert EinkaufslisteEintrag to Produkt for VorratRepository
-        Produkt produktToAdd = new Produkt(
-                currentHaushaltId,
-                eintrag.getName(),
-                eintrag.getKategorie(),
-                0, // Mindestbestand, Zielbestand are not directly available from EinkaufslisteEintrag, set to default or retrieve from somewhere else if needed
-                0,
-                eintrag.getEinheit()
-        );
-        produktToAdd.setProdukt_id(eintrag.getProduktId());
-
-        vorratRepository.addVorratItem(currentHaushaltId, produktToAdd, eintrag.getMenge(), new VorratRepository.OnVorratItemAddedListener() {
-            @Override
-            public void onSuccess() {
-                einkaufslisteRepository.removeShoppingListItem(currentHaushaltId, eintrag.getProduktId(), new EinkaufslisteRepository.OnShoppingListItemRemovedListener() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(EinkaufslisteActivity.this, produktToAdd.getName() + " zum Vorrat hinzugefügt und von der Einkaufsliste entfernt.", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        Toast.makeText(EinkaufslisteActivity.this, "Fehler beim Entfernen von der Einkaufsliste: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(EinkaufslisteActivity.this, "Fehler beim Hinzufügen zum Vorrat: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        // This method is not intended to be used in VorratActivity, checkbox is hidden
     }
 
     private void showEditQuantityDialog(EinkaufslisteEintrag eintrag) {
@@ -159,7 +123,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
             String newQuantityStr = editTextQuantity.getText().toString();
             if (!newQuantityStr.isEmpty()) {
                 int newQuantity = Integer.parseInt(newQuantityStr);
-                einkaufslisteRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
+                vorratRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
             }
         });
         builder.setNegativeButton("Abbrechen", (dialog, which) -> dialog.dismiss());
@@ -169,12 +133,12 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     }
 
     @Override
-    public void onEinkaufslisteDataChanged(List<EinkaufslisteEintrag> einkaufsliste) {
-        einkaufslisteAdapter.setProductList(einkaufsliste);
+    public void onVorratDataChanged(List<EinkaufslisteEintrag> vorratliste) {
+        vorratAdapter.setProductList(vorratliste);
     }
 
     @Override
     public void onError(DatabaseError error) {
-        Toast.makeText(this, "Fehler beim Laden der Einkaufsliste: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Fehler beim Laden der Vorratliste: " + error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 }

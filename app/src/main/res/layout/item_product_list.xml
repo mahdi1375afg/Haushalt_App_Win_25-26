@@ -40,7 +40,7 @@
             android:id="@+id/buttonEditQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
             android:background="#303F9F"
             android:minHeight="0dp"
             android:minWidth="0dp"
@@ -51,7 +51,7 @@
             android:text="Edit"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="@+id/textViewProductName"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/checkBoxMoveToVorrat"
             app:layout_constraintTop_toTopOf="@+id/textViewProductName" />
 
         <TextView
@@ -76,10 +76,18 @@
             android:layout_marginStart="8dp"
             android:textColor="@android:color/darker_gray"
             app:layout_constraintBottom_toBottomOf="@+id/textViewProductQuantity"
-            app:layout_constraintEnd_toEndOf="@+id/buttonEditQuantity"
+            app:layout_constraintEnd_toStartOf="@+id/checkBoxMoveToVorrat"
             app:layout_constraintStart_toEndOf="@+id/textViewProductQuantity"
             app:layout_constraintTop_toTopOf="@+id/textViewProductQuantity"
             tools:text="Stk" />
+
+        <CheckBox
+            android:id="@+id/checkBoxMoveToVorrat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textViewProductQuantity"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewProductQuantity" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

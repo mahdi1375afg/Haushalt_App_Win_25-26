@@ -26,6 +26,12 @@
         android:iconTint="@color/ux_color_on_surface" />
 
     <item
+        android:id="@+id/nav_vorrat"
+        android:icon="@drawable/outline_inventory_24"
+        android:title="Vorrat"
+        android:iconTint="@color/ux_color_on_surface" />
+
+    <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/profile"
         android:title="Konto"

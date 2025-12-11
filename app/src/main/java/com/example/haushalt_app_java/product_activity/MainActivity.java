@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.StartActivity;
 import com.example.haushalt_app_java.activity.EinkaufslisteActivity;
+import com.example.haushalt_app_java.activity.VorratActivity;
 import com.example.haushalt_app_java.domain.Produkt;
 import com.example.haushalt_app_java.domain.Kategorie;
 import com.example.haushalt_app_java.haushalt_activity.HaushaltActivity;
@@ -176,6 +177,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.nav_einkaufslisten) {
                 Intent intent = new Intent(MainActivity.this, EinkaufslisteActivity.class);
+                intent.putExtra("HAUSHALT_ID", currentHausId);
+                startActivity(intent);
+                return true;
+            } else if (itemId == R.id.nav_vorrat) { // Added Vorrat navigation
+                Intent intent = new Intent(MainActivity.this, VorratActivity.class);
                 intent.putExtra("HAUSHALT_ID", currentHausId);
                 startActivity(intent);
                 return true;

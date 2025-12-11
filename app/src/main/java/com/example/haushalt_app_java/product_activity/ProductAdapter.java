@@ -2,6 +2,7 @@ package com.example.haushalt_app_java.product_activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,19 +17,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.haushalt_app_java.R;
-import com.example.haushalt_app_java.domain.EinkaufslisteEintrag;
 import com.example.haushalt_app_java.domain.Produkt;
-import com.example.haushalt_app_java.domain.ShoppingListRepository;
+import com.example.haushalt_app_java.domain.VorratRepository;
+import com.example.haushalt_app_java.domain.EinkaufslisteRepository;
 
 import java.util.ArrayList;
 
 public class ProductAdapter extends ArrayAdapter<Produkt> {
 
     private String haushaltId;
+    private EinkaufslisteRepository einkaufslisteRepository;
 
     public ProductAdapter(@NonNull Context context, ArrayList<Produkt> produkte, String haushaltId) {
         super(context, 0, produkte);
         this.haushaltId = haushaltId;
+        this.einkaufslisteRepository = new EinkaufslisteRepository();
     }
 
     @NonNull
@@ -61,12 +64,11 @@ public class ProductAdapter extends ArrayAdapter<Produkt> {
     private void showShoppingListOrStockDialog(Produkt produkt) {
         new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom) // Apply custom style here
             .setTitle("Hinzufügen zu...")
-            .setItems(new CharSequence[]{"Einkaufsliste", "Lagerbestand"}, (dialog, which) -> {
+            .setItems(new CharSequence[]{"Einkaufsliste", "Vorrat"}, (dialog, which) -> {
                 if (which == 0) { // Einkaufsliste
                     showQuantityDialog(produkt);
-                } else { // Lagerbestand
-                    // TODO: Implement logic to add to stock
-                    Toast.makeText(getContext(), "Add to stock clicked for " + produkt.getName(), Toast.LENGTH_SHORT).show();
+                } else { // Vorrat
+                    showQuantityDialogForVorrat(produkt);
                 }
             })
             .show();
@@ -85,9 +87,7 @@ public class ProductAdapter extends ArrayAdapter<Produkt> {
 
         builder.setPositiveButton("OK", (dialog, which) -> {
             int quantity = Integer.parseInt(input.getText().toString());
-            EinkaufslisteEintrag item = new EinkaufslisteEintrag(produkt, quantity);
-            ShoppingListRepository shoppingListRepository = new ShoppingListRepository(haushaltId);
-            shoppingListRepository.addShoppingListItem(item, new ShoppingListRepository.OnShoppingListItemAddedListener() {
+            einkaufslisteRepository.addShoppingListItem(haushaltId, produkt, quantity, new EinkaufslisteRepository.OnShoppingListItemAddedListener() {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(getContext(), produkt.getName() + " zur Einkaufsliste hinzugefügt", Toast.LENGTH_SHORT).show();
@@ -95,7 +95,37 @@ public class ProductAdapter extends ArrayAdapter<Produkt> {
 
                 @Override
                 public void onFailure(Exception e) {
-                    Toast.makeText(getContext(), "Fehler beim Hinzufügen zur Einkaufsliste", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Fehler beim Hinzufügen zur Einkaufsliste: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+        builder.setNegativeButton("Abbrechen", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void showQuantityDialogForVorrat(Produkt produkt) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom);
+        builder.setTitle("Menge eingeben");
+
+        final EditText input = new EditText(getContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setTextColor(getContext().getResources().getColor(android.R.color.white));
+        input.setHintTextColor(getContext().getResources().getColor(android.R.color.darker_gray));
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            int quantity = Integer.parseInt(input.getText().toString());
+            VorratRepository vorratRepository = new VorratRepository();
+            vorratRepository.addVorratItem(haushaltId, produkt, quantity, new VorratRepository.OnVorratItemAddedListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(getContext(), produkt.getName() + " zum Vorrat hinzugefügt", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(getContext(), "Fehler beim Hinzufügen zum Vorrat: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         });

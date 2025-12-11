@@ -56,6 +56,9 @@
             android:name=".activity.EinkaufslisteActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.VorratActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegisterActivity2"
             android:exported="false" />
         <activity
