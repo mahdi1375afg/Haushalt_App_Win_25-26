@@ -62,13 +62,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         bottomNav.setSelectedItemId(R.id.nav_vorrat);
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                Intent intent = new Intent(VorratActivity.this, StartActivity.class);
-                intent.putExtra("HAUSHALT_ID", currentHaushaltId);
-                startActivity(intent);
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_products) {
+            if (itemId == R.id.nav_products) {
                 Intent intent = new Intent(VorratActivity.this, MainActivity.class);
                 intent.putExtra("HAUSHALT_ID", currentHaushaltId);
                 startActivity(intent);

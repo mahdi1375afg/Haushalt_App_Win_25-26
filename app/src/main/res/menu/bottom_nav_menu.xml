@@ -2,12 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nav_home"
-        android:icon="@drawable/baseline_home_24"
-        android:title="Home"
-        android:iconTint="@color/ux_color_on_surface" />
-
-    <item
         android:id="@+id/nav_products"
         android:icon="@drawable/product_menu"
         android:title="Produkte"

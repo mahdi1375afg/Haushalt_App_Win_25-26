@@ -67,13 +67,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
         bottomNav.setSelectedItemId(R.id.nav_einkaufslisten);
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                Intent intent = new Intent(EinkaufslisteActivity.this, StartActivity.class);
-                intent.putExtra("HAUSHALT_ID", currentHaushaltId);
-                startActivity(intent);
-                finish();
-                return true;
-            } else if (itemId == R.id.nav_products) {
+            if (itemId == R.id.nav_products) {
                 Intent intent = new Intent(EinkaufslisteActivity.this, MainActivity.class);
                 intent.putExtra("HAUSHALT_ID", currentHaushaltId);
                 startActivity(intent);
