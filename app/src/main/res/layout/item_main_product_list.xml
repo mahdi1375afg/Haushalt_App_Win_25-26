@@ -14,49 +14,58 @@
         android:padding="16dp">
 
         <LinearLayout
-            android:id="@+id/name_layout"
+            android:id="@+id/text_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/buttons_container"
+            android:layout_marginEnd="8dp">
 
-            <TextView
-                android:id="@+id/textViewProductName"
+            <LinearLayout
+                android:id="@+id/name_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/black"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:text="Product Name" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textViewProductName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="Product Name" />
+
+                <TextView
+                    android:id="@+id/textViewProductUnit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textColor="@android:color/darker_gray"
+                    tools:text="(Stk)" />
+
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/textViewProductUnit"
+                android:id="@+id/textViewProductCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
                 android:textColor="@android:color/darker_gray"
-                tools:text="(Stk)" />
-
+                tools:text="Category" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textViewProductCategory"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@android:color/darker_gray"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/name_layout"
-            tools:text="Category" />
-
         <LinearLayout
+            android:id="@+id/buttons_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewProductCategory">
+            app:layout_constraintTop_toTopOf="@+id/text_container"
+            app:layout_constraintBottom_toBottomOf="@+id/text_container">
 
             <ImageButton
                 android:id="@+id/button_delete_product"

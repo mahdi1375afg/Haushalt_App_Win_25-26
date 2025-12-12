@@ -78,8 +78,8 @@ public class UpdateProductActivity extends AppCompatActivity {
         for (Kategorie kategorie : Kategorie.values()) {
             categories.add(kategorie.getDisplayName());
         }
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, categories);
-        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, categories);
+        categoryAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
         productCategorySpinner.setAdapter(categoryAdapter);
 
         String currentCategory = getIntent().getStringExtra("kategorie");
@@ -93,8 +93,8 @@ public class UpdateProductActivity extends AppCompatActivity {
         for (Einheit einheit : Einheit.values()) {
             units.add(einheit.getDisplayName());
         }
-        ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, units);
-        unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, units);
+        unitAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
         productUnitSpinner.setAdapter(unitAdapter);
 
         String currentUnit = getIntent().getStringExtra("einheit");

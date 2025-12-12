@@ -193,7 +193,7 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
                 R.layout.spinner_item,
                 kategorien
         );
-        kategorieAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+        kategorieAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
         spinnerKategorie.setAdapter(kategorieAdapter);
 
         spinnerKategorie.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
