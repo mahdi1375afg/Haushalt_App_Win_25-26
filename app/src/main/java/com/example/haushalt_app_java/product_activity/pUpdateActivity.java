@@ -1,14 +1,21 @@
 package com.example.haushalt_app_java.product_activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.haushalt_app_java.R;
+import com.example.haushalt_app_java.domain.AutomatischeEinkaufslisteService;
+import com.example.haushalt_app_java.domain.Einheit;
+import com.example.haushalt_app_java.domain.Produkt;
+import com.example.haushalt_app_java.domain.kategorie;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -58,6 +65,95 @@ public class pUpdateActivity extends AppCompatActivity {
         pEinheit.setText(getIntent().getStringExtra("einheit"));
         pKategorie.setText(getIntent().getStringExtra("kategorie"));
         pMindBestand.setText(String.valueOf(getIntent().getIntExtra("mindBestand", 0)));
+        // Keine Tastatur öffnen, nur Klick akzeptieren
+        pKategorie.setInputType(InputType.TYPE_NULL);
+        pKategorie.setFocusable(false);
+        pKategorie.setClickable(true);
+
+
+
+        pEinheit.setInputType(InputType.TYPE_NULL);
+        pEinheit.setFocusable(false);
+        pEinheit.setClickable(true);
+
+        pKategorie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                kategorie[] values = kategorie.values();
+                String[] items = new String[values.length];
+                for (int i = 0; i < values.length; i++) {
+                    items[i] = values[i].getDisplayName();
+                }
+
+                final int[] selectedIndex = new int[]{-1};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(pUpdateActivity.this)
+                        .setTitle("Kategorie wählen")
+                        .setSingleChoiceItems(items, selectedIndex[0], new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                selectedIndex[0] = which;
+                            }
+                        })
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (selectedIndex[0] >= 0) {
+                                    pKategorie.setText(items[selectedIndex[0]]);
+                                }
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                builder.show();
+            }
+        });
+
+        pEinheit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Einheit[] values = Einheit.values();
+                String[] items = new String[values.length];
+                for (int i = 0; i < values.length; i++) {
+                    items[i] = values[i].getDisplayName();
+                }
+
+                final int[] selectedIndex = new int[]{-1};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(pUpdateActivity.this)
+                        .setTitle("Einheit wählen")
+                        .setSingleChoiceItems(items, selectedIndex[0], new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                selectedIndex[0] = which;
+                            }
+                        })
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (selectedIndex[0] >= 0) {
+                                    pEinheit.setText(items[selectedIndex[0]]);
+                                }
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                builder.show();
+            }
+        });
+
 
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,16 +196,25 @@ public class pUpdateActivity extends AppCompatActivity {
                 .child("produkte")
                 .child(produktId);
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("name", name);
-        updates.put("name_lower", name.toLowerCase());
-        updates.put("menge", menge);
-        updates.put("einheit", einheit);
-        updates.put("kategorie", kategorie);
-        updates.put("mindBestand", mindBestand);
+        Produkt neuesProdukt = new Produkt(
+                produktId,
+                hausId,
+                name,
+                menge,
+                kategorie,
+                mindBestand,
+                einheit
+        );
 
-        produktRef.updateChildren(updates)
+        neuesProdukt.setName_lower(name.toLowerCase());
+
+        produktRef.setValue(neuesProdukt)
                 .addOnSuccessListener(aVoid -> {
+
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                        new AutomatischeEinkaufslisteService().aktualisiereAutomatischeListe(hausId);
+                    }, 150);
+
                     Toast.makeText(pUpdateActivity.this, "Produkt aktualisiert", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();
@@ -118,6 +223,7 @@ public class pUpdateActivity extends AppCompatActivity {
                     Toast.makeText(pUpdateActivity.this, "Fehler: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     private void deleteProdukt() {
         if (produktId == null || hausId == null) {
@@ -133,6 +239,10 @@ public class pUpdateActivity extends AppCompatActivity {
                 .removeValue()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(pUpdateActivity.this, "Produkt gelöscht", Toast.LENGTH_SHORT).show();
+
+                    new AutomatischeEinkaufslisteService()
+                            .aktualisiereAutomatischeListe(hausId);
+
                     setResult(RESULT_OK);
                     finish();
                 })
@@ -140,4 +250,5 @@ public class pUpdateActivity extends AppCompatActivity {
                     Toast.makeText(pUpdateActivity.this, "Fehler: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 }

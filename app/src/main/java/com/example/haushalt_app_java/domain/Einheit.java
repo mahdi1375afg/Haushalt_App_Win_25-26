@@ -1,12 +1,14 @@
 package com.example.haushalt_app_java.domain;
 
 public enum Einheit {
-    KG("Kilogramm"),
-    G("Gramm"),
-    L("Liter"),
-    ML("Milliliter"),
-    ST("Stück");
-
+    Kilogramm("Kilogramm"),
+    Gramm("Gramm"),
+    Liter("Liter"),
+    Flasche("Flasche"),
+    Stueck("Stück"),
+    Packung("Packung"),
+    Meter("Meter"),
+    SONSTIGES("Sonstiges");
 
     private final String displayName;
 

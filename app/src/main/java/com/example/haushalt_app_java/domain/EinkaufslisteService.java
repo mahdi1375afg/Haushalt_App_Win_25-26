@@ -28,32 +28,36 @@ public class EinkaufslisteService {
                 });
     }
 
-    public void addProduktZuListe(String hausId, String listeId, Produkt produkt, Runnable onSuccess, Runnable onError) {
+    public void addProduktZuListe(String hausId, String listeId, Produkt produkt,
+                                  Runnable onSuccess, Runnable onError) {
+
+        String produktId = produkt.getProdukt_id();
+
         DatabaseReference ref = db.getReference()
                 .child("Hauser")
                 .child(hausId)
                 .child("einkaufslisten")
                 .child(listeId)
                 .child("produkte")
-                .push();
+                .child(produktId);
 
         ref.setValue(produkt)
                 .addOnSuccessListener(aVoid -> {
-                    Log.d("EinkaufslisteService", "Produkt hinzugefügt");
                     if (onSuccess != null) onSuccess.run();
+                    new AutomatischeEinkaufslisteService().aktualisiereAutomatischeListe(hausId);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("EinkaufslisteService", "Fehler beim Hinzufügen des Produkts: " + e.getMessage());
                     if (onError != null) onError.run();
                 });
     }
-    public void getEinkaufslisten(String hausId, ValueEventListener listener) {
+
+/*    public void getEinkaufslisten(String hausId, ValueEventListener listener) {
         db.getReference()
                 .child("Hauser")
                 .child(hausId)
                 .child("einkaufslisten")
-                .addListenerForSingleValueEvent(listener);
-    }
+                .addValueEventListener(listener);
+    } */
 
     public void getProdukteEinerListe(String hausId, String listeId, ValueEventListener listener) {
         db.getReference()
@@ -77,6 +81,9 @@ public class EinkaufslisteService {
                 .addOnSuccessListener(aVoid -> {
                     Log.d("EinkaufslisteService", "Listenname aktualisiert");
                     if (onSuccess != null) onSuccess.run();
+                    new AutomatischeEinkaufslisteService()
+                            .aktualisiereAutomatischeListe(hausId);
+
                 })
                 .addOnFailureListener(e -> {
                     Log.e("EinkaufslisteService", "Fehler beim Aktualisieren des Listennamens: " + e.getMessage());
@@ -95,6 +102,7 @@ public class EinkaufslisteService {
                 .child(produktId)
                 .setValue(neuesProdukt)
                 .addOnSuccessListener(aVoid -> {
+                    new AutomatischeEinkaufslisteService().aktualisiereAutomatischeListe(hausId);
                     Log.d("EinkaufslisteService", "Produkt aktualisiert");
                     if (onSuccess != null) onSuccess.run();
                 })
@@ -111,6 +119,8 @@ public class EinkaufslisteService {
                 .child(listeId)
                 .removeValue()
                 .addOnSuccessListener(aVoid -> {
+                    new AutomatischeEinkaufslisteService()
+                            .aktualisiereAutomatischeListe(hausId);
                     Log.d("EinkaufslisteService", "Einkaufsliste gelöscht");
                     if (onSuccess != null) onSuccess.run();
                 })
@@ -131,6 +141,8 @@ public class EinkaufslisteService {
                 .child(produktId)
                 .removeValue()
                 .addOnSuccessListener(aVoid -> {
+                    new AutomatischeEinkaufslisteService()
+                            .aktualisiereAutomatischeListe(hausId);
                     Log.d("EinkaufslisteService", "Produkt gelöscht");
                     if (onSuccess != null) onSuccess.run();
                 })
