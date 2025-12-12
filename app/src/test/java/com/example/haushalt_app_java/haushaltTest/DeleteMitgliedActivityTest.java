@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.os.Looper;
 import android.widget.Button;
 
-import com.example.haushalt_app_java.haushalt_activity.delete_mitglied_Activity;
+import com.example.haushalt_app_java.haushalt.delete_mitglied_Activity;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

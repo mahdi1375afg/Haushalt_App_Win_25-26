@@ -3,7 +3,7 @@ package einkaufslisteTest;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
-import com.example.haushalt_app_java.domain.EinkaufslisteService;
+import com.example.haushalt_app_java.einkaufsliste.EinkaufslisteService;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.*;
 

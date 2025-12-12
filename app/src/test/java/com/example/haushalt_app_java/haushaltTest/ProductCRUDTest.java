@@ -11,9 +11,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.haushalt_app_java.R;
-import com.example.haushalt_app_java.domain.Produkt;
-import com.example.haushalt_app_java.product_activity.p_addActivity2;
-import com.example.haushalt_app_java.product_activity.pUpdateActivity;
+import com.example.haushalt_app_java.produkt.Produkt;
+import com.example.haushalt_app_java.produkt.AddProductActivity;
+import com.example.haushalt_app_java.produkt.UpdateProductActivity;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DatabaseReference;
@@ -65,8 +65,8 @@ public class ProductCRUDTest {
             Intent intent = new Intent();
             intent.putExtra("haus_id", "test-haus-id");
 
-            var controller = Robolectric.buildActivity(p_addActivity2.class, intent).create().start().resume();
-            p_addActivity2 activity = controller.get();
+            var controller = Robolectric.buildActivity(AddProductActivity.class, intent).create().start().resume();
+            AddProductActivity activity = controller.get();
 
             // --- UI Interaction ---
             EditText nameInput = activity.findViewById(R.id.pName);
@@ -135,8 +135,8 @@ public class ProductCRUDTest {
             intent.putExtra("kategorie", "Obst");
             intent.putExtra("mindBestand", 5);
 
-            var controller = Robolectric.buildActivity(pUpdateActivity.class, intent).create().start().resume();
-            pUpdateActivity activity = controller.get();
+            var controller = Robolectric.buildActivity(UpdateProductActivity.class, intent).create().start().resume();
+            UpdateProductActivity activity = controller.get();
 
             // --- UI Interaction ---
             EditText nameInput = activity.findViewById(R.id.pName);
@@ -160,7 +160,7 @@ public class ProductCRUDTest {
             assertEquals(25, capturedMap.get("menge"));
 
             assertTrue(activity.isFinishing());
-            assertEquals(pUpdateActivity.RESULT_OK, shadowOf(activity).getResultCode());
+            assertEquals(UpdateProductActivity.RESULT_OK, shadowOf(activity).getResultCode());
         }
     }
 }

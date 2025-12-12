@@ -2,7 +2,7 @@ package einkaufslisteTest;
 
 import static org.mockito.Mockito.*;
 
-import com.example.haushalt_app_java.domain.EinkaufslisteService;
+import com.example.haushalt_app_java.einkaufsliste.EinkaufslisteService;
 import com.google.firebase.database.*;
 
 import org.junit.Test;

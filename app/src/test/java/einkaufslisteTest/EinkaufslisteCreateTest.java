@@ -3,15 +3,13 @@ package einkaufslisteTest;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
-import com.example.haushalt_app_java.domain.Einkaufsliste;
-import com.example.haushalt_app_java.domain.EinkaufslisteService;
+import com.example.haushalt_app_java.einkaufsliste.Einkaufsliste;
+import com.example.haushalt_app_java.einkaufsliste.EinkaufslisteService;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;

@@ -9,7 +9,7 @@ import android.os.Looper;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.haushalt_app_java.haushalt_activity.delete_haushalt_Activity;
+import com.example.haushalt_app_java.haushalt.delete_haushalt_Activity;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.*;
 
