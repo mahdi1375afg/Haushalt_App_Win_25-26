@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.haushalt_app_java.R;
+import com.example.haushalt_app_java.domain.Kategorie;
 import com.example.haushalt_app_java.vorrat.VorratActivity;
 import com.example.haushalt_app_java.produkt.ProductListAdapter;
 import com.example.haushalt_app_java.produkt.Produkt;
@@ -25,7 +29,6 @@ import com.example.haushalt_app_java.vorrat.VorratRepository;
 import com.example.haushalt_app_java.haushalt.HaushaltActivity;
 import com.example.haushalt_app_java.produkt.ProductActivity;
 import com.example.haushalt_app_java.profile.ProfileActivity;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DatabaseError;
 
@@ -38,6 +41,9 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     private VorratRepository vorratRepository;
     private ProductListAdapter einkaufslisteAdapter;
     private String currentHaushaltId;
+    private Spinner spinnerKategorie;
+    private ArrayList<EinkaufslisteEintrag> alleEintraege = new ArrayList<>();
+    private String selectedKategorie = "Alle";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +57,12 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
             return insets;
         });
 
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Einkaufsliste"); // Set the title on the Toolbar
+        TextView title = findViewById(R.id.textViewTitle);
+        title.setText("Einkaufsliste");
 
         RecyclerView recyclerView = findViewById(R.id.einkaufslisteRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        einkaufslisteAdapter = new ProductListAdapter(new ArrayList<>(), this, true); // Pass true for isShoppingList
+        einkaufslisteAdapter = new ProductListAdapter(new ArrayList<>(), this, true);
         recyclerView.setAdapter(einkaufslisteAdapter);
 
         einkaufslisteRepository = new EinkaufslisteRepository();
@@ -71,6 +76,8 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
             Toast.makeText(this, "Haushalts-ID nicht gefunden.", Toast.LENGTH_LONG).show();
             finish();
         }
+
+        setupKategorieSpinner();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_einkaufslisten);
@@ -107,6 +114,51 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
         });
     }
 
+    private void setupKategorieSpinner() {
+        spinnerKategorie = findViewById(R.id.spinnerKategorie);
+        ArrayList<String> kategorien = new ArrayList<>();
+        kategorien.add("Alle");
+        for (Kategorie kategorie : Kategorie.values()) {
+            kategorien.add(kategorie.getDisplayName());
+        }
+
+        ArrayAdapter<String> kategorieAdapter = new ArrayAdapter<>(
+                this,
+                R.layout.spinner_item,
+                kategorien
+        );
+        kategorieAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
+        spinnerKategorie.setAdapter(kategorieAdapter);
+
+        spinnerKategorie.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                selectedKategorie = kategorien.get(position);
+                filterProdukte();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                selectedKategorie = "Alle";
+                filterProdukte();
+            }
+        });
+    }
+
+    private void filterProdukte() {
+        ArrayList<EinkaufslisteEintrag> filteredList = new ArrayList<>();
+        if (selectedKategorie.equals("Alle")) {
+            filteredList.addAll(alleEintraege);
+        } else {
+            for (EinkaufslisteEintrag eintrag : alleEintraege) {
+                if (eintrag.getKategorie().equals(selectedKategorie)) {
+                    filteredList.add(eintrag);
+                }
+            }
+        }
+        einkaufslisteAdapter.setProductList(filteredList);
+    }
+
     @Override
     public void onEditClick(EinkaufslisteEintrag eintrag) {
         showEditQuantityDialog(eintrag);
@@ -114,12 +166,11 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
     @Override
     public void onMoveToVorratClick(EinkaufslisteEintrag eintrag) {
-        // Convert EinkaufslisteEintrag to Produkt for VorratRepository
         Produkt produktToAdd = new Produkt(
                 currentHaushaltId,
                 eintrag.getName(),
                 eintrag.getKategorie(),
-                0, // Mindestbestand, Zielbestand are not directly available from EinkaufslisteEintrag, set to default or retrieve from somewhere else if needed
+                0, 
                 0,
                 eintrag.getEinheit()
         );
@@ -179,7 +230,6 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
     @Override
     public void onBookmarkClick(EinkaufslisteEintrag eintrag, ImageButton bookmarkButton) {
-        // Toggle the bookmarked state and update the icon
         boolean isBookmarked = !eintrag.isBookmarked();
         eintrag.setBookmarked(isBookmarked);
         einkaufslisteRepository.updateBookmarkedStatus(currentHaushaltId, eintrag.getProduktId(), isBookmarked);
@@ -221,7 +271,9 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
     @Override
     public void onEinkaufslisteDataChanged(List<EinkaufslisteEintrag> einkaufsliste) {
-        einkaufslisteAdapter.setProductList(einkaufsliste);
+        alleEintraege.clear();
+        alleEintraege.addAll(einkaufsliste);
+        filterProdukte();
     }
 
     @Override
