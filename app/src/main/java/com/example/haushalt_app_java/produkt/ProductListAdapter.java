@@ -10,17 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.haushalt_app_java.R;
-import com.example.haushalt_app_java.einkaufsliste.EinkaufslisteEintrag;
+import com.example.haushalt_app_java.einkaufsliste.ListenEintrag;
 
 import java.util.List;
 
 public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.ProductListViewHolder> {
 
-    private List<EinkaufslisteEintrag> productList;
+    private List<ListenEintrag> productList;
     private final OnItemClickListener listener;
     private final boolean isShoppingList;
 
-    public ProductListAdapter(List<EinkaufslisteEintrag> productList, OnItemClickListener listener, boolean isShoppingList) {
+    public ProductListAdapter(List<ListenEintrag> productList, OnItemClickListener listener, boolean isShoppingList) {
         this.productList = productList;
         this.listener = listener;
         this.isShoppingList = isShoppingList;
@@ -35,7 +35,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ProductListViewHolder holder, int position) {
-        EinkaufslisteEintrag eintrag = productList.get(position);
+        ListenEintrag eintrag = productList.get(position);
         holder.bind(eintrag, listener, isShoppingList);
     }
 
@@ -44,19 +44,19 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         return productList.size();
     }
 
-    public void setProductList(List<EinkaufslisteEintrag> productList) {
+    public void setProductList(List<ListenEintrag> productList) {
         this.productList = productList;
         notifyDataSetChanged();
     }
 
     public interface OnItemClickListener {
-        void onEditClick(EinkaufslisteEintrag eintrag);
-        void onMoveToVorratClick(EinkaufslisteEintrag eintrag);
-        void onDeleteClick(EinkaufslisteEintrag eintrag);
-        void onIncreaseQuantityClick(EinkaufslisteEintrag eintrag);
-        void onDecreaseQuantityClick(EinkaufslisteEintrag eintrag);
-        void onBookmarkClick(EinkaufslisteEintrag eintrag, ImageButton bookmarkButton);
-        void onAddToShoppingListClick(EinkaufslisteEintrag eintrag);
+        void onEditClick(ListenEintrag eintrag);
+        void onMoveToVorratClick(ListenEintrag eintrag);
+        void onDeleteClick(ListenEintrag eintrag);
+        void onIncreaseQuantityClick(ListenEintrag eintrag);
+        void onDecreaseQuantityClick(ListenEintrag eintrag);
+        void onBookmarkClick(ListenEintrag eintrag, ImageButton bookmarkButton);
+        void onAddToShoppingListClick(ListenEintrag eintrag);
     }
 
     static class ProductListViewHolder extends RecyclerView.ViewHolder {
@@ -87,7 +87,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             buttonBookmark = itemView.findViewById(R.id.button_bookmark);
         }
 
-        public void bind(final EinkaufslisteEintrag eintrag, final OnItemClickListener listener, boolean isShoppingList) {
+        public void bind(final ListenEintrag eintrag, final OnItemClickListener listener, boolean isShoppingList) {
             textViewProductName.setText(eintrag.getName());
             textViewProductCategory.setText(eintrag.getKategorie());
             textViewProductUnit.setText(eintrag.getEinheit());

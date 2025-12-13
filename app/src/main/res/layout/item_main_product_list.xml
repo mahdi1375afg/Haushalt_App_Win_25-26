@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_add"
+                android:src="@drawable/baseline_add_box_24"
                 app:tint="#303F9F" />
         </LinearLayout>
 
