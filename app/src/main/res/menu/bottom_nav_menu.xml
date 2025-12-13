@@ -8,15 +8,21 @@
         android:iconTint="@color/ux_color_on_surface" />
 
     <item
-        android:id="@+id/nav_household"
-        android:icon="@drawable/haushalt"
-        android:title="Haushalt"
+        android:id="@+id/nav_vorrat"
+        android:icon="@drawable/material_symbols_outlined_shelves"
+        android:title="Vorrat"
         android:iconTint="@color/ux_color_on_surface" />
 
     <item
         android:id="@+id/nav_einkaufslisten"
         android:icon="@drawable/outline_checklist_24"
         android:title="Einkaufliste"
+        android:iconTint="@color/ux_color_on_surface" />
+
+    <item
+        android:id="@+id/nav_household"
+        android:icon="@drawable/haushalt"
+        android:title="Haushalt"
         android:iconTint="@color/ux_color_on_surface" />
 
     <item

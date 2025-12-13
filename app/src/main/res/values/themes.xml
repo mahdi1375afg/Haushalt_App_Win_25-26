@@ -26,4 +26,24 @@
         <!-- Icon-Farbe (für baseline_add_24, haushalt etc.) -->
         <item name="colorControlNormal">@color/ux_color_on_surface</item>
     </style>
+
+    <!-- Style for AlertDialog with dark navy background and white text -->
+    <style name="AlertDialogCustom" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">#303F9F</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorAlertDialogListItem">@android:color/white</item>
+        <item name="android:windowTitleStyle">@style/AlertDialogTitleText</item>
+        <!-- Customize button colors and overall dialog background -->
+        <item name="colorAccent">@android:color/white</item>
+        <item name="colorPrimary">#303F9F</item>
+        <item name="colorPrimaryDark">#1A237E</item>
+        <item name="colorSurface">#303F9F</item>
+        <item name="android:colorBackground">#303F9F</item>
+    </style>
+
+    <style name="AlertDialogTitleText" parent="Base.DialogWindowTitle.AppCompat">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
 </resources>

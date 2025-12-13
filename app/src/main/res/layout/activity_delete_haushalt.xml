@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@color/ux_color_primary"
     android:padding="24dp"
-    tools:context=".haushalt_activity.delete_haushalt_Activity">
+    tools:context=".haushalt.delete_haushalt_Activity">
 
     <!-- Zurück-Button -->
     <ImageView

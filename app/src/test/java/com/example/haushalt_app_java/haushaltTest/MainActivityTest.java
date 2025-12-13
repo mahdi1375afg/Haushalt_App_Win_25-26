@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.widget.ListView;
 
 import com.example.haushalt_app_java.R;
-import com.example.haushalt_app_java.domain.Produkt;
-import com.example.haushalt_app_java.product_activity.MainActivity;
+import com.example.haushalt_app_java.produkt.Produkt;
+import com.example.haushalt_app_java.produkt.ProductActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -76,8 +76,8 @@ public class MainActivityTest {
             Intent intent = new Intent();
             intent.putExtra("haus_id", "test-haus-id");
 
-            var controller = Robolectric.buildActivity(MainActivity.class, intent).create().start().resume();
-            MainActivity activity = controller.get();
+            var controller = Robolectric.buildActivity(ProductActivity.class, intent).create().start().resume();
+            ProductActivity activity = controller.get();
 
             // --- Verification ---
             // Capture the listener passed to the database reference

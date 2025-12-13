@@ -8,7 +8,7 @@ import android.os.Looper;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.haushalt_app_java.haushalt_activity.AddHaushaltActivity;
+import com.example.haushalt_app_java.haushalt.AddHaushaltActivity;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

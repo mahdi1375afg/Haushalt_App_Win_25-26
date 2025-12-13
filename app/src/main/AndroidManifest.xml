@@ -17,46 +17,46 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Haushalt_App_Java">
         <activity
-            android:name=".profile.profile_update_Activity"
+            android:name=".profile.UpdateProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".profile.profile_Activity"
+            android:name=".profile.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".haushalt_activity.delete_mitglied_Activity"
+            android:name=".haushalt.delete_mitglied_Activity"
             android:exported="false" />
         <activity
-            android:name=".haushalt_activity.delete_haushalt_Activity"
+            android:name=".haushalt.delete_haushalt_Activity"
             android:exported="false" />
         <activity
-            android:name=".haushalt_activity.AddHaushaltActivity"
+            android:name=".haushalt.AddHaushaltActivity"
             android:exported="false"
-            android:parentActivityName=".haushalt_activity.HaushaltActivity" />
+            android:parentActivityName=".haushalt.HaushaltActivity" />
         <activity
-            android:name=".haushalt_activity.AddUserActivity"
+            android:name=".haushalt.AddUserActivity"
             android:exported="false"
-            android:parentActivityName=".haushalt_activity.HaushaltActivity" />
+            android:parentActivityName=".haushalt.HaushaltActivity" />
         <activity
-            android:name=".haushalt_activity.HaushaltActivity"
+            android:name=".haushalt.HaushaltActivity"
             android:exported="false" />
         <activity
-            android:name=".product_activity.pUpdateActivity"
+            android:name=".produkt.UpdateProductActivity"
             android:exported="false" />
         <activity
-            android:name=".product_activity.p_addActivity2"
+            android:name=".produkt.AddProductActivity"
             android:exported="false" />
 
         <activity
-            android:name=".product_activity.MainActivity"
+            android:name=".produkt.ProductActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity2"
             android:exported="false" />
         <activity
-            android:name=".domain.EinkaufslistenActivity"
+            android:name=".einkaufsliste.EinkaufslisteActivity"
             android:exported="false" />
         <activity
-            android:name=".domain.EinkaufslisteDetailActivity"
+            android:name=".vorrat.VorratActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity2"
@@ -71,7 +71,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.JoinHouseholdActivity"
+            android:name=".domain.JoinHouseholdActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
