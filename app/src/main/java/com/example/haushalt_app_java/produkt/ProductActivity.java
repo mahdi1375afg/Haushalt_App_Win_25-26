@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -295,6 +296,19 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
         showShoppingListOrStockDialog(produkt);
     }
 
+    @Override
+    public void onBookmarkClick(Produkt produkt, ImageButton bookmarkButton) {
+        boolean isBookmarked = !produkt.isBookmarked();
+        produkt.setBookmarked(isBookmarked);
+        productRepository.updateBookmarkStatus(produkt.getProdukt_id(), isBookmarked);
+
+        if (isBookmarked) {
+            bookmarkButton.setImageResource(R.drawable.ic_bookmark_checked);
+        } else {
+            bookmarkButton.setImageResource(R.drawable.ic_bookmark_unchecked);
+        }
+    }
+
     private void showShoppingListOrStockDialog(Produkt produkt) {
         new AlertDialog.Builder(this, R.style.AlertDialogCustom)
                 .setTitle("Hinzufügen zu...")
@@ -320,7 +334,7 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
 
         builder.setPositiveButton("OK", (dialog, which) -> {
             int quantity = Integer.parseInt(input.getText().toString());
-            einkaufslisteRepository.addShoppingListItem(currentHausId, produkt, quantity, new EinkaufslisteRepository.OnShoppingListItemAddedListener() {
+            einkaufslisteRepository.addShoppingListItem(currentHausId, produkt.getProdukt_id(), quantity, new EinkaufslisteRepository.OnShoppingListItemAddedListener() {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(ProductActivity.this, produkt.getName() + " zur Einkaufsliste hinzugefügt", Toast.LENGTH_SHORT).show();

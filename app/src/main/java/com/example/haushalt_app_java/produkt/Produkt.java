@@ -14,6 +14,7 @@ public class Produkt {
     private int mindBestand;
     private int zielbestand;
     private Object timestamp;
+    private boolean bookmarked;
 
 
     public Produkt() {
@@ -29,6 +30,7 @@ public class Produkt {
         this.mindBestand = mindBestand;
         this.zielbestand = zielbestand;
         this.timestamp = ServerValue.TIMESTAMP;
+        this.bookmarked = false;
     }
 
     public String getHaus_id() {
@@ -84,6 +86,13 @@ public class Produkt {
         this.timestamp = timestamp;
     }
 
+    public boolean isBookmarked() {
+        return bookmarked;
+    }
+
+    public void setBookmarked(boolean bookmarked) {
+        this.bookmarked = bookmarked;
+    }
 
     public void setName_lower(String lowerCase) {
         this.name=lowerCase;

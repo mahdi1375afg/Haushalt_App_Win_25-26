@@ -136,6 +136,17 @@ public class VorratRepository {
         databaseReference.child("Haushalte").child(haushaltId).child("vorrat").child(produktId).updateChildren(updates);
     }
 
+    public void removeVorratItem(String currentHaushaltId, String produktId, VorratRepository.OnVorratItemRemovedListener onVorratItemRemovedListener) {
+    }
+
+    public void updateBookmarkedStatus(String currentHaushaltId, String produktId, boolean isBookmarked) {
+    }
+
+    public interface OnVorratItemRemovedListener {
+        void onVorratDataChanged(List<EinkaufslisteEintrag> vorratliste);
+        void onError(DatabaseError error);
+    }
+
     public interface OnVorratDataChangedListener {
         void onVorratDataChanged(List<EinkaufslisteEintrag> vorratliste);
         void onError(DatabaseError error);

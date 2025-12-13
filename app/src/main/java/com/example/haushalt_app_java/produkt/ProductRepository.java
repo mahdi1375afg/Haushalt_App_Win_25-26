@@ -50,6 +50,10 @@ public class ProductRepository {
                 .addOnFailureListener(e -> listener.onFailure(e));
     }
 
+    public void updateBookmarkStatus(String produktId, boolean isBookmarked) {
+        databaseReference.child(produktId).child("bookmarked").setValue(isBookmarked);
+    }
+
     public interface OnProductAddedListener {
         void onSuccess();
         void onFailure(Exception e);

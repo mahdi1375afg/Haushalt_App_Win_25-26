@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -145,6 +146,54 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
                 Toast.makeText(EinkaufslisteActivity.this, "Fehler beim Hinzufügen zum Vorrat: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onDeleteClick(EinkaufslisteEintrag eintrag) {
+        einkaufslisteRepository.removeShoppingListItem(currentHaushaltId, eintrag.getProduktId(), new EinkaufslisteRepository.OnShoppingListItemRemovedListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(EinkaufslisteActivity.this, eintrag.getName() + " von der Einkaufsliste entfernt", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(EinkaufslisteActivity.this, "Fehler beim Entfernen von " + eintrag.getName() + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onIncreaseQuantityClick(EinkaufslisteEintrag eintrag) {
+        int newQuantity = eintrag.getMenge() + 1;
+        einkaufslisteRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
+    }
+
+    @Override
+    public void onDecreaseQuantityClick(EinkaufslisteEintrag eintrag) {
+        int newQuantity = eintrag.getMenge() - 1;
+        if (newQuantity >= 0) {
+            einkaufslisteRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
+        }
+    }
+
+    @Override
+    public void onBookmarkClick(EinkaufslisteEintrag eintrag, ImageButton bookmarkButton) {
+        // Toggle the bookmarked state and update the icon
+        boolean isBookmarked = !eintrag.isBookmarked();
+        eintrag.setBookmarked(isBookmarked);
+        einkaufslisteRepository.updateBookmarkedStatus(currentHaushaltId, eintrag.getProduktId(), isBookmarked);
+
+        if (isBookmarked) {
+            bookmarkButton.setImageResource(R.drawable.ic_bookmark_checked);
+        } else {
+            bookmarkButton.setImageResource(R.drawable.ic_bookmark_unchecked);
+        }
+    }
+
+    @Override
+    public void onAddToShoppingListClick(EinkaufslisteEintrag eintrag) {
+        // This method is not intended to be used in EinkaufslisteActivity
     }
 
     private void showEditQuantityDialog(EinkaufslisteEintrag eintrag) {

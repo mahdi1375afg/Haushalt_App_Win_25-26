@@ -50,13 +50,14 @@ public class MainProductListAdapter extends RecyclerView.Adapter<MainProductList
         void onDeleteClick(Produkt produkt);
         void onEditClick(Produkt produkt);
         void onAddToCartClick(Produkt produkt);
+        void onBookmarkClick(Produkt produkt, ImageButton bookmarkButton);
     }
 
     static class MainProductViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewProductName;
         private final TextView textViewProductCategory;
         private final TextView textViewProductUnit;
-        private final ImageButton buttonDelete, buttonEdit, buttonAddToCart;
+        private final ImageButton buttonDelete, buttonEdit, buttonAddToCart, buttonBookmark;
 
         public MainProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -66,6 +67,7 @@ public class MainProductListAdapter extends RecyclerView.Adapter<MainProductList
             buttonDelete = itemView.findViewById(R.id.button_delete_product);
             buttonEdit = itemView.findViewById(R.id.button_edit_product);
             buttonAddToCart = itemView.findViewById(R.id.button_add_to_cart);
+            buttonBookmark = itemView.findViewById(R.id.button_bookmark);
         }
 
         public void bind(final Produkt produkt, final OnItemClickListener listener) {
@@ -76,6 +78,7 @@ public class MainProductListAdapter extends RecyclerView.Adapter<MainProductList
             buttonDelete.setOnClickListener(v -> listener.onDeleteClick(produkt));
             buttonEdit.setOnClickListener(v -> listener.onEditClick(produkt));
             buttonAddToCart.setOnClickListener(v -> listener.onAddToCartClick(produkt));
+            buttonBookmark.setOnClickListener(v -> listener.onBookmarkClick(produkt, buttonBookmark));
         }
     }
 }

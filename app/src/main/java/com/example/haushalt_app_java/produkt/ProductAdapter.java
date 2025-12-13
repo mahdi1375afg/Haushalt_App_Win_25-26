@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -57,8 +58,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         private final TextView textViewProductCategory;
         private final TextView textViewProductUnit;
         private final TextView textViewProductQuantity;
-        private final Button buttonEditQuantity;
-        private final CheckBox checkBoxMoveToVorrat;
+        private final ImageButton buttonEditQuantity;
+        private final ImageButton buttonMoveToVorrat;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -66,8 +67,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             textViewProductCategory = itemView.findViewById(R.id.textViewProductCategory);
             textViewProductUnit = itemView.findViewById(R.id.textViewProductUnit);
             textViewProductQuantity = itemView.findViewById(R.id.textViewProductQuantity);
-            buttonEditQuantity = itemView.findViewById(R.id.buttonEditQuantity);
-            checkBoxMoveToVorrat = itemView.findViewById(R.id.checkBoxMoveToVorrat);
+            buttonEditQuantity = itemView.findViewById(R.id.button_edit_product);
+            buttonMoveToVorrat = itemView.findViewById(R.id.button_move_to_vorrat);
         }
 
         public void bind(final Produkt produkt, final OnItemClickListener listener) {
@@ -77,7 +78,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             textViewProductQuantity.setText(String.valueOf(produkt.getMenge()));
 
             buttonEditQuantity.setOnClickListener(v -> listener.onEditClick(produkt));
-            checkBoxMoveToVorrat.setVisibility(View.GONE); // Hide checkbox in product list
+            buttonMoveToVorrat.setVisibility(View.GONE); // Hide checkbox in product list
         }
     }
 }

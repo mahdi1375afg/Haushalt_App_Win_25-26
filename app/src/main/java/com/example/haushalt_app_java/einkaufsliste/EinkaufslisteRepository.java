@@ -91,13 +91,13 @@ public class EinkaufslisteRepository {
         });
     }
 
-    public void addShoppingListItem(String haushaltId, Produkt produkt, int quantity, final OnShoppingListItemAddedListener listener) {
-        if (produkt.getProdukt_id() == null) {
+    public void addShoppingListItem(String haushaltId, String productId, int quantity, final OnShoppingListItemAddedListener listener) {
+        if (productId == null) {
             listener.onFailure(new IllegalArgumentException("Produkt ID cannot be null"));
             return;
         }
 
-        DatabaseReference shoppingListItemRef = databaseReference.child("Haushalte").child(haushaltId).child("einkaufsliste").child(produkt.getProdukt_id());
+        DatabaseReference shoppingListItemRef = databaseReference.child("Haushalte").child(haushaltId).child("einkaufsliste").child(productId);
 
         Map<String, Object> shoppingListData = new HashMap<>();
         shoppingListData.put("menge", quantity);
@@ -119,6 +119,9 @@ public class EinkaufslisteRepository {
         databaseReference.child("Haushalte").child(haushaltId).child("einkaufsliste").child(produktId).removeValue()
                 .addOnSuccessListener(aVoid -> listener.onSuccess())
                 .addOnFailureListener(e -> listener.onFailure(e));
+    }
+
+    public void updateBookmarkedStatus(String currentHaushaltId, String produktId, boolean isBookmarked) {
     }
 
     public interface OnEinkaufslisteDataChangedListener {

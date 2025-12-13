@@ -9,6 +9,9 @@ public class EinkaufslisteEintrag {
     private String einheit;
     private int menge;
 
+    private boolean isBookmarked;
+
+
     public EinkaufslisteEintrag() {
     }
     public EinkaufslisteEintrag(Produkt produkt, int menge) {
@@ -65,5 +68,13 @@ public class EinkaufslisteEintrag {
 
     public void setMenge(int menge) {
         this.menge = menge;
+    }
+
+    public boolean isBookmarked() {
+        return isBookmarked;
+    }
+
+    public void setBookmarked(boolean isBookmarked) {
+        this.isBookmarked = isBookmarked;
     }
 }
