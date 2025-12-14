@@ -1,5 +1,7 @@
 package com.example.haushalt_app_java.produkt;
 
+import android.util.Log;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -11,11 +13,12 @@ public class ProductRepository {
     private final DatabaseReference databaseReference;
 
     public ProductRepository(String haushaltId) {
-        databaseReference = FirebaseDatabase.getInstance().getReference("Haushalte").child(haushaltId).child("produkte");
+        databaseReference = FirebaseDatabase.getInstance("https://haushalt-app-68451-default-rtdb.europe-west1.firebasedatabase.app").getReference("Haushalte").child(haushaltId).child("produkte");
     }
 
     public void addProduct(Produkt product, final OnProductAddedListener listener) {
         String produktId = databaseReference.push().getKey();
+        Log.d("ProductRepository", "Generated produktId: " + produktId);
         if (produktId != null) {
             product.setProdukt_id(produktId);
             databaseReference.child(produktId).setValue(product)

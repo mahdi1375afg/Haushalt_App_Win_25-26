@@ -101,24 +101,9 @@ public class AddProductActivity extends AppCompatActivity {
         int minStock = Integer.parseInt(minStockStr);
         int targetStock = Integer.parseInt(targetStockStr);
 
-        String category = "";
-        for (Kategorie k : Kategorie.values()) {
-            if (k.getDisplayName().equals(categoryDisplayName)) {
-                category = k.name();
-                break;
-            }
-        }
-
-        String unit = "";
-        for (Einheit e : Einheit.values()) {
-            if (e.getDisplayName().equals(unitDisplayName)) {
-                unit = e.name();
-                break;
-            }
-        }
-
-        Produkt product = new Produkt(haushaltId, name, category, minStock, targetStock, unit);
-        Log.d("Product", "Adding product with values: name(String): " + name + ", category(String): " + category + ", unit(String): " + unit + ", minStock(int): " + minStock + ", targetStock(int): " + targetStock);
+        // Verwende direkt die DisplayNames anstatt Enum-Namen
+        Produkt product = new Produkt(haushaltId, name, categoryDisplayName, minStock, targetStock, unitDisplayName);
+        Log.d("Product", "Adding product with values: name(String): " + name + ", category(String): " + categoryDisplayName + ", unit(String): " + unitDisplayName + ", minStock(int): " + minStock + ", targetStock(int): " + targetStock);
 
         productRepository.addProduct(product, new ProductRepository.OnProductAddedListener() {
             @Override
