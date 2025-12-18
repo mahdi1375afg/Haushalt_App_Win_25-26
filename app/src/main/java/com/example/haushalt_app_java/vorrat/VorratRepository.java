@@ -5,7 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.haushalt_app_java.produkt.Produkt;
-import com.example.haushalt_app_java.einkaufsliste.EinkaufslisteEintrag;
+import com.example.haushalt_app_java.einkaufsliste.ListenEintrag;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,10 +36,9 @@ public class VorratRepository {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d("VorratRepository", "Snapshot: " + snapshot);
 
-                List<EinkaufslisteEintrag> vorratliste = new ArrayList<>();
+                List<ListenEintrag> vorratliste = new ArrayList<>();
                 if (!snapshot.exists() || !snapshot.hasChildren()) {
                     listener.onVorratDataChanged(vorratliste);
-                    return;
                 }
 
                 long totalItems = snapshot.getChildrenCount();
@@ -65,7 +64,7 @@ public class VorratRepository {
                                 Produkt produkt = produktSnapshot.getValue(Produkt.class);
                                 Log.d("VorratRepository", "Produkt: " + produkt);
                                 if (produkt != null) {
-                                    vorratliste.add(new EinkaufslisteEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge));
+                                    vorratliste.add(new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge));
                                 }
                                 loadedItems[0]++;
                                 if (loadedItems[0] == totalItems) {
@@ -137,18 +136,21 @@ public class VorratRepository {
     }
 
     public void removeVorratItem(String currentHaushaltId, String produktId, VorratRepository.OnVorratItemRemovedListener onVorratItemRemovedListener) {
+        // TODO Jonas
     }
 
     public void updateBookmarkedStatus(String currentHaushaltId, String produktId, boolean isBookmarked) {
+        // TODO Jonas (bookmarked als boolean in der Datenbank unter Produkt)
     }
 
+    // TODO Jonas unify & simplify Listeners (nur bei Abruf Listener notwendig?)
     public interface OnVorratItemRemovedListener {
-        void onVorratDataChanged(List<EinkaufslisteEintrag> vorratliste);
+        void onVorratDataChanged(List<ListenEintrag> vorratliste);
         void onError(DatabaseError error);
     }
 
     public interface OnVorratDataChangedListener {
-        void onVorratDataChanged(List<EinkaufslisteEintrag> vorratliste);
+        void onVorratDataChanged(List<ListenEintrag> vorratliste);
         void onError(DatabaseError error);
     }
 

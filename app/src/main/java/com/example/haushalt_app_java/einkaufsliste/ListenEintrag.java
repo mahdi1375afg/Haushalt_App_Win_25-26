@@ -2,7 +2,7 @@ package com.example.haushalt_app_java.einkaufsliste;
 
 import com.example.haushalt_app_java.produkt.Produkt;
 
-public class EinkaufslisteEintrag {
+public class ListenEintrag {
     private String produktId;
     private String name;
     private String kategorie;
@@ -12,9 +12,9 @@ public class EinkaufslisteEintrag {
     private boolean isBookmarked;
 
 
-    public EinkaufslisteEintrag() {
+    public ListenEintrag() {
     }
-    public EinkaufslisteEintrag(Produkt produkt, int menge) {
+    public ListenEintrag(Produkt produkt, int menge) {
         this.produktId = produkt.getProdukt_id();
         this.name = produkt.getName();
         this.kategorie = produkt.getKategorie();
@@ -22,7 +22,7 @@ public class EinkaufslisteEintrag {
         this.menge = menge;
     }
 
-    public EinkaufslisteEintrag(String produktId, String name, String kategorie, String einheit, int menge) {
+    public ListenEintrag(String produktId, String name, String kategorie, String einheit, int menge) {
         this.produktId = produktId;
         this.name = name;
         this.kategorie = kategorie;

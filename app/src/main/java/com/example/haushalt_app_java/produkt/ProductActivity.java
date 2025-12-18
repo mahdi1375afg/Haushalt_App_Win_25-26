@@ -105,7 +105,6 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
                         Toast.makeText(ProductActivity.this, "Bitte wähle einen Haushalt", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(ProductActivity.this, HaushaltActivity.class));
                         finish();
-                        return;
                     }
 
                     productRepository = new ProductRepository(currentHausId);
@@ -348,7 +347,7 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
 
         builder.setPositiveButton("OK", (dialog, which) -> {
             int quantity = Integer.parseInt(input.getText().toString());
-            einkaufslisteRepository.addShoppingListItem(currentHausId, produkt.getProdukt_id(), quantity, new EinkaufslisteRepository.OnShoppingListItemAddedListener() {
+            einkaufslisteRepository.addShoppingListItem(currentHausId, produkt.getProdukt_id(), quantity, new EinkaufslisteRepository.OnShoppingListItemListener() {
                 @Override
                 public void onSuccess() {
                     Toast.makeText(ProductActivity.this, produkt.getName() + " zur Einkaufsliste hinzugefügt", Toast.LENGTH_SHORT).show();

@@ -42,7 +42,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     private ProductListAdapter einkaufslisteAdapter;
     private String currentHaushaltId;
     private Spinner spinnerKategorie;
-    private ArrayList<EinkaufslisteEintrag> alleEintraege = new ArrayList<>();
+    private ArrayList<ListenEintrag> alleEintraege = new ArrayList<>();
     private String selectedKategorie = "Alle";
 
     @Override
@@ -146,11 +146,11 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     }
 
     private void filterProdukte() {
-        ArrayList<EinkaufslisteEintrag> filteredList = new ArrayList<>();
+        ArrayList<ListenEintrag> filteredList = new ArrayList<>();
         if (selectedKategorie.equals("Alle")) {
             filteredList.addAll(alleEintraege);
         } else {
-            for (EinkaufslisteEintrag eintrag : alleEintraege) {
+            for (ListenEintrag eintrag : alleEintraege) {
                 if (eintrag.getKategorie().equals(selectedKategorie)) {
                     filteredList.add(eintrag);
                 }
@@ -160,12 +160,12 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     }
 
     @Override
-    public void onEditClick(EinkaufslisteEintrag eintrag) {
+    public void onEditClick(ListenEintrag eintrag) {
         showEditQuantityDialog(eintrag);
     }
 
     @Override
-    public void onMoveToVorratClick(EinkaufslisteEintrag eintrag) {
+    public void onMoveToVorratClick(ListenEintrag eintrag) {
         Produkt produktToAdd = new Produkt(
                 currentHaushaltId,
                 eintrag.getName(),
@@ -200,7 +200,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     }
 
     @Override
-    public void onDeleteClick(EinkaufslisteEintrag eintrag) {
+    public void onDeleteClick(ListenEintrag eintrag) {
         einkaufslisteRepository.removeShoppingListItem(currentHaushaltId, eintrag.getProduktId(), new EinkaufslisteRepository.OnShoppingListItemRemovedListener() {
             @Override
             public void onSuccess() {
@@ -215,13 +215,13 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     }
 
     @Override
-    public void onIncreaseQuantityClick(EinkaufslisteEintrag eintrag) {
+    public void onIncreaseQuantityClick(ListenEintrag eintrag) {
         int newQuantity = eintrag.getMenge() + 1;
         einkaufslisteRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
     }
 
     @Override
-    public void onDecreaseQuantityClick(EinkaufslisteEintrag eintrag) {
+    public void onDecreaseQuantityClick(ListenEintrag eintrag) {
         int newQuantity = eintrag.getMenge() - 1;
         if (newQuantity >= 0) {
             einkaufslisteRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
@@ -229,7 +229,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     }
 
     @Override
-    public void onBookmarkClick(EinkaufslisteEintrag eintrag, ImageButton bookmarkButton) {
+    public void onBookmarkClick(ListenEintrag eintrag, ImageButton bookmarkButton) {
         boolean isBookmarked = !eintrag.isBookmarked();
         eintrag.setBookmarked(isBookmarked);
         einkaufslisteRepository.updateBookmarkedStatus(currentHaushaltId, eintrag.getProduktId(), isBookmarked);
@@ -242,11 +242,11 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     }
 
     @Override
-    public void onAddToShoppingListClick(EinkaufslisteEintrag eintrag) {
+    public void onAddToShoppingListClick(ListenEintrag eintrag) {
         // This method is not intended to be used in EinkaufslisteActivity
     }
 
-    private void showEditQuantityDialog(EinkaufslisteEintrag eintrag) {
+    private void showEditQuantityDialog(ListenEintrag eintrag) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_edit_quantity, null);
@@ -270,7 +270,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     }
 
     @Override
-    public void onEinkaufslisteDataChanged(List<EinkaufslisteEintrag> einkaufsliste) {
+    public void onEinkaufslisteDataChanged(List<ListenEintrag> einkaufsliste) {
         alleEintraege.clear();
         alleEintraege.addAll(einkaufsliste);
         filterProdukte();

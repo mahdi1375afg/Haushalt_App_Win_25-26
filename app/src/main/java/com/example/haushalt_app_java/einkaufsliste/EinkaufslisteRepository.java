@@ -35,7 +35,7 @@ public class EinkaufslisteRepository {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d("EinkaufslisteRepository", "Snapshot: " + snapshot);
 
-                List<EinkaufslisteEintrag> einkaufsliste = new ArrayList<>();
+                List<ListenEintrag> einkaufsliste = new ArrayList<>();
                 if (!snapshot.exists() || !snapshot.hasChildren()) {
                     listener.onEinkaufslisteDataChanged(einkaufsliste);
                     return;
@@ -64,7 +64,7 @@ public class EinkaufslisteRepository {
                                 Produkt produkt = produktSnapshot.getValue(Produkt.class);
                                 Log.d("EinkaufslisteRepository", "Produkt: " + produkt);
                                 if (produkt != null) {
-                                    einkaufsliste.add(new EinkaufslisteEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge));
+                                    einkaufsliste.add(new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge));
                                 }
                                 loadedItems[0]++;
                                 if (loadedItems[0] == totalItems) {
@@ -91,7 +91,7 @@ public class EinkaufslisteRepository {
         });
     }
 
-    public void addShoppingListItem(String haushaltId, String productId, int quantity, final OnShoppingListItemAddedListener listener) {
+    public void addShoppingListItem(String haushaltId, String productId, int quantity, final OnShoppingListItemListener listener) {
         if (productId == null) {
             listener.onFailure(new IllegalArgumentException("Produkt ID cannot be null"));
             return;
@@ -108,6 +108,33 @@ public class EinkaufslisteRepository {
                 .addOnFailureListener(listener::onFailure);
     }
 
+    public void setQuantityOnShoppingList(String haushaltId, String productId, int quantity, final OnShoppingListItemListener listener) {
+        if (productId == null || productId.isEmpty()) {
+            if (listener != null) {
+                listener.onFailure(new IllegalArgumentException("Product ID cannot be null or empty."));
+            }
+            return;
+        }
+
+        DatabaseReference itemRef = databaseReference.child("Haushalte").child(haushaltId).child("einkaufsliste").child(productId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("menge", quantity);
+        updates.put("timestamp", ServerValue.TIMESTAMP);
+
+        itemRef.setValue(updates)
+                .addOnSuccessListener(aVoid -> {
+                    if (listener != null) {
+                        listener.onSuccess();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (listener != null) {
+                        listener.onFailure(e);
+                    }
+                });
+    }
+
     public void updateMenge(String haushaltId, String produktId, int neueMenge) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("menge", neueMenge);
@@ -122,17 +149,20 @@ public class EinkaufslisteRepository {
     }
 
     public void updateBookmarkedStatus(String currentHaushaltId, String produktId, boolean isBookmarked) {
+        // TODO Jonas
     }
 
+    // TODO Jonas unify & simplify Listeners
     public interface OnEinkaufslisteDataChangedListener {
-        void onEinkaufslisteDataChanged(List<EinkaufslisteEintrag> einkaufsliste);
+        void onEinkaufslisteDataChanged(List<ListenEintrag> einkaufsliste);
         void onError(DatabaseError error);
     }
 
-    public interface OnShoppingListItemAddedListener {
+    public interface OnShoppingListItemListener {
         void onSuccess();
         void onFailure(Exception e);
     }
+
 
     public interface OnShoppingListItemRemovedListener {
         void onSuccess();
