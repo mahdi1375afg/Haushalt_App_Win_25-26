@@ -15,6 +15,7 @@ import com.example.haushalt_app_java.einkaufsliste.EinkaufslisteActivity;
 import com.example.haushalt_app_java.produkt.ProductActivity;
 import com.example.haushalt_app_java.profile.ProfileActivity;
 import com.example.haushalt_app_java.utils.HausIdManager;
+import com.example.haushalt_app_java.vorrat.VorratActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -90,7 +91,12 @@ public class HaushaltActivity extends AppCompatActivity {
             }
             if (itemId == R.id.nav_einkaufslisten) {
                 Intent intent = new Intent(this, EinkaufslisteActivity.class);
-                intent.putExtra("hausId", currentHausId);
+                intent.putExtra("HAUSHALT_ID", currentHausId);
+                startActivity(intent);
+                return true;
+            }else if (itemId == R.id.nav_vorrat) {
+                Intent intent = new Intent(this, VorratActivity.class);
+                intent.putExtra("HAUSHALT_ID", currentHausId);
                 startActivity(intent);
                 return true;
             }

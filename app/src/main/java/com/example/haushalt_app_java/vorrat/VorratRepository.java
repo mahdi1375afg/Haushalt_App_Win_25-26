@@ -135,9 +135,38 @@ public class VorratRepository {
         databaseReference.child("Haushalte").child(haushaltId).child("vorrat").child(produktId).updateChildren(updates);
     }
 
-    public void removeVorratItem(String currentHaushaltId, String produktId, VorratRepository.OnVorratItemRemovedListener onVorratItemRemovedListener) {
-        // TODO Jonas
-    }
+     public void removeVorratItem(String haushaltId, String produktId, OnVorratItemRemovedListener listener) {
+         if (produktId == null || produktId.isEmpty()) {
+             listener.onError(DatabaseError.fromException(new IllegalArgumentException("Produkt ID cannot be null or empty")));
+             return;
+         }
+
+         DatabaseReference vorratItemRef = databaseReference
+                 .child("Haushalte")
+                 .child(haushaltId)
+                 .child("vorrat")
+                 .child(produktId);
+
+         vorratItemRef.removeValue()
+                 .addOnSuccessListener(aVoid -> {
+                     Log.d("VorratRepository", "Vorrat item removed successfully: " + produktId);
+                     getVorrat(haushaltId, new OnVorratDataChangedListener() {
+                         @Override
+                         public void onVorratDataChanged(List<ListenEintrag> vorratliste) {
+                             listener.onVorratDataChanged(vorratliste);
+                         }
+
+                         @Override
+                         public void onError(DatabaseError error) {
+                             listener.onError(error);
+                         }
+                     });
+                 })
+                 .addOnFailureListener(e -> {
+                     Log.e("VorratRepository", "Failed to remove vorrat item: " + e.getMessage());
+                     listener.onError(DatabaseError.fromException(e));
+                 });
+     }
 
     public void updateBookmarkedStatus(String currentHaushaltId, String produktId, boolean isBookmarked) {
         // TODO Jonas (bookmarked als boolean in der Datenbank unter Produkt)

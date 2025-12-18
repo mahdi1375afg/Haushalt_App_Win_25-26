@@ -271,9 +271,9 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
 
     @Override
     public void onDeleteClick(Produkt produkt) {
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(this,R.style.AlertDialogCustom)
                 .setTitle("Produkt löschen")
-                .setMessage("Sind Sie sicher, dass Sie dieses Produkt löschen möchten?")
+                .setMessage("Sind Sie sicher, dass Sie dieses Produkt löschen möchten?\n\nMit löschen werden alle zugehörigen Einträge im Vorrat und der Einkaufsliste entfernt.")
                 .setPositiveButton("Löschen", (dialog, which) -> {
                     productRepository.deleteProduct(produkt.getProdukt_id(), new ProductRepository.OnProductDeletedListener() {
                         @Override

@@ -23,6 +23,7 @@ import com.example.haushalt_app_java.StartActivity;
 import com.example.haushalt_app_java.einkaufsliste.EinkaufslisteActivity;
 import com.example.haushalt_app_java.haushalt.HaushaltActivity;
 import com.example.haushalt_app_java.produkt.ProductActivity;
+import com.example.haushalt_app_java.vorrat.VorratActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -122,24 +123,30 @@ public class ProfileActivity extends AppCompatActivity {
             if (itemId == R.id.nav_profile) {
                 return true;
             } else if (itemId == R.id.nav_products) {
-                // ✅ Übergebe hausId
+                // Übergebe hausId
                 String hausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
                 Intent intent = new Intent(ProfileActivity.this, ProductActivity.class);
-                intent.putExtra("haus_id", hausId);
+                intent.putExtra("HAUSHALT_ID", hausId);
                 startActivity(intent);
                 return true;
             } else if (itemId == R.id.nav_household) {
-                // ✅ Übergebe hausId
+                //  Übergebe hausId
                 String hausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
                 Intent intent = new Intent(ProfileActivity.this, HaushaltActivity.class);
-                intent.putExtra("hausId", hausId);
+                intent.putExtra("HAUSHALT_ID", hausId);
                 startActivity(intent);
                 return true;
             } else if (itemId == R.id.nav_einkaufslisten) {
-                // ✅ Übergebe hausId
+                //  Übergebe hausId
                 String hausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
                 Intent intent = new Intent(ProfileActivity.this, EinkaufslisteActivity.class);
-                intent.putExtra("hausId", hausId);
+                intent.putExtra("HAUSHALT_ID", hausId);
+                startActivity(intent);
+                return true;
+            }else if (itemId == R.id.nav_vorrat) {
+                String hausId = com.example.haushalt_app_java.utils.HausIdManager.getInstance().getHausId();
+                Intent intent = new Intent(this, VorratActivity.class);
+                intent.putExtra("HAUSHALT_ID", hausId);
                 startActivity(intent);
                 return true;
             }
