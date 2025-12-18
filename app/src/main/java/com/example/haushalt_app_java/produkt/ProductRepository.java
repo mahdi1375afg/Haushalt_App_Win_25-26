@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import android.util.Log;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -22,6 +24,7 @@ public class ProductRepository {
 
     public void addProduct(Produkt product, final OnProductAddedListener listener) {
         String produktId = databaseReference.push().getKey();
+        Log.d("ProductRepository", "Generated produktId: " + produktId);
         if (produktId != null) {
             product.setProdukt_id(produktId);
             databaseReference.child(produktId).setValue(product)

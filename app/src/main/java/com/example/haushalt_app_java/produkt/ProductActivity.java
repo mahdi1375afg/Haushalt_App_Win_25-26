@@ -247,12 +247,26 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
         for (Produkt produkt : alleProdukte) {
             String produktKategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
 
-            if (selectedKategorie.equals("Alle") || produktKategorie.equals(selectedKategorie)) {
+            // Vergleiche mit DisplayName und Enum-Name
+            boolean matches = selectedKategorie.equals("Alle")
+                || produktKategorie.equals(selectedKategorie)
+                || produktKategorie.equals(getEnumNameForDisplayName(selectedKategorie));
+
+            if (matches) {
                 productList.add(produkt);
             }
         }
 
         productAdapter.notifyDataSetChanged();
+    }
+
+    private String getEnumNameForDisplayName(String displayName) {
+        for (Kategorie k : Kategorie.values()) {
+            if (k.getDisplayName().equals(displayName)) {
+                return k.name();
+            }
+        }
+        return displayName;
     }
 
     @Override
