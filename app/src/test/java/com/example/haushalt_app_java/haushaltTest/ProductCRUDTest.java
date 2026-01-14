@@ -9,6 +9,7 @@ import static org.robolectric.Shadows.shadowOf;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.produkt.Produkt;
@@ -45,9 +46,9 @@ public class ProductCRUDTest {
         DatabaseReference newProduktRefMock = mock(DatabaseReference.class);
         DatabaseReference finalProduktRefMock = mock(DatabaseReference.class);
 
-        // Chain the mock calls to simulate the database path
+        // Chain the mock calls
         when(dbMock.getReference()).thenReturn(rootRefMock);
-        when(rootRefMock.child("Hauser")).thenReturn(hauserRefMock);
+        when(rootRefMock.child("Haushalte")).thenReturn(hauserRefMock);
         when(hauserRefMock.child("test-haus-id")).thenReturn(specificHausRefMock);
         when(specificHausRefMock.child("produkte")).thenReturn(produkteRefMock);
         when(produkteRefMock.push()).thenReturn(newProduktRefMock);
@@ -68,20 +69,20 @@ public class ProductCRUDTest {
             var controller = Robolectric.buildActivity(AddProductActivity.class, intent).create().start().resume();
             AddProductActivity activity = controller.get();
 
-            // --- UI Interaction ---
-            EditText nameInput = activity.findViewById(R.id.pName);
-            EditText mengeInput = activity.findViewById(R.id.pMenge);
-            EditText einheitInput = activity.findViewById(R.id.pEinheit);
-            EditText mindestInput = activity.findViewById(R.id.pMindBestand);
-            EditText kategorieInput = activity.findViewById(R.id.pKategorie);
+            // --- UI Interaction (korrigierte IDs aus activity_add_product.xml) ---
+            EditText nameInput = activity.findViewById(R.id.product_name);
+            EditText mindestInput = activity.findViewById(R.id.product_min_stock_input);
+            EditText zielbestandInput = activity.findViewById(R.id.product_target_stock_input);
+            Spinner kategorieSpinner = activity.findViewById(R.id.product_category_spinner);
+            Spinner einheitSpinner = activity.findViewById(R.id.product_unit_spinner);
 
             nameInput.setText("Test Tomaten");
-            mengeInput.setText("500");
-            einheitInput.setText("g");
             mindestInput.setText("100");
-            kategorieInput.setText("Lebensmittel");
+            zielbestandInput.setText("500");
+            kategorieSpinner.setSelection(1); // z.B. Lebensmittel
+            einheitSpinner.setSelection(0); // z.B. erste Einheit
 
-            Button addButton = activity.findViewById(R.id.add);
+            Button addButton = activity.findViewById(R.id.button_add);
             addButton.performClick();
 
             ShadowLooper.idleMainLooper();
@@ -94,10 +95,10 @@ public class ProductCRUDTest {
             assertEquals("new-product-id", savedProdukt.getProdukt_id());
             assertEquals("test-haus-id", savedProdukt.getHaus_id());
             assertEquals("Test Tomaten", savedProdukt.getName());
-            assertEquals(500, savedProdukt.getMenge());
-            assertEquals("g", savedProdukt.getEinheit());
+            assertNotNull(savedProdukt.getEinheit());
             assertEquals(100, savedProdukt.getMindBestand());
-            assertEquals("Lebensmittel", savedProdukt.getKategorie());
+            assertEquals(500, savedProdukt.getZielbestand());
+            assertNotNull(savedProdukt.getKategorie());
 
             assertTrue(activity.isFinishing());
         }
@@ -114,7 +115,7 @@ public class ProductCRUDTest {
         DatabaseReference specificProduktRefMock = mock(DatabaseReference.class);
 
         when(dbMock.getReference()).thenReturn(rootRefMock);
-        when(rootRefMock.child("Hauser")).thenReturn(hauserRefMock);
+        when(rootRefMock.child("Haushalte")).thenReturn(hauserRefMock);
         when(hauserRefMock.child("test-haus-id")).thenReturn(specificHausRefMock);
         when(specificHausRefMock.child("produkte")).thenReturn(produkteRefMock);
         when(produkteRefMock.child("test-produkt-id")).thenReturn(specificProduktRefMock);
@@ -130,22 +131,24 @@ public class ProductCRUDTest {
             intent.putExtra("haus_id", "test-haus-id");
             intent.putExtra("produkt_id", "test-produkt-id");
             intent.putExtra("name", "Old Name");
-            intent.putExtra("menge", 10);
             intent.putExtra("einheit", "Stk");
-            intent.putExtra("kategorie", "Obst");
+            intent.putExtra("kategorie", "LEBENSMITTEL");
             intent.putExtra("mindBestand", 5);
+            intent.putExtra("zielbestand", 10);
 
             var controller = Robolectric.buildActivity(UpdateProductActivity.class, intent).create().start().resume();
             UpdateProductActivity activity = controller.get();
 
-            // --- UI Interaction ---
-            EditText nameInput = activity.findViewById(R.id.pName);
-            EditText mengeInput = activity.findViewById(R.id.pMenge);
+            // --- UI Interaction (korrigierte IDs aus activity_update_product.xml) ---
+            EditText nameInput = activity.findViewById(R.id.product_name);
+            EditText mindBestandInput = activity.findViewById(R.id.product_min_stock_input);
+            EditText zielbestandInput = activity.findViewById(R.id.product_target_stock_input);
 
             nameInput.setText("New Updated Name");
-            mengeInput.setText("25");
+            mindBestandInput.setText("10");
+            zielbestandInput.setText("25");
 
-            Button updateButton = activity.findViewById(R.id.add);
+            Button updateButton = activity.findViewById(R.id.button_update);
             updateButton.performClick();
 
             ShadowLooper.idleMainLooper();
@@ -157,7 +160,8 @@ public class ProductCRUDTest {
             Map<String, Object> capturedMap = mapCaptor.getValue();
             assertEquals("New Updated Name", capturedMap.get("name"));
             assertEquals("new updated name", capturedMap.get("name_lower"));
-            assertEquals(25, capturedMap.get("menge"));
+            assertEquals(10, capturedMap.get("mindBestand"));
+            assertEquals(25, capturedMap.get("zielbestand"));
 
             assertTrue(activity.isFinishing());
             assertEquals(UpdateProductActivity.RESULT_OK, shadowOf(activity).getResultCode());

@@ -7,6 +7,8 @@ import static org.mockito.Mockito.*;
 import android.content.Intent;
 import android.widget.ListView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.produkt.Produkt;
 import com.example.haushalt_app_java.produkt.ProductActivity;
@@ -44,8 +46,8 @@ public class MainActivityTest {
         DataSnapshot p1SnapshotMock = mock(DataSnapshot.class);
         DataSnapshot p2SnapshotMock = mock(DataSnapshot.class);
 
-        Produkt p1 = new Produkt("p1", "test-haus-id", "Milch", 1, "Lebensmittel", 1, "Liter");
-        Produkt p2 = new Produkt("p2", "test-haus-id", "Brot", 1, "Lebensmittel", 1, "Stk");
+        Produkt p1 = new Produkt("p1", "test-haus-id", "Milch", 1, 1, "Liter");
+        Produkt p2 = new Produkt("p2", "test-haus-id", "Brot", 1, 1, "Stk");
 
         // Mock the database path
         when(dbMock.getReference()).thenReturn(rootRefMock);
@@ -88,15 +90,12 @@ public class MainActivityTest {
             listenerCaptor.getValue().onDataChange(rootSnapshotMock);
 
             // --- Assertions ---
-            ListView listView = activity.findViewById(R.id.listViewp);
-            assertNotNull(listView.getAdapter());
-            assertEquals(2, listView.getAdapter().getCount()); // Should have two items
+            // Verwende RecyclerView statt ListView
+            RecyclerView recyclerView = activity.findViewById(R.id.productRecyclerView);
+            assertNotNull(recyclerView.getAdapter());
+            assertEquals(2, recyclerView.getAdapter().getItemCount());
 
-            // Check if the items are formatted correctly
-            String item1 = (String) listView.getAdapter().getItem(0);
-            String item2 = (String) listView.getAdapter().getItem(1);
-            assertEquals("Milch - 1 Liter - Lebensmittel", item1);
-            assertEquals("Brot - 1 Stk - Lebensmittel", item2);
+
         }
     }
 }

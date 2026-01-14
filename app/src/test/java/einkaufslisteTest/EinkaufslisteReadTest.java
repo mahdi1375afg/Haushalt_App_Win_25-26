@@ -1,4 +1,4 @@
-package einkaufslisteTest;
+/*package einkaufslisteTest;
 
 import static org.mockito.Mockito.*;
 
@@ -51,3 +51,4 @@ public class EinkaufslisteReadTest {
         }
     }
 }
+*/

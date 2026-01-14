@@ -9,8 +9,6 @@
     android:background="@color/ux_color_primary"
     android:padding="24dp"
     tools:context=".RegisterActivity2">
-    tools:context=".RegisterActivity2"
-    android:background="@color/ux_color_primary">
 
     <!-- Titel -->
     <TextView

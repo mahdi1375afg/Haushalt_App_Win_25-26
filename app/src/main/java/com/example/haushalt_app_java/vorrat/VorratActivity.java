@@ -47,6 +47,8 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     private Spinner spinnerKategorie;
     private ArrayList<ListenEintrag> alleEintraege = new ArrayList<>();
     private String selectedKategorie = "Alle";
+    private androidx.appcompat.widget.SearchView searchView;
+    private String searchQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         }
 
         setupKategorieSpinner();
+        setupSearchView();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_vorrat);
@@ -117,6 +120,24 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         });
     }
 
+    private void setupSearchView() {
+        searchView = findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchQuery = newText.toLowerCase().trim();
+                filterProdukte();
+                return true;
+            }
+        });
+    }
+
+
     private void setupKategorieSpinner() {
         spinnerKategorie = findViewById(R.id.spinnerKategorie);
         ArrayList<String> kategorien = new ArrayList<>();
@@ -150,15 +171,22 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
 
     private void filterProdukte() {
         ArrayList<ListenEintrag> filteredList = new ArrayList<>();
-        if (selectedKategorie.equals("Alle")) {
-            filteredList.addAll(alleEintraege);
-        } else {
-            for (ListenEintrag eintrag : alleEintraege) {
-                if (eintrag.getKategorie().equals(selectedKategorie)) {
-                    filteredList.add(eintrag);
-                }
+
+        for (ListenEintrag eintrag : alleEintraege) {
+            // Kategorie-Filter
+            boolean kategorieMatch = selectedKategorie.equals("Alle") ||
+                                    eintrag.getKategorie().equals(selectedKategorie);
+
+            // Such-Filter
+            boolean searchMatch = searchQuery.isEmpty() ||
+                                 eintrag.getName().toLowerCase().contains(searchQuery);
+
+            // Nur hinzufügen, wenn beide Filter zutreffen
+            if (kategorieMatch && searchMatch) {
+                filteredList.add(eintrag);
             }
         }
+
         vorratAdapter.setProductList(filteredList);
     }
 

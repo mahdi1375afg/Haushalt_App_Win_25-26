@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import androidx.appcompat.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -63,6 +64,8 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
     private ProductRepository productRepository;
     private EinkaufslisteRepository einkaufslisteRepository;
     private VorratRepository vorratRepository;
+    private SearchView searchView;
+    private String searchQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +137,22 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
         pAddScreen = findViewById(R.id.pAddScreen);
         productRecyclerView = findViewById(R.id.productRecyclerView);
         spinnerKategorie = findViewById(R.id.spinnerKategorie);
+        searchView = findViewById(R.id.searchView);
         setupKategorieSpinner();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchQuery = newText.toLowerCase();
+                filterProdukte();
+                return true;
+            }
+        });
 
         pAddScreen.setOnClickListener(v -> {
             Intent intent = new Intent(ProductActivity.this, AddProductActivity.class);
@@ -247,12 +265,16 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
         for (Produkt produkt : alleProdukte) {
             String produktKategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
 
-            // Vergleiche mit DisplayName und Enum-Name
-            boolean matches = selectedKategorie.equals("Alle")
-                || produktKategorie.equals(selectedKategorie)
-                || produktKategorie.equals(getEnumNameForDisplayName(selectedKategorie));
+            // Kategoriefilter
+            boolean kategorieMatch = selectedKategorie.equals("Alle")
+                    || produktKategorie.equals(selectedKategorie)
+                    || produktKategorie.equals(getEnumNameForDisplayName(selectedKategorie));
 
-            if (matches) {
+            // Suchfilter
+            boolean searchMatch = searchQuery.isEmpty()
+                    || produkt.getName().toLowerCase().contains(searchQuery);
+
+            if (kategorieMatch && searchMatch) {
                 productList.add(produkt);
             }
         }

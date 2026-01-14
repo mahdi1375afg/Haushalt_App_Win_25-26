@@ -44,6 +44,8 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     private Spinner spinnerKategorie;
     private ArrayList<ListenEintrag> alleEintraege = new ArrayList<>();
     private String selectedKategorie = "Alle";
+    private androidx.appcompat.widget.SearchView searchView;
+    private String searchQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,9 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
         }
 
         setupKategorieSpinner();
+        setupSearchView();
+
+
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_einkaufslisten);
@@ -145,17 +150,38 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
         });
     }
 
+    private void setupSearchView() {
+        searchView = findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchQuery = newText.toLowerCase();
+                filterProdukte();
+                return true;
+            }
+        });
+    }
+
     private void filterProdukte() {
         ArrayList<ListenEintrag> filteredList = new ArrayList<>();
-        if (selectedKategorie.equals("Alle")) {
-            filteredList.addAll(alleEintraege);
-        } else {
-            for (ListenEintrag eintrag : alleEintraege) {
-                if (eintrag.getKategorie().equals(selectedKategorie)) {
-                    filteredList.add(eintrag);
-                }
+
+        for (ListenEintrag eintrag : alleEintraege) {
+            boolean kategorieMatch = selectedKategorie.equals("Alle")
+                || eintrag.getKategorie().equals(selectedKategorie);
+
+            boolean searchMatch = searchQuery.isEmpty()
+                || eintrag.getName().toLowerCase().contains(searchQuery);
+
+            if (kategorieMatch && searchMatch) {
+                filteredList.add(eintrag);
             }
         }
+
         einkaufslisteAdapter.setProductList(filteredList);
     }
 

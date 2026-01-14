@@ -8,8 +8,6 @@
     android:background="@color/ux_color_primary"
     android:padding="24dp"
     tools:context=".StartActivity">
-    tools:context=".StartActivity"
-    android:background="@color/ux_color_primary">
 
     <!-- Titel / Hinweis -->
     <TextView
