@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="sort_options_product">
+        <item>Alphabet</item>
+        <item>Lesezeichen</item>
+    </string-array>
+</resources>

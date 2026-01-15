@@ -58,8 +58,10 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
     private ArrayList<Produkt> productList = new ArrayList<>();
     private MainProductListAdapter productAdapter;
     private Spinner spinnerKategorie;
+    private Spinner spinnerSort;
     private ArrayList<Produkt> alleProdukte = new ArrayList<>();
     private String selectedKategorie = "Alle";
+    private String selectedSort = "Alphabet";
 
     private ProductRepository productRepository;
     private EinkaufslisteRepository einkaufslisteRepository;
@@ -139,6 +141,7 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
         spinnerKategorie = findViewById(R.id.spinnerKategorie);
         searchView = findViewById(R.id.searchView);
         setupKategorieSpinner();
+        setupSortSpinner();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -194,6 +197,27 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
                 return true;
             }
             return false;
+        });
+    }
+
+    private void setupSortSpinner() {
+        spinnerSort = findViewById(R.id.spinnerSort);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sort_options_product, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
+        spinnerSort.setAdapter(adapter);
+        spinnerSort.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                selectedSort = parent.getItemAtPosition(position).toString();
+                filterProdukte();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                selectedSort = "Alphabet";
+                filterProdukte();
+            }
         });
     }
 
@@ -262,25 +286,37 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
     private void filterProdukte() {
         productList.clear();
 
-        for (Produkt produkt : alleProdukte) {
-            String produktKategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
+        ArrayList<Produkt> tempList = new ArrayList<>(alleProdukte);
 
-            // Kategoriefilter
+        // Filter logic
+        tempList.removeIf(produkt -> {
+            String produktKategorie = produkt.getKategorie() != null ? produkt.getKategorie() : "";
             boolean kategorieMatch = selectedKategorie.equals("Alle")
                     || produktKategorie.equals(selectedKategorie)
                     || produktKategorie.equals(getEnumNameForDisplayName(selectedKategorie));
-
-            // Suchfilter
             boolean searchMatch = searchQuery.isEmpty()
                     || produkt.getName().toLowerCase().contains(searchQuery);
+            return !(kategorieMatch && searchMatch);
+        });
 
-            if (kategorieMatch && searchMatch) {
-                productList.add(produkt);
-            }
+
+        // Sorting logic
+        if (selectedSort.equals("Alphabet")) {
+            tempList.sort((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+        } else if (selectedSort.equals("Lesezeichen")) {
+            tempList.sort((o1, o2) -> {
+                if (o1.isBookmarked() != o2.isBookmarked()) {
+                    return o1.isBookmarked() ? -1 : 1;
+                }
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            });
         }
 
+        productList.addAll(tempList);
         productAdapter.notifyDataSetChanged();
     }
+
+
 
     private String getEnumNameForDisplayName(String displayName) {
         for (Kategorie k : Kategorie.values()) {
