@@ -49,7 +49,8 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     private String selectedKategorie = "Alle";
     private androidx.appcompat.widget.SearchView searchView;
     private String searchQuery = "";
-
+    private View layoutSelectionActions;
+    private boolean selectionModeActive = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +86,8 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         setupKategorieSpinner();
         setupSearchView();
 
+        setupSelectionMode();
+
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_vorrat);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -118,6 +121,193 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
             }
             return false;
         });
+    }
+
+    private void setupSelectionMode() {
+        layoutSelectionActions = findViewById(R.id.layoutSelectionActions);
+
+        // Lang-Klick aktiviert Auswahlmodus
+        RecyclerView recyclerView = findViewById(R.id.einkaufslisteRecyclerView);
+        recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener());
+
+        findViewById(R.id.btnCancelSelection).setOnClickListener(v -> {
+            disableSelectionMode();
+        });
+
+        findViewById(R.id.btnAddSelectedToShoppingList).setOnClickListener(v -> {
+            addSelectedToShoppingList();
+        });
+
+        findViewById(R.id.btnDeleteSelected).setOnClickListener(v -> {
+            deleteSelectedProducts();
+        });
+
+        // Toolbar-Button für Auswahlmodus
+        ImageButton btnSelectMode = findViewById(R.id.btnSelectMode);
+        if (btnSelectMode != null) {
+            btnSelectMode.setOnClickListener(v -> {
+                toggleSelectionMode();
+            });
+        }
+    }
+
+    private void toggleSelectionMode() {
+        if (selectionModeActive) {
+            disableSelectionMode();
+        } else {
+            enableSelectionMode();
+        }
+    }
+
+    private void enableSelectionMode() {
+        selectionModeActive = true;
+        vorratAdapter.setSelectionMode(true);
+        layoutSelectionActions.setVisibility(View.VISIBLE);
+        Toast.makeText(this, "Auswahlmodus aktiviert", Toast.LENGTH_SHORT).show();
+    }
+
+    private void disableSelectionMode() {
+        selectionModeActive = false;
+        vorratAdapter.setSelectionMode(false);
+        layoutSelectionActions.setVisibility(View.GONE);
+    }
+
+    private void addSelectedToShoppingList() {
+        ArrayList<String> selectedIds = vorratAdapter.getSelectedProductIds();
+
+        if (selectedIds.isEmpty()) {
+            Toast.makeText(this, "Keine Produkte ausgewählt", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+        builder.setTitle("Zur Einkaufsliste hinzufügen");
+        builder.setMessage(selectedIds.size() + " Produkt(e) zur Einkaufsliste hinzufügen?");
+
+        builder.setPositiveButton("Bis Zielbestand", (dialog, which) -> {
+            addSelectedProductsToList(selectedIds, true);
+        });
+
+
+        builder.setNegativeButton("Abbrechen", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void addSelectedProductsToList(ArrayList<String> selectedIds, boolean useZielbestand) {
+        int totalProducts = selectedIds.size();
+        final int[] successCount = {0};
+        final int[] errorCount = {0};
+
+        ProductRepository productRepository = new ProductRepository(currentHaushaltId);
+
+        for (String produktId : selectedIds) {
+            // Finde den Eintrag in alleEintraege
+            ListenEintrag eintrag = null;
+            for (ListenEintrag e : alleEintraege) {
+                if (e.getProduktId().equals(produktId)) {
+                    eintrag = e;
+                    break;
+                }
+            }
+
+            if (eintrag == null) continue;
+
+            final ListenEintrag finalEintrag = eintrag;
+
+            productRepository.getProductById(produktId, new ProductRepository.OnProductLoadedListener() {
+                @Override
+                public void onSuccess(Produkt produkt) {
+                    int quantity = useZielbestand ?
+                            Math.max(0, produkt.getZielbestand() - finalEintrag.getMenge()) : 1;
+
+                    if (quantity > 0) {
+                        einkaufslisteRepository.setQuantityOnShoppingList(
+                                currentHaushaltId, produktId, quantity,
+                                new EinkaufslisteRepository.OnShoppingListItemListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        successCount[0]++;
+                                        checkCompletion();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        errorCount[0]++;
+                                        checkCompletion();
+                                    }
+
+                                    private void checkCompletion() {
+                                        if (successCount[0] + errorCount[0] == totalProducts) {
+                                            String message = successCount[0] + " Produkt(e) hinzugefügt";
+                                            if (errorCount[0] > 0) {
+                                                message += " (" + errorCount[0] + " Fehler)";
+                                            }
+                                            Toast.makeText(VorratActivity.this, message, Toast.LENGTH_SHORT).show();
+                                            disableSelectionMode();
+                                        }
+                                    }
+                                });
+                    } else {
+                        successCount[0]++;
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    errorCount[0]++;
+                }
+            });
+        }
+    }
+
+    private void deleteSelectedProducts() {
+        ArrayList<String> selectedIds = vorratAdapter.getSelectedProductIds();
+
+        if (selectedIds.isEmpty()) {
+            Toast.makeText(this, "Keine Produkte ausgewählt", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+        builder.setTitle("Produkte löschen");
+        builder.setMessage("Wirklich " + selectedIds.size() + " Produkt(e) löschen?");
+
+        builder.setPositiveButton("Löschen", (dialog, which) -> {
+            int totalProducts = selectedIds.size();
+            final int[] successCount = {0};
+            final int[] errorCount = {0};
+
+            for (String produktId : selectedIds) {
+                vorratRepository.removeVorratItem(currentHaushaltId, produktId,
+                        new VorratRepository.OnVorratItemRemovedListener() {
+                            @Override
+                            public void onVorratDataChanged(List<ListenEintrag> vorratliste) {
+                                successCount[0]++;
+                                checkCompletion();
+                            }
+
+                            @Override
+                            public void onError(DatabaseError error) {
+                                errorCount[0]++;
+                                checkCompletion();
+                            }
+
+                            private void checkCompletion() {
+                                if (successCount[0] + errorCount[0] == totalProducts) {
+                                    String message = successCount[0] + " Produkt(e) gelöscht";
+                                    if (errorCount[0] > 0) {
+                                        message += " (" + errorCount[0] + " Fehler)";
+                                    }
+                                    Toast.makeText(VorratActivity.this, message, Toast.LENGTH_SHORT).show();
+                                    disableSelectionMode();
+                                }
+                            }
+                        });
+            }
+        });
+
+        builder.setNegativeButton("Abbrechen", (dialog, which) -> dialog.dismiss());
+        builder.show();
     }
 
     private void setupSearchView() {

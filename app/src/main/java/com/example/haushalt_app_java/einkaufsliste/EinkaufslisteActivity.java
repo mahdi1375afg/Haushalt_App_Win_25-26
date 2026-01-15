@@ -79,6 +79,12 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
             finish();
         }
 
+        // Auswahlmodus-Button ausblenden
+        ImageButton btnSelectMode = findViewById(R.id.btnSelectMode);
+        if (btnSelectMode != null) {
+            btnSelectMode.setVisibility(View.GONE);
+        }
+
         setupKategorieSpinner();
         setupSearchView();
 

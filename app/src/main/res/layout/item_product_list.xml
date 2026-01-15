@@ -43,21 +43,23 @@
             android:id="@+id/button_add_to_shopping_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/list_plus_bold"
-            app:tint="#303F9F"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:tint="#303F9F" />
 
         <ImageButton
             android:id="@+id/button_move_to_vorrat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_check_box"
-            app:tint="#303F9F"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:tint="#303F9F" />
 
         <ImageButton
             android:id="@+id/button_bookmark"
@@ -65,9 +67,9 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_bookmark_unchecked"
-            app:tint="#303F9F"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#303F9F" />
 
         <LinearLayout
             android:id="@+id/quantity_container"
