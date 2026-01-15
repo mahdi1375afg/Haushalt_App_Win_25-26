@@ -50,6 +50,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     private androidx.appcompat.widget.SearchView searchView;
     private String searchQuery = "";
     private Spinner spinnerSort;
+    private String selectedSort = "Alphabet";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +129,18 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
                 R.array.sort_options, R.layout.spinner_item);
         adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
         spinnerSort.setAdapter(adapter);
+        spinnerSort.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                selectedSort = parent.getItemAtPosition(position).toString();
+                filterAndSortProdukte();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
     }
 
     private void setupSearchView() {
@@ -141,7 +154,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
             @Override
             public boolean onQueryTextChange(String newText) {
                 searchQuery = newText.toLowerCase().trim();
-                filterProdukte();
+                filterAndSortProdukte();
                 return true;
             }
         });
@@ -169,18 +182,18 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
                 selectedKategorie = kategorien.get(position);
-                filterProdukte();
+                filterAndSortProdukte();
             }
 
             @Override
             public void onNothingSelected(android.widget.AdapterView<?> parent) {
                 selectedKategorie = "Alle";
-                filterProdukte();
+                filterAndSortProdukte();
             }
         });
     }
 
-    private void filterProdukte() {
+    private void filterAndSortProdukte() {
         ArrayList<ListenEintrag> filteredList = new ArrayList<>();
 
         for (ListenEintrag eintrag : alleEintraege) {
@@ -198,7 +211,31 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
             }
         }
 
+        // Sorting logic
+        if (selectedSort.equals("Alphabet")) {
+            filteredList.sort((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+        } else if (selectedSort.equals("Lagerbestand")) {
+            filteredList.sort((o1, o2) -> {
+                int status1 = getStatus(o1);
+                int status2 = getStatus(o2);
+                if (status1 != status2) {
+                    return Integer.compare(status1, status2);
+                }
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            });
+        }
+
         vorratAdapter.setProductList(filteredList);
+    }
+
+    private int getStatus(ListenEintrag eintrag) {
+        if (eintrag.getMengeImVorrat() == 0) {
+            return 1; // Rot
+        } else if (eintrag.getMengeImVorrat() <= eintrag.getMindestmenge()) {
+            return 2; // Orange
+        } else {
+            return 3; // Schwarz
+        }
     }
 
     @Override
@@ -338,7 +375,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     public void onVorratDataChanged(List<ListenEintrag> vorratliste) {
         alleEintraege.clear();
         alleEintraege.addAll(vorratliste);
-        filterProdukte();
+        filterAndSortProdukte();
     }
 
     @Override

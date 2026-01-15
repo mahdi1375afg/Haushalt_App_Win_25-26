@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -47,6 +48,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     private androidx.appcompat.widget.SearchView searchView;
     private String searchQuery = "";
     private Spinner spinnerSort;
+    private String selectedSort = "Alphabet";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,13 +141,13 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
                 selectedKategorie = kategorien.get(position);
-                filterProdukte();
+                filterAndSortProdukte();
             }
 
             @Override
             public void onNothingSelected(android.widget.AdapterView<?> parent) {
                 selectedKategorie = "Alle";
-                filterProdukte();
+                filterAndSortProdukte();
             }
         });
     }
@@ -156,6 +158,19 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
                 R.array.sort_options, R.layout.spinner_item);
         adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
         spinnerSort.setAdapter(adapter);
+        spinnerSort.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedSort = parent.getItemAtPosition(position).toString();
+                filterAndSortProdukte();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
     }
 
     private void setupSearchView() {
@@ -169,13 +184,13 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
             @Override
             public boolean onQueryTextChange(String newText) {
                 searchQuery = newText.toLowerCase();
-                filterProdukte();
+                filterAndSortProdukte();
                 return true;
             }
         });
     }
 
-    private void filterProdukte() {
+    private void filterAndSortProdukte() {
         ArrayList<ListenEintrag> filteredList = new ArrayList<>();
 
         for (ListenEintrag eintrag : alleEintraege) {
@@ -190,7 +205,31 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
             }
         }
 
+        // Sorting logic
+        if (selectedSort.equals("Alphabet")) {
+            filteredList.sort((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
+        } else if (selectedSort.equals("Lagerbestand")) {
+            filteredList.sort((o1, o2) -> {
+                int status1 = getStatus(o1);
+                int status2 = getStatus(o2);
+                if (status1 != status2) {
+                    return Integer.compare(status1, status2);
+                }
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            });
+        }
+
         einkaufslisteAdapter.setProductList(filteredList);
+    }
+
+    private int getStatus(ListenEintrag eintrag) {
+        if (eintrag.getMengeImVorrat() == 0) {
+            return 1; // Rot
+        } else if (eintrag.getMengeImVorrat() <= eintrag.getMindestmenge()) {
+            return 2; // Orange
+        } else {
+            return 3; // Schwarz
+        }
     }
 
     @Override
@@ -307,7 +346,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     public void onEinkaufslisteDataChanged(List<ListenEintrag> einkaufsliste) {
         alleEintraege.clear();
         alleEintraege.addAll(einkaufsliste);
-        filterProdukte();
+        filterAndSortProdukte();
     }
 
     @Override
