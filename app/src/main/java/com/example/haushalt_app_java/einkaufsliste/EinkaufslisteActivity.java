@@ -220,6 +220,18 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
                 }
                 return o1.getName().compareToIgnoreCase(o2.getName());
             });
+        } else if (selectedSort.equals("Lesezeichen")) {
+            filteredList.sort((o1, o2) -> {
+                if (o1.isBookmarked() != o2.isBookmarked()) {
+                    return o1.isBookmarked() ? -1 : 1;
+                }
+                int status1 = getStatus(o1);
+                int status2 = getStatus(o2);
+                if (status1 != status2) {
+                    return Integer.compare(status1, status2);
+                }
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            });
         }
 
         einkaufslisteAdapter.setProductList(filteredList);
