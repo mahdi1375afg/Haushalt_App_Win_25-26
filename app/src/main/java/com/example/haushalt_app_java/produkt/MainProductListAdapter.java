@@ -75,6 +75,12 @@ public class MainProductListAdapter extends RecyclerView.Adapter<MainProductList
             textViewProductCategory.setText(produkt.getKategorie());
             textViewProductUnit.setText("(" + produkt.getEinheit() + ")");
 
+            if (produkt.isBookmarked()) {
+                buttonBookmark.setImageResource(R.drawable.ic_bookmark_checked);
+            } else {
+                buttonBookmark.setImageResource(R.drawable.ic_bookmark_unchecked);
+            }
+
             buttonDelete.setOnClickListener(v -> listener.onDeleteClick(produkt));
             buttonEdit.setOnClickListener(v -> listener.onEditClick(produkt));
             buttonAddToCart.setOnClickListener(v -> listener.onAddToCartClick(produkt));

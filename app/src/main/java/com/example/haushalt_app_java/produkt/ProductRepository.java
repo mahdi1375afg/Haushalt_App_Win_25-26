@@ -83,8 +83,15 @@ public class ProductRepository {
                 .addOnFailureListener(e -> listener.onFailure(e));
     }
 
-    public void updateBookmarkStatus(String produktId, boolean isBookmarked) {
-        databaseReference.child(produktId).child("bookmarked").setValue(isBookmarked);
+    public void updateBookmarkStatus(String produktId, boolean isBookmarked, OnBookmarkUpdatedListener listener) {
+        databaseReference.child(produktId).child("bookmarked").setValue(isBookmarked)
+                .addOnSuccessListener(aVoid -> listener.onSuccess())
+                .addOnFailureListener(e -> listener.onFailure(e));
+    }
+
+    public interface OnBookmarkUpdatedListener {
+        void onSuccess();
+        void onFailure(Exception e);
     }
 
     public interface OnProductAddedListener {

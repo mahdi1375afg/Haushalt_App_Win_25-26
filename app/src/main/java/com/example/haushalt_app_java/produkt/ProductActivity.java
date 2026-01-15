@@ -334,14 +334,22 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
     @Override
     public void onBookmarkClick(Produkt produkt, ImageButton bookmarkButton) {
         boolean isBookmarked = !produkt.isBookmarked();
-        produkt.setBookmarked(isBookmarked);
-        productRepository.updateBookmarkStatus(produkt.getProdukt_id(), isBookmarked);
+        productRepository.updateBookmarkStatus(produkt.getProdukt_id(), isBookmarked, new ProductRepository.OnBookmarkUpdatedListener() {
+            @Override
+            public void onSuccess() {
+                produkt.setBookmarked(isBookmarked);
+                if (isBookmarked) {
+                    bookmarkButton.setImageResource(R.drawable.ic_bookmark_checked);
+                } else {
+                    bookmarkButton.setImageResource(R.drawable.ic_bookmark_unchecked);
+                }
+            }
 
-        if (isBookmarked) {
-            bookmarkButton.setImageResource(R.drawable.ic_bookmark_checked);
-        } else {
-            bookmarkButton.setImageResource(R.drawable.ic_bookmark_unchecked);
-        }
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(ProductActivity.this, "Fehler beim Aktualisieren des Lesezeichens", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showShoppingListOrStockDialog(Produkt produkt) {

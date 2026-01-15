@@ -67,6 +67,7 @@ public class VorratRepository {
                                     ListenEintrag listenEintrag = new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge);
                                     listenEintrag.setMengeImVorrat(menge);
                                     listenEintrag.setMindestmenge(produkt.getMindBestand());
+                                    listenEintrag.setBookmarked(produkt.isBookmarked());
                                     vorratliste.add(listenEintrag);
                                 }
                                 loadedItems[0]++;
@@ -171,9 +172,7 @@ public class VorratRepository {
                  });
      }
 
-    public void updateBookmarkedStatus(String currentHaushaltId, String produktId, boolean isBookmarked) {
-        // TODO Jonas (bookmarked als boolean in der Datenbank unter Produkt)
-    }
+
 
     // TODO Jonas unify & simplify Listeners (nur bei Abruf Listener notwendig?)
     public interface OnVorratItemRemovedListener {

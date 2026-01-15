@@ -74,6 +74,7 @@ public class EinkaufslisteRepository {
                                             ListenEintrag listenEintrag = new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge);
                                             listenEintrag.setMengeImVorrat(mengeImVorrat);
                                             listenEintrag.setMindestmenge(produkt.getMindBestand());
+                                            listenEintrag.setBookmarked(produkt.isBookmarked());
                                             einkaufsliste.add(listenEintrag);
 
                                             loadedItems[0]++;
@@ -174,9 +175,7 @@ public class EinkaufslisteRepository {
                 .addOnFailureListener(e -> listener.onFailure(e));
     }
 
-    public void updateBookmarkedStatus(String currentHaushaltId, String produktId, boolean isBookmarked) {
-        // TODO Jonas
-    }
+
 
     // TODO Jonas unify & simplify Listeners
     public interface OnEinkaufslisteDataChangedListener {

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.haushalt_app_java.R;
 import com.example.haushalt_app_java.domain.Kategorie;
+import com.example.haushalt_app_java.produkt.ProductRepository;
 import com.example.haushalt_app_java.vorrat.VorratActivity;
 import com.example.haushalt_app_java.produkt.ProductListAdapter;
 import com.example.haushalt_app_java.produkt.Produkt;
@@ -40,6 +41,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
     private EinkaufslisteRepository einkaufslisteRepository;
     private VorratRepository vorratRepository;
+    private ProductRepository productRepository;
     private ProductListAdapter einkaufslisteAdapter;
     private String currentHaushaltId;
     private Spinner spinnerKategorie;
@@ -76,6 +78,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
         currentHaushaltId = getIntent().getStringExtra("HAUSHALT_ID");
 
         if (currentHaushaltId != null && !currentHaushaltId.isEmpty()) {
+            productRepository = new ProductRepository(currentHaushaltId);
             einkaufslisteRepository.getEinkaufsliste(currentHaushaltId, this);
         } else {
             Toast.makeText(this, "Haushalts-ID nicht gefunden.", Toast.LENGTH_LONG).show();
@@ -304,14 +307,22 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     @Override
     public void onBookmarkClick(ListenEintrag eintrag, ImageButton bookmarkButton) {
         boolean isBookmarked = !eintrag.isBookmarked();
-        eintrag.setBookmarked(isBookmarked);
-        einkaufslisteRepository.updateBookmarkedStatus(currentHaushaltId, eintrag.getProduktId(), isBookmarked);
+        productRepository.updateBookmarkStatus(eintrag.getProduktId(), isBookmarked, new ProductRepository.OnBookmarkUpdatedListener() {
+            @Override
+            public void onSuccess() {
+                eintrag.setBookmarked(isBookmarked);
+                if (isBookmarked) {
+                    bookmarkButton.setImageResource(R.drawable.ic_bookmark_checked);
+                } else {
+                    bookmarkButton.setImageResource(R.drawable.ic_bookmark_unchecked);
+                }
+            }
 
-        if (isBookmarked) {
-            bookmarkButton.setImageResource(R.drawable.ic_bookmark_checked);
-        } else {
-            bookmarkButton.setImageResource(R.drawable.ic_bookmark_unchecked);
-        }
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(EinkaufslisteActivity.this, "Fehler beim Aktualisieren des Lesezeichens", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

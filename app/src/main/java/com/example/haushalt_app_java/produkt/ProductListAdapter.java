@@ -99,6 +99,12 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             textViewProductUnit.setText(eintrag.getEinheit());
             textViewProductQuantity.setText(String.valueOf(eintrag.getMenge()));
 
+            if (eintrag.isBookmarked()) {
+                buttonBookmark.setImageResource(R.drawable.ic_bookmark_checked);
+            } else {
+                buttonBookmark.setImageResource(R.drawable.ic_bookmark_unchecked);
+            }
+
             buttonEdit.setOnClickListener(v -> listener.onEditClick(eintrag));
             buttonDelete.setOnClickListener(v -> listener.onDeleteClick(eintrag));
             buttonIncreaseQuantity.setOnClickListener(v -> listener.onIncreaseQuantityClick(eintrag));
