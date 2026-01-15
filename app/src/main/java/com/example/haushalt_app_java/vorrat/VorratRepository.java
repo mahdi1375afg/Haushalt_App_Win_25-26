@@ -64,7 +64,10 @@ public class VorratRepository {
                                 Produkt produkt = produktSnapshot.getValue(Produkt.class);
                                 Log.d("VorratRepository", "Produkt: " + produkt);
                                 if (produkt != null) {
-                                    vorratliste.add(new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge));
+                                    ListenEintrag listenEintrag = new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge);
+                                    listenEintrag.setMengeImVorrat(menge);
+                                    listenEintrag.setMindestmenge(produkt.getMindBestand());
+                                    vorratliste.add(listenEintrag);
                                 }
                                 loadedItems[0]++;
                                 if (loadedItems[0] == totalItems) {

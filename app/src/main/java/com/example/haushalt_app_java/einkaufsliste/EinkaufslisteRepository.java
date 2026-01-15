@@ -64,11 +64,37 @@ public class EinkaufslisteRepository {
                                 Produkt produkt = produktSnapshot.getValue(Produkt.class);
                                 Log.d("EinkaufslisteRepository", "Produkt: " + produkt);
                                 if (produkt != null) {
-                                    einkaufsliste.add(new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge));
-                                }
-                                loadedItems[0]++;
-                                if (loadedItems[0] == totalItems) {
-                                    listener.onEinkaufslisteDataChanged(einkaufsliste);
+                                    DatabaseReference vorratRef = databaseReference.child("Haushalte").child(haushaltId).child("vorrat").child(produktId).child("menge");
+                                    vorratRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot vorratSnapshot) {
+                                            Integer mengeImVorratInt = vorratSnapshot.getValue(Integer.class);
+                                            int mengeImVorrat = (mengeImVorratInt != null) ? mengeImVorratInt : 0;
+
+                                            ListenEintrag listenEintrag = new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge);
+                                            listenEintrag.setMengeImVorrat(mengeImVorrat);
+                                            listenEintrag.setMindestmenge(produkt.getMindBestand());
+                                            einkaufsliste.add(listenEintrag);
+
+                                            loadedItems[0]++;
+                                            if (loadedItems[0] == totalItems) {
+                                                listener.onEinkaufslisteDataChanged(einkaufsliste);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            loadedItems[0]++;
+                                            if (loadedItems[0] == totalItems) {
+                                                listener.onEinkaufslisteDataChanged(einkaufsliste);
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    loadedItems[0]++;
+                                    if (loadedItems[0] == totalItems) {
+                                        listener.onEinkaufslisteDataChanged(einkaufsliste);
+                                    }
                                 }
                             }
 

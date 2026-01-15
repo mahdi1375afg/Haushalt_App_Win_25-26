@@ -1,10 +1,12 @@
 package com.example.haushalt_app_java.produkt;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -71,6 +73,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         private final ImageButton buttonMoveToVorrat;
         private final ImageButton buttonAddToShoppingList;
         private final ImageButton buttonBookmark;
+        private final FrameLayout cardBorder;
 
         public ProductListViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -85,6 +88,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             buttonMoveToVorrat = itemView.findViewById(R.id.button_move_to_vorrat);
             buttonAddToShoppingList = itemView.findViewById(R.id.button_add_to_shopping_list);
             buttonBookmark = itemView.findViewById(R.id.button_bookmark);
+            cardBorder = itemView.findViewById(R.id.card_border);
         }
 
         public void bind(final ListenEintrag eintrag, final OnItemClickListener listener, boolean isShoppingList) {
@@ -107,6 +111,17 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
                 buttonMoveToVorrat.setVisibility(View.GONE);
                 buttonAddToShoppingList.setVisibility(View.VISIBLE);
                 buttonAddToShoppingList.setOnClickListener(v -> listener.onAddToShoppingListClick(eintrag));
+            }
+
+            int mengeImVorrat = eintrag.getMengeImVorrat();
+            int mindestmenge = eintrag.getMindestmenge();
+
+            if (mengeImVorrat == 0) {
+                cardBorder.setBackgroundColor(Color.RED);
+            } else if (mengeImVorrat <= mindestmenge) {
+                cardBorder.setBackgroundColor(Color.parseColor("#FFA500")); // Orange
+            } else {
+                cardBorder.setBackgroundColor(Color.BLACK);
             }
         }
     }

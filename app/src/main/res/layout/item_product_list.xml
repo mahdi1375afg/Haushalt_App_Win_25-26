@@ -1,157 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_border"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardBackgroundColor="#E0E0E0"
-    app:cardCornerRadius="8dp">
+    android:padding="8dp"> <!-- This padding will be the border width -->
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="80dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="8dp"
-        android:paddingVertical="8dp">
+        app:cardBackgroundColor="#E0E0E0"
+        app:cardCornerRadius="6dp">
 
-        <ImageButton
-            android:id="@+id/button_bookmark"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_bookmark_unchecked"
-            app:tint="#303F9F"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <ImageButton
-            android:id="@+id/button_add_to_shopping_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/list_plus_bold"
-            app:tint="#303F9F"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_bookmark"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <ImageButton
-            android:id="@+id/button_move_to_vorrat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_check_box"
-            app:tint="#303F9F"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_bookmark"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <LinearLayout
-            android:id="@+id/quantity_container"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:background="@drawable/quantity_frame"
-            android:gravity="center"
-            android:layout_marginEnd="8dp"
-            android:padding="4dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/button_bookmark">
+            android:minHeight="80dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
+            android:paddingVertical="8dp">
 
             <ImageButton
-                android:id="@+id/button_decrease_quantity"
+                android:id="@+id/button_bookmark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_remove"
-                app:tint="#303F9F" />
+                android:src="@drawable/ic_bookmark_unchecked"
+                app:tint="#303F9F"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
-            <LinearLayout
+            <ImageButton
+                android:id="@+id/button_add_to_shopping_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp">
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/list_plus_bold"
+                app:tint="#303F9F"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_bookmark"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-                <TextView
-                    android:id="@+id/textViewProductQuantity"
+            <ImageButton
+                android:id="@+id/button_move_to_vorrat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_check_box"
+                app:tint="#303F9F"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_bookmark"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <LinearLayout
+                android:id="@+id/quantity_container"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:orientation="horizontal"
+                android:background="@drawable/quantity_frame"
+                android:gravity="center"
+                android:layout_marginEnd="8dp"
+                android:padding="4dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_bookmark">
+
+                <ImageButton
+                    android:id="@+id/button_decrease_quantity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    tools:text="10" />
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_remove"
+                    app:tint="#303F9F" />
 
-                <TextView
-                    android:id="@+id/textViewProductUnit"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp"
-                    tools:text="Stk" />
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp">
+
+                    <TextView
+                        android:id="@+id/textViewProductQuantity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="10" />
+
+                    <TextView
+                        android:id="@+id/textViewProductUnit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="12sp"
+                        tools:text="Stk" />
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/button_increase_quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_add"
+                    app:tint="#303F9F" />
             </LinearLayout>
 
             <ImageButton
-                android:id="@+id/button_increase_quantity"
+                android:id="@+id/button_edit_product"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_add"
-                app:tint="#303F9F" />
-        </LinearLayout>
+                android:src="@drawable/ic_edit"
+                app:tint="#303F9F"
+                app:layout_constraintEnd_toStartOf="@+id/quantity_container"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <ImageButton
-            android:id="@+id/button_edit_product"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_edit"
-            app:tint="#303F9F"
-            app:layout_constraintEnd_toStartOf="@+id/quantity_container"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            <ImageButton
+                android:id="@+id/button_delete_product"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_delete"
+                app:tint="#303F9F"
+                app:layout_constraintEnd_toStartOf="@+id/button_edit_product"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <ImageButton
-            android:id="@+id/button_delete_product"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_delete"
-            app:tint="#303F9F"
-            app:layout_constraintEnd_toStartOf="@+id/button_edit_product"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            <TextView
+                android:id="@+id/textViewProductName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_delete_product"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Product Name" />
 
-        <TextView
-            android:id="@+id/textViewProductName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/button_delete_product"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Product Name" />
+            <TextView
+                android:id="@+id/textViewProductCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewProductName"
+                tools:text="Category" />
 
-        <TextView
-            android:id="@+id/textViewProductCategory"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewProductName"
-            tools:text="Category" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

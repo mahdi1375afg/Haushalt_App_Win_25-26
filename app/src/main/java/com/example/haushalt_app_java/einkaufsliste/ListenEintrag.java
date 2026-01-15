@@ -8,6 +8,8 @@ public class ListenEintrag {
     private String kategorie;
     private String einheit;
     private int menge;
+    private int mengeImVorrat;
+    private int mindestmenge;
 
     private boolean isBookmarked;
 
@@ -68,6 +70,22 @@ public class ListenEintrag {
 
     public void setMenge(int menge) {
         this.menge = menge;
+    }
+
+    public int getMengeImVorrat() {
+        return mengeImVorrat;
+    }
+
+    public void setMengeImVorrat(int mengeImVorrat) {
+        this.mengeImVorrat = mengeImVorrat;
+    }
+
+    public int getMindestmenge() {
+        return mindestmenge;
+    }
+
+    public void setMindestmenge(int mindestmenge) {
+        this.mindestmenge = mindestmenge;
     }
 
     public boolean isBookmarked() {
