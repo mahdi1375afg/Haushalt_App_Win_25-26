@@ -1,0 +1,7 @@
+<resources>
+    <string-array name="sort_options">
+        <item>Alphabet</item>
+        <item>Lagerbestand</item>
+        <item>Lesezeichen</item>
+    </string-array>
+</resources>

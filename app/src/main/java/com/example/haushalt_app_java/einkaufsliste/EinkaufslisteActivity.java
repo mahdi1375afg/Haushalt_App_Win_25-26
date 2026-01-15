@@ -46,6 +46,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     private String selectedKategorie = "Alle";
     private androidx.appcompat.widget.SearchView searchView;
     private String searchQuery = "";
+    private Spinner spinnerSort;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +82,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
         setupKategorieSpinner();
         setupSearchView();
-
-
+        setupSortSpinner();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_einkaufslisten);
@@ -148,6 +148,14 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
                 filterProdukte();
             }
         });
+    }
+
+    private void setupSortSpinner() {
+        spinnerSort = findViewById(R.id.spinnerSort);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sort_options, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
+        spinnerSort.setAdapter(adapter);
     }
 
     private void setupSearchView() {

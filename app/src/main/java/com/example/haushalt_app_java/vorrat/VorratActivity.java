@@ -49,6 +49,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     private String selectedKategorie = "Alle";
     private androidx.appcompat.widget.SearchView searchView;
     private String searchQuery = "";
+    private Spinner spinnerSort;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +85,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
 
         setupKategorieSpinner();
         setupSearchView();
+        setupSortSpinner();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_vorrat);
@@ -120,6 +122,14 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         });
     }
 
+    private void setupSortSpinner() {
+        spinnerSort = findViewById(R.id.spinnerSort);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sort_options, R.layout.spinner_item);
+        adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item);
+        spinnerSort.setAdapter(adapter);
+    }
+
     private void setupSearchView() {
         searchView = findViewById(R.id.searchView);
         searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
@@ -140,6 +150,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
 
     private void setupKategorieSpinner() {
         spinnerKategorie = findViewById(R.id.spinnerKategorie);
+        ProductRepository productRepository = new ProductRepository(currentHaushaltId);
         ArrayList<String> kategorien = new ArrayList<>();
         kategorien.add("Alle");
         for (Kategorie kategorie : Kategorie.values()) {
