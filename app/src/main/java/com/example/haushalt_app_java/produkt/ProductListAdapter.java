@@ -1,6 +1,8 @@
 package com.example.haushalt_app_java.produkt;
 
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,7 +75,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         private final ImageButton buttonMoveToVorrat;
         private final ImageButton buttonAddToShoppingList;
         private final ImageButton buttonBookmark;
-        private final FrameLayout cardBorder;
+        private final androidx.constraintlayout.widget.ConstraintLayout productItemContainer;
 
         public ProductListViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -88,7 +90,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             buttonMoveToVorrat = itemView.findViewById(R.id.button_move_to_vorrat);
             buttonAddToShoppingList = itemView.findViewById(R.id.button_add_to_shopping_list);
             buttonBookmark = itemView.findViewById(R.id.button_bookmark);
-            cardBorder = itemView.findViewById(R.id.card_border);
+            productItemContainer = itemView.findViewById(R.id.product_item_container);
         }
 
         public void bind(final ListenEintrag eintrag, final OnItemClickListener listener, boolean isShoppingList) {
@@ -116,12 +118,15 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             int mengeImVorrat = eintrag.getMengeImVorrat();
             int mindestmenge = eintrag.getMindestmenge();
 
+            LayerDrawable background = (LayerDrawable) productItemContainer.getBackground();
+            GradientDrawable border = (GradientDrawable) background.findDrawableByLayerId(R.id.border);
+
             if (mengeImVorrat == 0) {
-                cardBorder.setBackgroundColor(Color.RED);
+                border.setColor(Color.RED);
             } else if (mengeImVorrat <= mindestmenge) {
-                cardBorder.setBackgroundColor(Color.parseColor("#FFA500")); // Orange
+                border.setColor(Color.parseColor("#FFA500")); // Orange
             } else {
-                cardBorder.setBackgroundColor(Color.BLACK);
+                border.setColor(Color.BLACK);
             }
         }
     }
