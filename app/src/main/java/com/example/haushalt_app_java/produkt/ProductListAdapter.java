@@ -140,6 +140,8 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
                 buttonMoveToVorrat.setVisibility(View.GONE);
                 selectionCheckbox.setVisibility(View.VISIBLE);
                 selectionCheckbox.setChecked(isSelected);
+                buttonDecreaseQuantity.setVisibility(View.GONE);
+                buttonIncreaseQuantity.setVisibility(View.GONE);
             } else {
                 buttonEdit.setVisibility(View.VISIBLE);
                 buttonDelete.setVisibility(View.VISIBLE);
@@ -156,6 +158,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             }
 
             itemView.setOnClickListener(v -> listener.onItemClick(eintrag));
+            selectionCheckbox.setOnClickListener(v -> listener.onItemClick(eintrag));
             buttonEdit.setOnClickListener(v -> listener.onEditClick(eintrag));
             buttonDelete.setOnClickListener(v -> listener.onDeleteClick(eintrag));
             buttonIncreaseQuantity.setOnClickListener(v -> listener.onIncreaseQuantityClick(eintrag));
@@ -172,7 +175,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
             int color;
             if (isSelected) {
-                color = Color.GREEN;
+                color = Color.CYAN;
             } else {
                 color = Color.BLACK; // Default
                 if (eintrag.getMengeImVorrat() == 0) {
