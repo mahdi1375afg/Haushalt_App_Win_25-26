@@ -66,4 +66,12 @@
     <string name="battery_opt_disable">Benachrichtigungen deaktivieren</string>
     <string name="battery_opt_enable">Benachrichtigungen aktivieren</string>
 
+    <string name="bookmark_button">Lesezeichen</string>
+    <string name="add_to_shopping_list_button">Zur Einkaufsliste hinzufügen</string>
+    <string name="move_to_vorrat_button">In den Vorrat verschieben</string>
+    <string name="decrease_quantity_button">Menge verringern</string>
+    <string name="increase_quantity_button">Menge erhöhen</string>
+    <string name="edit_product_button">Produkt bearbeiten</string>
+    <string name="delete_product_button">Produkt löschen</string>
+
 </resources>
