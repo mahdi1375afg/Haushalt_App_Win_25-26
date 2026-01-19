@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +40,7 @@ import com.google.firebase.database.DatabaseError;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VorratActivity extends AppCompatActivity implements ProductListAdapter.OnItemClickListener, VorratRepository.OnVorratDataChangedListener {
+public class VorratActivity extends AppCompatActivity implements ProductListAdapter.OnItemClickListener, ProductListAdapter.OnItemLongClickListener, VorratRepository.OnVorratDataChangedListener {
 
     private VorratRepository vorratRepository;
     private EinkaufslisteRepository einkaufslisteRepository;
@@ -52,6 +54,10 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     private String searchQuery = "";
     private Spinner spinnerSort;
     private String selectedSort = "Alphabet";
+    private boolean isSelectionMode = false;
+    private List<ListenEintrag> selectedItems = new ArrayList<>();
+    private LinearLayout selectionActionBar;
+    private Button buttonCancel, buttonAdd, buttonDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +77,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         RecyclerView recyclerView = findViewById(R.id.einkaufslisteRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         vorratAdapter = new ProductListAdapter(new ArrayList<>(), this, false);
+        vorratAdapter.setOnItemLongClickListener(this);
         recyclerView.setAdapter(vorratAdapter);
 
         vorratRepository = new VorratRepository();
@@ -90,6 +97,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         setupKategorieSpinner();
         setupSearchView();
         setupSortSpinner();
+        setupSelectionActionBar();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_vorrat);
@@ -194,6 +202,43 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
                 filterAndSortProdukte();
             }
         });
+    }
+
+    private void setupSelectionActionBar() {
+        selectionActionBar = findViewById(R.id.selection_action_bar);
+        buttonCancel = findViewById(R.id.button_cancel);
+        buttonAdd = findViewById(R.id.button_add);
+        buttonDelete = findViewById(R.id.button_delete);
+
+        buttonCancel.setOnClickListener(v -> toggleSelectionMode());
+        buttonAdd.setOnClickListener(v -> {
+            // Implement add logic
+            Toast.makeText(this, "Add clicked", Toast.LENGTH_SHORT).show();
+        });
+        buttonDelete.setOnClickListener(v -> {
+            // Implement delete logic
+            Toast.makeText(this, "Delete clicked", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void toggleSelectionMode() {
+        isSelectionMode = !isSelectionMode;
+        vorratAdapter.setSelectionMode(isSelectionMode);
+        selectionActionBar.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
+        findViewById(R.id.bottomNavigationView).setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
+        if (!isSelectionMode) {
+            selectedItems.clear();
+        }
+        vorratAdapter.notifyDataSetChanged();
+    }
+
+    private void toggleItemSelection(ListenEintrag eintrag) {
+        if (selectedItems.contains(eintrag)) {
+            selectedItems.remove(eintrag);
+        } else {
+            selectedItems.add(eintrag);
+        }
+        vorratAdapter.setSelectedItems(selectedItems);
     }
 
     private void filterAndSortProdukte() {
@@ -317,6 +362,21 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     @Override
     public void onAddToShoppingListClick(ListenEintrag eintrag) {
         showAddToShoppingListDialog(eintrag);
+    }
+
+    @Override
+    public void onItemClick(ListenEintrag eintrag) {
+        if (isSelectionMode) {
+            toggleItemSelection(eintrag);
+        }
+    }
+
+    @Override
+    public void onItemLongClick(ListenEintrag eintrag) {
+        if (!isSelectionMode) {
+            toggleSelectionMode();
+        }
+        toggleItemSelection(eintrag);
     }
 
     private void showEditQuantityDialog(ListenEintrag eintrag) {

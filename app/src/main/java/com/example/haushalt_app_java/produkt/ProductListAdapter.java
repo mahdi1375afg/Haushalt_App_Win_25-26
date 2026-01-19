@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.FrameLayout;
+import android.widget.CheckBox;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,12 +23,29 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
 
     private List<ListenEintrag> productList;
     private final OnItemClickListener listener;
+    private OnItemLongClickListener longClickListener;
     private final boolean isShoppingList;
+    private boolean isSelectionMode = false;
+    private List<ListenEintrag> selectedItems = new java.util.ArrayList<>();
 
     public ProductListAdapter(List<ListenEintrag> productList, OnItemClickListener listener, boolean isShoppingList) {
         this.productList = productList;
         this.listener = listener;
         this.isShoppingList = isShoppingList;
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener longClickListener) {
+        this.longClickListener = longClickListener;
+    }
+
+    public void setSelectionMode(boolean selectionMode) {
+        isSelectionMode = selectionMode;
+        notifyDataSetChanged();
+    }
+
+    public void setSelectedItems(List<ListenEintrag> selectedItems) {
+        this.selectedItems = selectedItems;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -40,7 +58,15 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
     @Override
     public void onBindViewHolder(@NonNull ProductListViewHolder holder, int position) {
         ListenEintrag eintrag = productList.get(position);
-        holder.bind(eintrag, listener, isShoppingList);
+        holder.bind(eintrag, listener, isShoppingList, isSelectionMode, selectedItems.contains(eintrag));
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onItemLongClick(eintrag);
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override
@@ -54,6 +80,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
     }
 
     public interface OnItemClickListener {
+        void onItemClick(ListenEintrag eintrag);
         void onEditClick(ListenEintrag eintrag);
         void onMoveToVorratClick(ListenEintrag eintrag);
         void onDeleteClick(ListenEintrag eintrag);
@@ -61,6 +88,10 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         void onDecreaseQuantityClick(ListenEintrag eintrag);
         void onBookmarkClick(ListenEintrag eintrag, ImageButton bookmarkButton);
         void onAddToShoppingListClick(ListenEintrag eintrag);
+    }
+
+    public interface OnItemLongClickListener {
+        void onItemLongClick(ListenEintrag eintrag);
     }
 
     static class ProductListViewHolder extends RecyclerView.ViewHolder {
@@ -75,6 +106,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         private final ImageButton buttonMoveToVorrat;
         private final ImageButton buttonAddToShoppingList;
         private final ImageButton buttonBookmark;
+        private final CheckBox selectionCheckbox;
         private final androidx.constraintlayout.widget.ConstraintLayout productItemContainer;
 
         public ProductListViewHolder(@NonNull View itemView) {
@@ -90,14 +122,47 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             buttonMoveToVorrat = itemView.findViewById(R.id.button_move_to_vorrat);
             buttonAddToShoppingList = itemView.findViewById(R.id.button_add_to_shopping_list);
             buttonBookmark = itemView.findViewById(R.id.button_bookmark);
+            selectionCheckbox = itemView.findViewById(R.id.selection_checkbox);
             productItemContainer = itemView.findViewById(R.id.product_item_container);
         }
 
-        public void bind(final ListenEintrag eintrag, final OnItemClickListener listener, boolean isShoppingList) {
+        public void bind(final ListenEintrag eintrag, final OnItemClickListener listener, boolean isShoppingList, boolean isSelectionMode, boolean isSelected) {
             textViewProductName.setText(eintrag.getName());
             textViewProductCategory.setText(eintrag.getKategorie());
             textViewProductUnit.setText(eintrag.getEinheit());
             textViewProductQuantity.setText(String.valueOf(eintrag.getMenge()));
+
+            if (isSelectionMode) {
+                buttonEdit.setVisibility(View.GONE);
+                buttonDelete.setVisibility(View.GONE);
+                buttonBookmark.setVisibility(View.GONE);
+                buttonAddToShoppingList.setVisibility(View.GONE);
+                buttonMoveToVorrat.setVisibility(View.GONE);
+                selectionCheckbox.setVisibility(View.VISIBLE);
+                selectionCheckbox.setChecked(isSelected);
+            } else {
+                buttonEdit.setVisibility(View.VISIBLE);
+                buttonDelete.setVisibility(View.VISIBLE);
+                buttonBookmark.setVisibility(View.VISIBLE);
+                selectionCheckbox.setVisibility(View.GONE);
+
+                if (isShoppingList) {
+                    buttonMoveToVorrat.setVisibility(View.VISIBLE);
+                    buttonAddToShoppingList.setVisibility(View.GONE);
+                } else {
+                    buttonMoveToVorrat.setVisibility(View.GONE);
+                    buttonAddToShoppingList.setVisibility(View.VISIBLE);
+                }
+            }
+
+            itemView.setOnClickListener(v -> listener.onItemClick(eintrag));
+            buttonEdit.setOnClickListener(v -> listener.onEditClick(eintrag));
+            buttonDelete.setOnClickListener(v -> listener.onDeleteClick(eintrag));
+            buttonIncreaseQuantity.setOnClickListener(v -> listener.onIncreaseQuantityClick(eintrag));
+            buttonDecreaseQuantity.setOnClickListener(v -> listener.onDecreaseQuantityClick(eintrag));
+            buttonBookmark.setOnClickListener(v -> listener.onBookmarkClick(eintrag, buttonBookmark));
+            buttonAddToShoppingList.setOnClickListener(v -> listener.onAddToShoppingListClick(eintrag));
+            buttonMoveToVorrat.setOnClickListener(v -> listener.onMoveToVorratClick(eintrag));
 
             if (eintrag.isBookmarked()) {
                 buttonBookmark.setImageResource(R.drawable.ic_bookmark_checked);
@@ -105,35 +170,21 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
                 buttonBookmark.setImageResource(R.drawable.ic_bookmark_unchecked);
             }
 
-            buttonEdit.setOnClickListener(v -> listener.onEditClick(eintrag));
-            buttonDelete.setOnClickListener(v -> listener.onDeleteClick(eintrag));
-            buttonIncreaseQuantity.setOnClickListener(v -> listener.onIncreaseQuantityClick(eintrag));
-            buttonDecreaseQuantity.setOnClickListener(v -> listener.onDecreaseQuantityClick(eintrag));
-            buttonBookmark.setOnClickListener(v -> listener.onBookmarkClick(eintrag, buttonBookmark));
-
-            if (isShoppingList) {
-                buttonMoveToVorrat.setVisibility(View.VISIBLE);
-                buttonAddToShoppingList.setVisibility(View.GONE);
-                buttonMoveToVorrat.setOnClickListener(v -> listener.onMoveToVorratClick(eintrag));
+            int color;
+            if (isSelected) {
+                color = Color.GREEN;
             } else {
-                buttonMoveToVorrat.setVisibility(View.GONE);
-                buttonAddToShoppingList.setVisibility(View.VISIBLE);
-                buttonAddToShoppingList.setOnClickListener(v -> listener.onAddToShoppingListClick(eintrag));
+                color = Color.BLACK; // Default
+                if (eintrag.getMengeImVorrat() == 0) {
+                    color = Color.RED;
+                } else if (eintrag.getMengeImVorrat() > 0 && eintrag.getMengeImVorrat() <= eintrag.getMindestmenge()) {
+                    color = Color.rgb(255, 165, 0); // Orange
+                }
             }
-
-            int mengeImVorrat = eintrag.getMengeImVorrat();
-            int mindestmenge = eintrag.getMindestmenge();
 
             LayerDrawable background = (LayerDrawable) productItemContainer.getBackground();
             GradientDrawable border = (GradientDrawable) background.findDrawableByLayerId(R.id.border);
-
-            if (mengeImVorrat == 0) {
-                border.setColor(Color.RED);
-            } else if (mengeImVorrat <= mindestmenge) {
-                border.setColor(Color.parseColor("#FFA500")); // Orange
-            } else {
-                border.setColor(Color.BLACK);
-            }
+            border.setStroke(5, color);
         }
     }
 }

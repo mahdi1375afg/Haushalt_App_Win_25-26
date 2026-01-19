@@ -35,6 +35,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DatabaseError;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class EinkaufslisteActivity extends AppCompatActivity implements ProductListAdapter.OnItemClickListener, EinkaufslisteRepository.OnEinkaufslisteDataChangedListener {
@@ -340,6 +341,11 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     @Override
     public void onAddToShoppingListClick(ListenEintrag eintrag) {
         // This method is not intended to be used in EinkaufslisteActivity
+    }
+
+    @Override
+    public void onItemClick(ListenEintrag eintrag) {
+        // Handle item click if needed, for now it can be empty.
     }
 
     private void showEditQuantityDialog(ListenEintrag eintrag) {

@@ -12,17 +12,35 @@
     android:paddingEnd="8dp"
     android:paddingVertical="8dp">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_icons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.94" />
+
+    <CheckBox
+        android:id="@+id/selection_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/guideline_icons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="0.5dp"/>
+
     <ImageButton
         android:id="@+id/button_bookmark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/bookmark_button"
+        android:importantForAutofill="no"
         android:src="@drawable/ic_bookmark_unchecked"
-        app:tint="#303F9F"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:importantForAutofill="no"
-        android:contentDescription="@string/bookmark_button" />
+        app:tint="#303F9F" />
 
     <ImageButton
         android:id="@+id/button_add_to_shopping_list"
@@ -62,7 +80,7 @@
         android:padding="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button_bookmark"
+        app:layout_constraintEnd_toStartOf="@+id/guideline_icons"
         app:layout_constraintWidth_percent="0.28">
 
         <RelativeLayout
