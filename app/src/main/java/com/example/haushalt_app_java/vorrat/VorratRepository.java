@@ -172,12 +172,29 @@ public class VorratRepository {
                  });
      }
 
+    public void removeVorratItems(String haushaltId, List<String> produktIds, OnVorratItemsRemovedListener listener) {
+        DatabaseReference vorratRef = databaseReference.child("Haushalte").child(haushaltId).child("vorrat");
+        Map<String, Object> updates = new HashMap<>();
+        for (String produktId : produktIds) {
+            updates.put(produktId, null);
+        }
+
+        vorratRef.updateChildren(updates)
+                .addOnSuccessListener(aVoid -> listener.onSuccess())
+                .addOnFailureListener(listener::onFailure);
+    }
+
 
 
     // TODO Jonas unify & simplify Listeners (nur bei Abruf Listener notwendig?)
     public interface OnVorratItemRemovedListener {
         void onVorratDataChanged(List<ListenEintrag> vorratliste);
         void onError(DatabaseError error);
+    }
+
+    public interface OnVorratItemsRemovedListener {
+        void onSuccess();
+        void onFailure(Exception e);
     }
 
     public interface OnVorratDataChangedListener {

@@ -216,8 +216,22 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
             Toast.makeText(this, "Add clicked", Toast.LENGTH_SHORT).show();
         });
         buttonDelete.setOnClickListener(v -> {
-            // Implement delete logic
-            Toast.makeText(this, "Delete clicked", Toast.LENGTH_SHORT).show();
+            List<String> itemIds = new ArrayList<>();
+            for (ListenEintrag eintrag : selectedItems) {
+                itemIds.add(eintrag.getProduktId());
+            }
+            vorratRepository.removeVorratItems(currentHaushaltId, itemIds, new VorratRepository.OnVorratItemsRemovedListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(VorratActivity.this, "Ausgewählte Elemente gelöscht", Toast.LENGTH_SHORT).show();
+                    toggleSelectionMode();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(VorratActivity.this, "Fehler beim Löschen: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 
