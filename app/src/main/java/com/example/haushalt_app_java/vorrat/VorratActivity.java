@@ -497,7 +497,44 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
                 });
 
                 builder.setNeutralButton("Zielbestand auffüllen", (dialog, which) -> {
-                    einkaufslisteRepository.setQuantityOnShoppingList(currentHaushaltId, produkt.getProdukt_id(), produkt.getZielbestand()-eintrag.getMenge(), itemListener);
+                    int zielbestand = produkt.getZielbestand();
+                    int aktuellerVorrat = eintrag.getMenge();
+                    int benoetigteMenge = zielbestand - aktuellerVorrat;
+
+                    if (benoetigteMenge < 1) {
+                        Toast.makeText(
+                                VorratActivity.this,
+                                "Zielbestand bereits erreicht",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        einkaufslisteRepository.removeShoppingListItem(
+                                currentHaushaltId,
+                                produkt.getProdukt_id(),
+                                new EinkaufslisteRepository.OnShoppingListItemRemovedListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        Toast.makeText(
+                                                VorratActivity.this,
+                                                produkt.getName() + " aus der Einkaufsliste entfernt",
+                                                Toast.LENGTH_SHORT
+                                        ).show();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                    }
+                                }
+                        );
+                        return;
+                    }
+
+                    einkaufslisteRepository.setQuantityOnShoppingList(
+                            currentHaushaltId,
+                            produkt.getProdukt_id(),
+                            benoetigteMenge,
+                            itemListener
+                    );
                 });
 
                 builder.setNegativeButton("Abbrechen", (dialog, which) -> dialog.dismiss());
