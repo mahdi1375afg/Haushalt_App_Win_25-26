@@ -50,7 +50,6 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
     private static final String DB_URL = "https://haushalt-app-68451-default-rtdb.europe-west1.firebasedatabase.app";
     private static final int REQ_UPDATE = 1001;
 
-    private Button logout;
     private String currentHausId;
     private FirebaseDatabase database;
     private FloatingActionButton pAddScreen;
@@ -135,7 +134,6 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
     }
 
     private void initializeUI() {
-        logout = findViewById(R.id.logout);
         pAddScreen = findViewById(R.id.pAddScreen);
         productRecyclerView = findViewById(R.id.productRecyclerView);
         spinnerKategorie = findViewById(R.id.spinnerKategorie);
@@ -163,12 +161,6 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
             startActivity(intent);
         });
 
-        logout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Toast.makeText(ProductActivity.this, "Logged out", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(ProductActivity.this, StartActivity.class));
-            finish();
-        });
 
         productRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         productAdapter = new MainProductListAdapter(productList, this);

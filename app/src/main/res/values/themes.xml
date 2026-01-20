@@ -46,4 +46,9 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="FabShape" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">4dp</item>
+    </style>
+
 </resources>

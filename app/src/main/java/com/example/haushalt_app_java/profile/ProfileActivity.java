@@ -44,6 +44,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Button konto_delete;
     private Button konto_bearbeiten;
     private Button backgroundSettingsButton;
+    private Button logoutButton;
 
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -71,8 +72,17 @@ public class ProfileActivity extends AppCompatActivity {
         konto_delete = findViewById(R.id.konot_delete);
         konto_bearbeiten = findViewById(R.id.konto_bearbeiten);
         backgroundSettingsButton = findViewById(R.id.backgroundSettingsButton);
+        logoutButton = findViewById(R.id.logout_button);
 
         loadKontoInfo();
+
+        logoutButton.setOnClickListener(v -> {
+            mAuth.signOut();
+            Intent intent = new Intent(ProfileActivity.this, StartActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
 
         // Set a click listener to manage battery optimization settings
         backgroundSettingsButton.setOnClickListener(v -> {

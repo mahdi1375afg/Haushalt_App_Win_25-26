@@ -73,7 +73,7 @@ public class MainProductListAdapter extends RecyclerView.Adapter<MainProductList
         public void bind(final Produkt produkt, final OnItemClickListener listener) {
             textViewProductName.setText(produkt.getName());
             textViewProductCategory.setText(produkt.getKategorie());
-            textViewProductUnit.setText("(" + produkt.getEinheit() + ")");
+            textViewProductUnit.setText("[" + produkt.getEinheit() + "]");
 
             if (produkt.isBookmarked()) {
                 buttonBookmark.setImageResource(R.drawable.ic_bookmark_checked);
