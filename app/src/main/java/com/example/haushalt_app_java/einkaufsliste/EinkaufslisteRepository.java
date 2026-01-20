@@ -75,6 +75,7 @@ public class EinkaufslisteRepository {
                                             listenEintrag.setMengeImVorrat(mengeImVorrat);
                                             listenEintrag.setMindestmenge(produkt.getMindBestand());
                                             listenEintrag.setZielmenge(produkt.getZielbestand());
+                                            listenEintrag.setSchrittweite(produkt.getSchrittweite());
                                             listenEintrag.setBookmarked(produkt.isBookmarked());
                                             einkaufsliste.add(listenEintrag);
 

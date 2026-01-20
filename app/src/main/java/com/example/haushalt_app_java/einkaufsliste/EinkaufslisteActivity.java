@@ -259,9 +259,10 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
                 currentHaushaltId,
                 eintrag.getName(),
                 eintrag.getKategorie(),
-                0, 
-                0,
-                eintrag.getEinheit()
+                eintrag.getMindestmenge(),
+                eintrag.getZielmenge(),
+                eintrag.getEinheit(),
+                eintrag.getSchrittweite()
         );
         produktToAdd.setProdukt_id(eintrag.getProduktId());
 
@@ -305,13 +306,13 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
     @Override
     public void onIncreaseQuantityClick(ListenEintrag eintrag) {
-        int newQuantity = eintrag.getMenge() + 1;
+        int newQuantity = eintrag.getMenge() + eintrag.getSchrittweite();
         einkaufslisteRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
     }
 
     @Override
     public void onDecreaseQuantityClick(ListenEintrag eintrag) {
-        int newQuantity = eintrag.getMenge() - 1;
+        int newQuantity = eintrag.getMenge() - eintrag.getSchrittweite();
         if (newQuantity >= 0) {
             einkaufslisteRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
         }

@@ -71,6 +71,7 @@ public class ProductRepository {
         productValues.put("einheit", product.getEinheit());
         productValues.put("mindBestand", product.getMindBestand());
         productValues.put("zielbestand", product.getZielbestand());
+        productValues.put("schrittweite", product.getSchrittweite());
 
         databaseReference.child(product.getProdukt_id()).updateChildren(productValues)
                 .addOnSuccessListener(aVoid -> listener.onSuccess())

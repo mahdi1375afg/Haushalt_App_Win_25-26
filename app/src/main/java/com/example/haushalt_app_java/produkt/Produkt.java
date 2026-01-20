@@ -13,6 +13,7 @@ public class Produkt {
     private String kategorie;
     private int mindBestand;
     private int zielbestand;
+    private int schrittweite;
     private Object timestamp;
     private boolean bookmarked;
 
@@ -21,7 +22,7 @@ public class Produkt {
         // Default-Konstruktor erforderlich für Firebase
     }
 
-    public Produkt(String haus_id, String name, String kategorie, int mindBestand, int zielbestand, String einheit) {
+    public Produkt(String haus_id, String name, String kategorie, int mindBestand, int zielbestand, String einheit, int schrittweite) {
         this.produkt_id = randomUUID().toString();
         this.haus_id = haus_id;
         this.name = name;
@@ -29,6 +30,7 @@ public class Produkt {
         this.kategorie = kategorie;
         this.mindBestand = mindBestand;
         this.zielbestand = zielbestand;
+        this.schrittweite = schrittweite;
         this.timestamp = ServerValue.TIMESTAMP;
         this.bookmarked = false;
     }
@@ -79,6 +81,12 @@ public class Produkt {
 
     public void setZielbestand(int zielbestand) {
         this.zielbestand = zielbestand;
+    }
+    public int getSchrittweite() {
+        return schrittweite;
+    }
+    public void setSchrittweite(int schrittweite) {
+        this.schrittweite = schrittweite;
     }
     public Object getTimestamp() {
         return timestamp;}

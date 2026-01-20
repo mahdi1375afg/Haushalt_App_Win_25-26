@@ -130,7 +130,14 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             textViewProductName.setText(eintrag.getName());
             textViewProductCategory.setText(eintrag.getKategorie());
             textViewProductUnit.setText(eintrag.getEinheit());
-            textViewProductQuantity.setText(String.valueOf(eintrag.getMenge()));
+            String quantityText = String.valueOf(eintrag.getMenge());
+            textViewProductQuantity.setText(quantityText);
+
+            if (quantityText.length() >= 4) {
+                textViewProductQuantity.setTextSize(14); // Kleinere Schriftgröße
+            } else {
+                textViewProductQuantity.setTextSize(18); // Standard-Schriftgröße
+            }
 
             if (isSelectionMode) {
                 buttonEdit.setVisibility(View.GONE);

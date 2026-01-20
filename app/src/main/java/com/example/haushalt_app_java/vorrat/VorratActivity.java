@@ -339,13 +339,13 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
 
     @Override
     public void onIncreaseQuantityClick(ListenEintrag eintrag) {
-        int newQuantity = eintrag.getMenge() + 1;
+        int newQuantity = eintrag.getMenge() + eintrag.getSchrittweite();
         vorratRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
     }
 
     @Override
     public void onDecreaseQuantityClick(ListenEintrag eintrag) {
-        int newQuantity = eintrag.getMenge() - 1;
+        int newQuantity = eintrag.getMenge() - eintrag.getSchrittweite();
         if (newQuantity >= 0) {
             vorratRepository.updateMenge(currentHaushaltId, eintrag.getProduktId(), newQuantity);
         }

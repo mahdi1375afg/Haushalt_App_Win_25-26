@@ -28,7 +28,7 @@ import java.util.List;
 
 public class UpdateProductActivity extends AppCompatActivity {
 
-    private EditText productName, productMinStock, productTargetStock;
+    private EditText productName, productMinStock, productTargetStock, productStepSize;
     private Spinner productCategorySpinner, productUnitSpinner;
     private Button btnUpdate, btnDelete;
 
@@ -55,6 +55,7 @@ public class UpdateProductActivity extends AppCompatActivity {
         productName = findViewById(R.id.product_name);
         productMinStock = findViewById(R.id.product_min_stock_input);
         productTargetStock = findViewById(R.id.product_target_stock_input);
+        productStepSize = findViewById(R.id.product_step_size_input);
         productCategorySpinner = findViewById(R.id.product_category_spinner);
         productUnitSpinner = findViewById(R.id.product_unit_spinner);
         btnUpdate = findViewById(R.id.button_update);
@@ -67,6 +68,7 @@ public class UpdateProductActivity extends AppCompatActivity {
         productName.setText(getIntent().getStringExtra("name"));
         productMinStock.setText(String.valueOf(getIntent().getIntExtra("mindBestand", 0)));
         productTargetStock.setText(String.valueOf(getIntent().getIntExtra("zielbestand", 0)));
+        productStepSize.setText(String.valueOf(getIntent().getIntExtra("schrittweite", 1)));
 
         btnUpdate.setOnClickListener(v -> updateProduct());
         btnDelete.setOnClickListener(v -> deleteProduct());
@@ -108,18 +110,20 @@ public class UpdateProductActivity extends AppCompatActivity {
         String name = productName.getText().toString().trim();
         String minStockStr = productMinStock.getText().toString().trim();
         String targetStockStr = productTargetStock.getText().toString().trim();
+        String stepSizeStr = productStepSize.getText().toString().trim();
         String categoryDisplayName = productCategorySpinner.getSelectedItem().toString();
         String unitDisplayName = productUnitSpinner.getSelectedItem().toString();
 
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(minStockStr) || TextUtils.isEmpty(targetStockStr)) {
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(minStockStr) || TextUtils.isEmpty(targetStockStr) || TextUtils.isEmpty(stepSizeStr)) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
         int minStock = Integer.parseInt(minStockStr);
         int targetStock = Integer.parseInt(targetStockStr);
+        int stepSize = Integer.parseInt(stepSizeStr);
 
-        Produkt updatedProduct = new Produkt(hausId, name, categoryDisplayName, minStock, targetStock, unitDisplayName);
+        Produkt updatedProduct = new Produkt(hausId, name, categoryDisplayName, minStock, targetStock, unitDisplayName, stepSize);
         updatedProduct.setProdukt_id(produktId);
 
         productRepository.updateProduct(updatedProduct, new ProductRepository.OnProductUpdatedListener() {

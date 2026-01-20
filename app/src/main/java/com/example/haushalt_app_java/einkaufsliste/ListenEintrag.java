@@ -11,6 +11,7 @@ public class ListenEintrag {
     private int mengeImVorrat;
     private int mindestmenge;
     private int zielmenge;
+    private int schrittweite;
 
     private boolean isBookmarked;
 
@@ -104,6 +105,14 @@ public class ListenEintrag {
 
     public void setZielmenge(int zielmenge) {
         this.zielmenge = zielmenge;
+    }
+
+    public int getSchrittweite() {
+        return schrittweite;
+    }
+
+    public void setSchrittweite(int schrittweite) {
+        this.schrittweite = schrittweite;
     }
 
     public boolean isBookmarked() {

@@ -68,6 +68,7 @@ public class VorratRepository {
                                     listenEintrag.setMengeImVorrat(menge);
                                     listenEintrag.setMindestmenge(produkt.getMindBestand());
                                     listenEintrag.setZielmenge(produkt.getZielbestand());
+                                    listenEintrag.setSchrittweite(produkt.getSchrittweite());
                                     listenEintrag.setBookmarked(produkt.isBookmarked());
                                     vorratliste.add(listenEintrag);
                                 }

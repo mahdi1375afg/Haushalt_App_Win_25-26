@@ -21,7 +21,7 @@ import java.util.List;
 
 public class AddProductActivity extends AppCompatActivity {
 
-    private EditText productName, productMinStock, productTargetStock;
+    private EditText productName, productMinStock, productTargetStock, productStepSize;
     private Spinner productCategorySpinner, productUnitSpinner;
     private Button cancelButton, addButton;
 
@@ -48,6 +48,7 @@ public class AddProductActivity extends AppCompatActivity {
         productName = findViewById(R.id.product_name);
         productMinStock = findViewById(R.id.product_min_stock_input);
         productTargetStock = findViewById(R.id.product_target_stock_input);
+        productStepSize = findViewById(R.id.product_step_size_input);
         productCategorySpinner = findViewById(R.id.product_category_spinner);
         productUnitSpinner = findViewById(R.id.product_unit_spinner);
         cancelButton = findViewById(R.id.button_cancel);
@@ -90,20 +91,22 @@ public class AddProductActivity extends AppCompatActivity {
         String name = productName.getText().toString().trim();
         String minStockStr = productMinStock.getText().toString().trim();
         String targetStockStr = productTargetStock.getText().toString().trim();
+        String stepSizeStr = productStepSize.getText().toString().trim();
         String categoryDisplayName = productCategorySpinner.getSelectedItem().toString();
         String unitDisplayName = productUnitSpinner.getSelectedItem().toString();
 
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(minStockStr) || TextUtils.isEmpty(targetStockStr)) {
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(minStockStr) || TextUtils.isEmpty(targetStockStr) || TextUtils.isEmpty(stepSizeStr)) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
         int minStock = Integer.parseInt(minStockStr);
         int targetStock = Integer.parseInt(targetStockStr);
+        int stepSize = Integer.parseInt(stepSizeStr);
 
         // Verwende direkt die DisplayNames anstatt Enum-Namen
-        Produkt product = new Produkt(haushaltId, name, categoryDisplayName, minStock, targetStock, unitDisplayName);
-        Log.d("Product", "Adding product with values: name(String): " + name + ", category(String): " + categoryDisplayName + ", unit(String): " + unitDisplayName + ", minStock(int): " + minStock + ", targetStock(int): " + targetStock);
+        Produkt product = new Produkt(haushaltId, name, categoryDisplayName, minStock, targetStock, unitDisplayName, stepSize);
+        Log.d("Product", "Adding product with values: name(String): " + name + ", category(String): " + categoryDisplayName + ", unit(String): " + unitDisplayName + ", minStock(int): " + minStock + ", targetStock(int): " + targetStock + ", stepSize(int): " + stepSize);
 
         productRepository.addProduct(product, new ProductRepository.OnProductAddedListener() {
             @Override

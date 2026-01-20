@@ -359,6 +359,7 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
         i.putExtra("kategorie", produkt.getKategorie());
         i.putExtra("mindBestand", produkt.getMindBestand());
         i.putExtra("zielbestand", produkt.getZielbestand());
+        i.putExtra("schrittweite", produkt.getSchrittweite());
         startActivityForResult(i, REQ_UPDATE);
     }
 
