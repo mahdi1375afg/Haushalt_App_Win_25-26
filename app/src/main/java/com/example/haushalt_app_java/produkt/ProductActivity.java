@@ -382,15 +382,19 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
     }
 
     private void showShoppingListOrStockDialog(Produkt produkt) {
+        final CharSequence[] items = {"Einkaufsliste", "Vorrat"};
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, R.layout.dialog_list_item, items);
+
         new AlertDialog.Builder(this, R.style.AlertDialogCustom)
                 .setTitle("Hinzufügen zu...")
-                .setItems(new CharSequence[]{"Einkaufsliste", "Vorrat"}, (dialog, which) -> {
+                .setAdapter(adapter, (dialog, which) -> {
                     if (which == 0) { // Einkaufsliste
                         showQuantityDialogForShoppingList(produkt);
                     } else { // Vorrat
                         showQuantityDialogForStock(produkt);
                     }
                 })
+                .setNegativeButton("Abbrechen", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 

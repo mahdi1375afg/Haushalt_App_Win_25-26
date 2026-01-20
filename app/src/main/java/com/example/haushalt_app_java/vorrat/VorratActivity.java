@@ -393,9 +393,12 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     }
 
     private void showAddDialog() {
+        final CharSequence[] items = {"Alle auf Zielbestand auffüllen", "Einzeln Werte eintragen"};
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, R.layout.dialog_list_item, items);
+
         new AlertDialog.Builder(this, R.style.AlertDialogCustom)
-                .setTitle("Ausgewählte Elemente zur Einkaufsliste hinzufügen")
-                .setItems(new CharSequence[]{"Alle auf Zielbestand auffüllen", "Einzeln Werte eintragen"}, (dialog, which) -> {
+                .setTitle("Mengen für gewählte Produkte bestimmen:")
+                .setAdapter(adapter, (dialog, which) -> {
                     if (which == 0) { // Alle auf Zielbestand auffüllen
                         addSelectedItemsToShoppingList(true);
                     } else { // Einzeln Werte eintragen

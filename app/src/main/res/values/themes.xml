@@ -3,8 +3,7 @@
     <style name="Base.Theme.Haushalt_App_Java" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Textfarben im ganzen App-Theme -->
         <item name="android:textColor">@color/ux_color_on_surface</item>
-        <item name="android:textColorPrimary">@color/ux_color_on_surface</item>
-        <item name="android:textColorSecondary">@color/ux_color_on_surface</item>
+        <item name="android:textColorAlertDialogListItem">@android:color/white</item>
         <item name="android:textColorHint">@color/ux_color_outline</item>
 
         <!--Popup-Style für Menüs -->
