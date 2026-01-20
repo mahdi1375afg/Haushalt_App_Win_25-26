@@ -10,6 +10,7 @@ public class ListenEintrag {
     private int menge;
     private int mengeImVorrat;
     private int mindestmenge;
+    private int zielmenge;
 
     private boolean isBookmarked;
 
@@ -30,6 +31,15 @@ public class ListenEintrag {
         this.kategorie = kategorie;
         this.einheit = einheit;
         this.menge = menge;
+    }
+
+    public ListenEintrag(String produktId, String name, String kategorie, String einheit, int menge, int zielmenge) {
+        this.produktId = produktId;
+        this.name = name;
+        this.kategorie = kategorie;
+        this.einheit = einheit;
+        this.menge = menge;
+        this.zielmenge = zielmenge;
     }
 
     public String getProduktId() {
@@ -86,6 +96,14 @@ public class ListenEintrag {
 
     public void setMindestmenge(int mindestmenge) {
         this.mindestmenge = mindestmenge;
+    }
+
+    public int getZielmenge() {
+        return zielmenge;
+    }
+
+    public void setZielmenge(int zielmenge) {
+        this.zielmenge = zielmenge;
     }
 
     public boolean isBookmarked() {

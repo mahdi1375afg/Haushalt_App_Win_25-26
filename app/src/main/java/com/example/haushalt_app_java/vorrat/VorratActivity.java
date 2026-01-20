@@ -212,8 +212,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
 
         buttonCancel.setOnClickListener(v -> toggleSelectionMode());
         buttonAdd.setOnClickListener(v -> {
-            // Implement add logic
-            Toast.makeText(this, "Add clicked", Toast.LENGTH_SHORT).show();
+            showAddDialog();
         });
         buttonDelete.setOnClickListener(v -> {
             List<String> itemIds = new ArrayList<>();
@@ -391,6 +390,91 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
             toggleSelectionMode();
         }
         toggleItemSelection(eintrag);
+    }
+
+    private void showAddDialog() {
+        new AlertDialog.Builder(this, R.style.AlertDialogCustom)
+                .setTitle("Ausgewählte Elemente zur Einkaufsliste hinzufügen")
+                .setItems(new CharSequence[]{"Alle auf Zielbestand auffüllen", "Einzeln Werte eintragen"}, (dialog, which) -> {
+                    if (which == 0) { // Alle auf Zielbestand auffüllen
+                        addSelectedItemsToShoppingList(true);
+                    } else { // Einzeln Werte eintragen
+                        addSelectedItemsToShoppingList(false);
+                    }
+                })
+                .setNegativeButton("Abbrechen", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void addSelectedItemsToShoppingList(boolean fillToTarget) {
+        if (fillToTarget) {
+            for (ListenEintrag eintrag : selectedItems) {
+                einkaufslisteRepository.fillToTargetStock(currentHaushaltId, eintrag.getProduktId(), new EinkaufslisteRepository.OnShoppingListItemListener() {
+                    @Override
+                    public void onSuccess() {
+                        // Optional: Show a toast or log success
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(VorratActivity.this, "Fehler beim Hinzufügen von " + eintrag.getName(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            Toast.makeText(this, "Elemente wurden zur Einkaufsliste hinzugefügt.", Toast.LENGTH_SHORT).show();
+            toggleSelectionMode();
+        } else {
+            showIndividualQuantityListDialog();
+        }
+    }
+
+    private void showIndividualQuantityListDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_individual_quantity_list, null);
+        builder.setView(dialogView);
+        builder.setTitle("Mengen für Einkaufsliste");
+
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerViewIndividualQuantity);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        final IndividualQuantityAdapter adapter = new IndividualQuantityAdapter(new ArrayList<>(selectedItems));
+        recyclerView.setAdapter(adapter);
+
+        builder.setPositiveButton("Hinzufügen", (dialog, which) -> {
+            for (int i = 0; i < adapter.getItemCount(); i++) {
+                IndividualQuantityAdapter.ViewHolder holder = (IndividualQuantityAdapter.ViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
+                if (holder != null) {
+                    String quantityStr = holder.itemQuantity.getText().toString();
+                    if (!quantityStr.isEmpty()) {
+                        int quantity = Integer.parseInt(quantityStr);
+                        if (quantity > 0) {
+                            ListenEintrag item = adapter.getItem(i);
+                            einkaufslisteRepository.setQuantityOnShoppingList(currentHaushaltId, item.getProduktId(), quantity, new EinkaufslisteRepository.OnShoppingListItemListener() {
+                                @Override
+                                public void onSuccess() {
+                                    // Optional
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(VorratActivity.this, "Fehler: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+            Toast.makeText(this, "Elemente zur Einkaufsliste hinzugefügt.", Toast.LENGTH_SHORT).show();
+            toggleSelectionMode();
+        });
+
+        builder.setNegativeButton("Abbrechen", (dialog, which) -> {
+            dialog.dismiss();
+            toggleSelectionMode();
+        });
+
+        builder.setCancelable(false);
+        builder.show();
     }
 
     private void showEditQuantityDialog(ListenEintrag eintrag) {

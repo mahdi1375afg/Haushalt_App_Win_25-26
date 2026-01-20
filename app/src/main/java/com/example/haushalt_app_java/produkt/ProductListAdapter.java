@@ -147,6 +147,8 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
                 buttonDelete.setVisibility(View.VISIBLE);
                 buttonBookmark.setVisibility(View.VISIBLE);
                 selectionCheckbox.setVisibility(View.GONE);
+                buttonDecreaseQuantity.setVisibility(View.VISIBLE);
+                buttonIncreaseQuantity.setVisibility(View.VISIBLE);
 
                 if (isShoppingList) {
                     buttonMoveToVorrat.setVisibility(View.VISIBLE);

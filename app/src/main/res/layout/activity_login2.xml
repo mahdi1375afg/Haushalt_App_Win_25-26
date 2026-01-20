@@ -50,8 +50,9 @@
         android:textColor="@color/ux_color_on_surface"
         android:textColorHint="@color/ux_color_outline"
         android:padding="14dp"
-        android:elevation="1dp"/>
-    <!--android:text="jonas@gmail.com"-->
+        android:elevation="1dp"
+        android:text="jonas@gmail.com"
+        />
 
 <!-- Eingabefeld: Passwort (ID bleibt: password) -->
     <EditText
@@ -66,8 +67,8 @@
         android:textColor="@color/ux_color_on_surface"
         android:textColorHint="@color/ux_color_outline"
         android:padding="14dp"
-        android:elevation="1dp"/>
-    <!-- android:text="123456"-->
+        android:elevation="1dp"
+        android:text="123456"/>
 
  <!-- Login-Button (ID bleibt: login) -->
 

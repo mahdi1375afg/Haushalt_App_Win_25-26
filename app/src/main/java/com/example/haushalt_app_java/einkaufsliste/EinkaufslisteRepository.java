@@ -74,6 +74,7 @@ public class EinkaufslisteRepository {
                                             ListenEintrag listenEintrag = new ListenEintrag(produktId, produkt.getName(), produkt.getKategorie(), produkt.getEinheit(), menge);
                                             listenEintrag.setMengeImVorrat(mengeImVorrat);
                                             listenEintrag.setMindestmenge(produkt.getMindBestand());
+                                            listenEintrag.setZielmenge(produkt.getZielbestand());
                                             listenEintrag.setBookmarked(produkt.isBookmarked());
                                             einkaufsliste.add(listenEintrag);
 
@@ -136,6 +137,12 @@ public class EinkaufslisteRepository {
     }
 
     public void setQuantityOnShoppingList(String haushaltId, String productId, int quantity, final OnShoppingListItemListener listener) {
+        if (quantity <= 0) {
+            if (listener != null) {
+                listener.onFailure(new IllegalArgumentException("Menge muss größer als 0 sein."));
+            }
+            return;
+        }
         if (productId == null || productId.isEmpty()) {
             if (listener != null) {
                 listener.onFailure(new IllegalArgumentException("Product ID cannot be null or empty."));
@@ -173,6 +180,53 @@ public class EinkaufslisteRepository {
         databaseReference.child("Haushalte").child(haushaltId).child("einkaufsliste").child(produktId).removeValue()
                 .addOnSuccessListener(aVoid -> listener.onSuccess())
                 .addOnFailureListener(e -> listener.onFailure(e));
+    }
+
+    public void fillToTargetStock(String haushaltId, String produktId, final OnShoppingListItemListener listener) {
+        DatabaseReference produktRef = databaseReference.child("Haushalte").child(haushaltId).child("produkte").child(produktId);
+        produktRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot produktSnapshot) {
+                Produkt produkt = produktSnapshot.getValue(Produkt.class);
+                if (produkt != null) {
+                    DatabaseReference vorratRef = databaseReference.child("Haushalte").child(haushaltId).child("vorrat").child(produktId).child("menge");
+                    vorratRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot vorratSnapshot) {
+                            Integer mengeImVorratInt = vorratSnapshot.getValue(Integer.class);
+                            int mengeImVorrat = (mengeImVorratInt != null) ? mengeImVorratInt : 0;
+                            int quantityToAdd = Math.max(0, produkt.getZielbestand() - mengeImVorrat);
+
+                            if (quantityToAdd > 0) {
+                                setQuantityOnShoppingList(haushaltId, produktId, quantityToAdd, listener);
+                            } else {
+                                if (listener != null) {
+                                    listener.onSuccess(); // Nothing to add, but operation is successful
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            if (listener != null) {
+                                listener.onFailure(error.toException());
+                            }
+                        }
+                    });
+                } else {
+                    if (listener != null) {
+                        listener.onFailure(new Exception("Produkt nicht gefunden."));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                if (listener != null) {
+                    listener.onFailure(error.toException());
+                }
+            }
+        });
     }
 
 
