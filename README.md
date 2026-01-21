@@ -1,5 +1,5 @@
 # Haushalt_App_Win_25-26
-Der Projekt wird im Rahmen von Semester Projekt im Jahr 2025/2026. 
+Der Projekt würde im Rahmen von Semester Projekt im Winter Semester 2025/2026 entwickelt.
 
 ---
 
