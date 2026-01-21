@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.content.Intent;
 import android.widget.Toast;
 
-import com.example.haushalt_app_java.notification.NotificationService;
 import com.google.firebase.database.FirebaseDatabase;
 
 

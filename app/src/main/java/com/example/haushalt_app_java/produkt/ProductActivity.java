@@ -106,7 +106,7 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
                     currentHausId = snapshot.getValue(String.class);
 
                     if (currentHausId == null || currentHausId.isEmpty()) {
-                        Toast.makeText(ProductActivity.this, "Bitte wähle einen Haushalt", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProductActivity.this, "Bitte wählen Sie einen Haushalt", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(ProductActivity.this, HaushaltActivity.class));
                         finish();
                     }

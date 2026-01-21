@@ -42,7 +42,7 @@ public class AddProductActivity extends AppCompatActivity {
 
 
         if (haushaltId == null || haushaltId.isEmpty()) {
-            Toast.makeText(this, "Haushalt ID is missing", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Haushalts-ID fehlt", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -113,7 +113,7 @@ public class AddProductActivity extends AppCompatActivity {
         String unitDisplayName = productUnitSpinner.getSelectedItem().toString();
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(minStockStr) || TextUtils.isEmpty(targetStockStr) || TextUtils.isEmpty(stepSizeStr)) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bitte alle Felder ausfüllen", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -128,13 +128,13 @@ public class AddProductActivity extends AppCompatActivity {
         productRepository.addProduct(product, new ProductRepository.OnProductAddedListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(AddProductActivity.this, "Product added", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddProductActivity.this, "Produkt hinzugefügt", Toast.LENGTH_SHORT).show();
                 finish();
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(AddProductActivity.this, "Failed to add product: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddProductActivity.this, "Fehler beim Hinzufügen des Produkts: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

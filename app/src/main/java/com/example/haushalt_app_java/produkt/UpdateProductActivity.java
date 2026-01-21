@@ -48,7 +48,7 @@ public class UpdateProductActivity extends AppCompatActivity {
         hausId = getIntent().getStringExtra("haus_id");
 
         if (TextUtils.isEmpty(hausId) || TextUtils.isEmpty(produktId)) {
-            Toast.makeText(this, "Haushalt or Produkt ID is missing", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Haushalts- oder Produkt-ID fehlt", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -133,7 +133,7 @@ public class UpdateProductActivity extends AppCompatActivity {
         String unitDisplayName = productUnitSpinner.getSelectedItem().toString();
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(minStockStr) || TextUtils.isEmpty(targetStockStr) || TextUtils.isEmpty(stepSizeStr)) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bitte alle Felder ausfüllen", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -147,13 +147,13 @@ public class UpdateProductActivity extends AppCompatActivity {
         productRepository.updateProduct(updatedProduct, new ProductRepository.OnProductUpdatedListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(UpdateProductActivity.this, "Product updated", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UpdateProductActivity.this, "Produkt aktualisiert", Toast.LENGTH_SHORT).show();
                 finish();
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(UpdateProductActivity.this, "Failed to update product: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UpdateProductActivity.this, "Fehler beim Aktualisieren des Produkts: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -162,13 +162,13 @@ public class UpdateProductActivity extends AppCompatActivity {
         productRepository.deleteProduct(produktId, new ProductRepository.OnProductDeletedListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(UpdateProductActivity.this, "Product deleted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(UpdateProductActivity.this, "Produkt gelöscht", Toast.LENGTH_SHORT).show();
                 finish();
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(UpdateProductActivity.this, "Failed to delete product: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UpdateProductActivity.this, "Fehler beim Löschen des Produkts: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

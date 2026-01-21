@@ -113,7 +113,7 @@ public class DatabaseChangeService extends Service {
                 NotificationService.sendGeneralNotification(
                         getApplicationContext(),
                         "Änderungen im Haushalt",
-                        "Es gab Änderungen bei den Daten in ihrem Haushalt.",
+                        "Es gab Änderungen bei den Produkten in ihrem Haushalt.",
                         6 // A new notification ID
                 );
             }
