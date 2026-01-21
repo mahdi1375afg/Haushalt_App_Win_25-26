@@ -155,14 +155,48 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
                 }
                 return true;
             } else if (itemId == R.id.action_all_items_bought) {
-                for (ListenEintrag eintrag : alleEintraege) {
-                    onMoveToVorratClick(eintrag);
-                }
+                moveAllItemsToVorrat();
                 return true;
             }
             return false;
         });
         popupMenu.show();
+    }
+
+    private void moveAllItemsToVorrat() {
+        if (alleEintraege.isEmpty()) {
+            Toast.makeText(this, "Einkaufsliste ist leer.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        List<ListenEintrag> itemsToMove = new ArrayList<>(alleEintraege);
+        List<String> itemIdsToRemove = new ArrayList<>();
+        for (ListenEintrag eintrag : itemsToMove) {
+            itemIdsToRemove.add(eintrag.getProduktId());
+        }
+
+        vorratRepository.addMultipleVorratItems(currentHaushaltId, itemsToMove, new VorratRepository.OnVorratItemsAddedListener() {
+            @Override
+            public void onSuccess() {
+                einkaufslisteRepository.removeShoppingListItems(currentHaushaltId, itemIdsToRemove, new EinkaufslisteRepository.OnShoppingListItemsRemovedListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(EinkaufslisteActivity.this, "Alle Produkte gekauft und zum Vorrat hinzugefügt", Toast.LENGTH_SHORT).show();
+                        // Die Liste wird durch den Listener onEinkaufslisteDataChanged automatisch aktualisiert.
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(EinkaufslisteActivity.this, "Fehler beim Leeren der Einkaufsliste: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(EinkaufslisteActivity.this, "Fehler beim Hinzufügen zum Vorrat: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupSelectionActionBar() {

@@ -186,6 +186,20 @@ public class VorratRepository {
                 .addOnFailureListener(listener::onFailure);
     }
 
+    public void addMultipleVorratItems(String haushaltId, List<ListenEintrag> items, OnVorratItemsAddedListener listener) {
+        DatabaseReference vorratRef = databaseReference.child("Haushalte").child(haushaltId).child("vorrat");
+        Map<String, Object> updates = new HashMap<>();
+
+        for (ListenEintrag item : items) {
+            String path = item.getProduktId() + "/menge";
+            updates.put(path, ServerValue.increment(item.getMenge()));
+        }
+
+        vorratRef.updateChildren(updates)
+                .addOnSuccessListener(aVoid -> listener.onSuccess())
+                .addOnFailureListener(listener::onFailure);
+    }
+
 
 
     // TODO Jonas unify & simplify Listeners (nur bei Abruf Listener notwendig?)
@@ -205,6 +219,11 @@ public class VorratRepository {
     }
 
     public interface OnVorratItemAddedListener {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
+    public interface OnVorratItemsAddedListener {
         void onSuccess();
         void onFailure(Exception e);
     }

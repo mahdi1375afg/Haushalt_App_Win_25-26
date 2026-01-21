@@ -183,8 +183,14 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
 
         if (selectedItems.isEmpty()) {
             Toast.makeText(this, "Keine Produkte zum Auffüllen gefunden.", Toast.LENGTH_SHORT).show();
-        } else {
-            showAddDialog();
+            return; // Nichts zu tun
+        }
+
+        showAddDialog(true);
+
+        // Auswahlmodus nach der Aktion beenden
+        if (isSelectionMode) {
+            toggleSelectionMode();
         }
     }
 
@@ -266,7 +272,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
 
         buttonCancel.setOnClickListener(v -> toggleSelectionMode());
         buttonAdd.setOnClickListener(v -> {
-            showAddDialog();
+            showAddDialog(false);
         });
         buttonDelete.setOnClickListener(v -> {
             List<String> itemIds = new ArrayList<>();
@@ -446,7 +452,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         toggleItemSelection(eintrag);
     }
 
-    private void showAddDialog() {
+    private void showAddDialog(boolean fromMenu) {
         final CharSequence[] items = {"Alle auf Zielbestand auffüllen", "Einzeln Werte eintragen"};
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, R.layout.dialog_list_item, items);
 
@@ -454,16 +460,16 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
                 .setTitle("Mengen für gewählte Produkte bestimmen:")
                 .setAdapter(adapter, (dialog, which) -> {
                     if (which == 0) { // Alle auf Zielbestand auffüllen
-                        addSelectedItemsToShoppingList(true);
+                        addSelectedItemsToShoppingList(true, fromMenu);
                     } else { // Einzeln Werte eintragen
-                        addSelectedItemsToShoppingList(false);
+                        addSelectedItemsToShoppingList(false, fromMenu);
                     }
                 })
                 .setNegativeButton("Abbrechen", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
-    private void addSelectedItemsToShoppingList(boolean fillToTarget) {
+    private void addSelectedItemsToShoppingList(boolean fillToTarget, boolean fromMenu) {
         if (fillToTarget) {
             for (ListenEintrag eintrag : selectedItems) {
                 einkaufslisteRepository.fillToTargetStock(currentHaushaltId, eintrag.getProduktId(), new EinkaufslisteRepository.OnShoppingListItemListener() {
@@ -479,13 +485,15 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
                 });
             }
             Toast.makeText(this, "Elemente wurden zur Einkaufsliste hinzugefügt.", Toast.LENGTH_SHORT).show();
-            toggleSelectionMode();
+            if (!fromMenu) {
+                toggleSelectionMode();
+            }
         } else {
-            showIndividualQuantityListDialog();
+            showIndividualQuantityListDialog(fromMenu);
         }
     }
 
-    private void showIndividualQuantityListDialog() {
+    private void showIndividualQuantityListDialog(boolean fromMenu) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_individual_quantity_list, null);
@@ -522,12 +530,16 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
                 }
             }
             Toast.makeText(this, "Elemente zur Einkaufsliste hinzugefügt.", Toast.LENGTH_SHORT).show();
-            toggleSelectionMode();
+            if (!fromMenu) {
+                toggleSelectionMode();
+            }
         });
 
         builder.setNegativeButton("Abbrechen", (dialog, which) -> {
             dialog.dismiss();
-            toggleSelectionMode();
+            if (!fromMenu) {
+                toggleSelectionMode();
+            }
         });
 
         builder.setCancelable(false);
