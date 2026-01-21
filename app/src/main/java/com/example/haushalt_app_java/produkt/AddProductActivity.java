@@ -3,13 +3,16 @@ package com.example.haushalt_app_java.produkt;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.haushalt_app_java.R;
@@ -24,6 +27,7 @@ public class AddProductActivity extends AppCompatActivity {
     private EditText productName, productMinStock, productTargetStock, productStepSize;
     private Spinner productCategorySpinner, productUnitSpinner;
     private Button cancelButton, addButton;
+    private TextView labelTargetStock, labelStepSize;
 
     private ProductRepository productRepository;
     private String haushaltId;
@@ -53,6 +57,8 @@ public class AddProductActivity extends AppCompatActivity {
         productUnitSpinner = findViewById(R.id.product_unit_spinner);
         cancelButton = findViewById(R.id.button_cancel);
         addButton = findViewById(R.id.button_add);
+        labelTargetStock = findViewById(R.id.label_product_target_stock);
+        labelStepSize = findViewById(R.id.label_product_step_size);
 
         //Populate Spinners
         List<String> categories = new ArrayList<>();
@@ -85,6 +91,17 @@ public class AddProductActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        labelTargetStock.setOnClickListener(v -> showTooltip("Zielbestand", getString(R.string.tooltip_zielbestand)));
+        labelStepSize.setOnClickListener(v -> showTooltip("Schrittweite", getString(R.string.tooltip_schrittweite)));
+    }
+
+    private void showTooltip(String fieldName, String text) {
+        new AlertDialog.Builder(this, R.style.AlertDialogCustom)
+                .setTitle("Information: " + fieldName)
+                .setMessage(text)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private void addProduct() {

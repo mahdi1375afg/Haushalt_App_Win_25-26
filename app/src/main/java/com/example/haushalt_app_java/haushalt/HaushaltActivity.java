@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import android.content.Intent;
+import android.view.Gravity;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -56,7 +57,8 @@ public class HaushaltActivity extends AppCompatActivity {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            int padding = (int) (16 * getResources().getDisplayMetrics().density);
+            v.setPadding(systemBars.left + padding, systemBars.top + padding, systemBars.right + padding, systemBars.bottom);
             return insets;
         });
 
@@ -122,7 +124,7 @@ public class HaushaltActivity extends AppCompatActivity {
         });
 
         hAdd.setOnClickListener(v -> {
-            PopupMenu popup = new PopupMenu(this, v);
+            PopupMenu popup = new PopupMenu(this, v, Gravity.END);
             popup.getMenuInflater().inflate(R.menu.add_haushalt, popup.getMenu());
 
             popup.setOnMenuItemClickListener(item -> {

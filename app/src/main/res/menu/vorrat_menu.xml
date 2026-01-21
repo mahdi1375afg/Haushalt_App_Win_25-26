@@ -5,8 +5,8 @@
         android:title="Auswahlmodus aktivieren" />
     <item
         android:id="@+id/action_fill_below_min"
-        android:title="Alle unter Mindestbestand auffüllen" />
+        android:title="Alle unter Mindestbestand wählen" />
     <item
         android:id="@+id/action_fill_empty"
-        android:title="Alle Leeren auffüllen" />
+        android:title="Alle leeren Produkte wählen" />
 </menu>

@@ -140,12 +140,13 @@
         android:gravity="center_vertical">
 
         <Button
-            android:id="@+id/button_cancel"
+            android:id="@+id/button_delete"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Abbrechen"
-            android:background="@drawable/rounded_button_background"
+            android:text="Löschen"
+            android:background="@drawable/rounded_button_background_critical"
+            app:backgroundTint="@null"
             android:textColor="@android:color/white"
             android:textSize="11sp"
             android:textAllCaps="false"
@@ -157,12 +158,13 @@
             android:layout_marginEnd="4dp"/>
 
         <Button
-            android:id="@+id/button_add"
+            android:id="@+id/button_cancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hinzufügen"
+            android:text="Abbrechen"
             android:background="@drawable/rounded_button_background"
+            app:backgroundTint="@color/ux_color_accent"
             android:textColor="@android:color/white"
             android:textSize="11sp"
             android:textAllCaps="false"
@@ -175,13 +177,13 @@
             android:layout_marginEnd="4dp"/>
 
         <Button
-            android:id="@+id/button_delete"
+            android:id="@+id/button_add"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Löschen"
-            android:background="@drawable/rounded_button_background_critical"
-            app:backgroundTint="@null"
+            android:text="Hinzufügen"
+            android:background="@drawable/rounded_button_background"
+            app:backgroundTint="@color/ux_color_accent"
             android:textColor="@android:color/white"
             android:textSize="11sp"
             android:textAllCaps="false"

@@ -406,10 +406,26 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setTextColor(getResources().getColor(android.R.color.white));
         input.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
-        builder.setView(input);
+
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        android.widget.FrameLayout.LayoutParams params = new  android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        input.setLayoutParams(params);
+        container.addView(input);
+        builder.setView(container);
 
         builder.setPositiveButton("OK", (dialog, which) -> {
-            int quantity = Integer.parseInt(input.getText().toString());
+            String quantityStr = input.getText().toString();
+            if (quantityStr.isEmpty()) {
+                Toast.makeText(ProductActivity.this, "Bitte eine Menge eingeben", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            int quantity = Integer.parseInt(quantityStr);
+            if (quantity <= 0) {
+                Toast.makeText(ProductActivity.this, "Hinzufügen wegen eines negativen Wertes nicht möglich", Toast.LENGTH_SHORT).show();
+                return;
+            }
             einkaufslisteRepository.addShoppingListItem(currentHausId, produkt.getProdukt_id(), quantity, new EinkaufslisteRepository.OnShoppingListItemListener() {
                 @Override
                 public void onSuccess() {
@@ -435,10 +451,26 @@ public class ProductActivity extends AppCompatActivity implements MainProductLis
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setTextColor(getResources().getColor(android.R.color.white));
         input.setHintTextColor(getResources().getColor(android.R.color.darker_gray));
-        builder.setView(input);
+
+        android.widget.FrameLayout container = new android.widget.FrameLayout(this);
+        android.widget.FrameLayout.LayoutParams params = new  android.widget.FrameLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        input.setLayoutParams(params);
+        container.addView(input);
+        builder.setView(container);
 
         builder.setPositiveButton("OK", (dialog, which) -> {
-            int quantity = Integer.parseInt(input.getText().toString());
+            String quantityStr = input.getText().toString();
+            if (quantityStr.isEmpty()) {
+                Toast.makeText(ProductActivity.this, "Bitte eine Menge eingeben", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            int quantity = Integer.parseInt(quantityStr);
+            if (quantity <= 0) {
+                Toast.makeText(ProductActivity.this, "Hinzufügen wegen eines negativen Wertes nicht möglich", Toast.LENGTH_SHORT).show();
+                return;
+            }
             vorratRepository.addVorratItem(currentHausId, produkt, quantity, new VorratRepository.OnVorratItemAddedListener() {
                 @Override
                 public void onSuccess() {

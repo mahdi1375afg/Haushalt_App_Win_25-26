@@ -6,19 +6,22 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="12dp"
     android:background="@color/ux_color_primary"
     tools:context=".haushalt.HaushaltActivity">
 
-    <!-- horizontale Trenn-Guideline (ca. 46% Höhe) -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_mid"
+    <TextView
+        android:id="@+id/label_haushalt_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.11" />
+        android:text="Haushaltsname:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/ux_color_on_surface"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"/>
 
-    <!-- Titel: Haushalte -->
+    <!-- horizontale Trenn-Guideline (ca. 46% Höhe) -->
     <TextView
         android:id="@+id/haushalt_name"
         android:layout_width="0dp"
@@ -26,10 +29,10 @@
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="@color/ux_color_on_surface"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_haushalt_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginTop="4dp"/>
 
 
 
@@ -40,22 +43,22 @@
         android:id="@+id/textView11"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Mitglieder"
+        android:layout_marginTop="75dp"
+        android:text="Mitglieder:"
         android:textColor="@color/ux_color_on_surface"
-        android:textSize="22sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline_mid" />
+        app:layout_constraintTop_toBottomOf="@id/haushalt_name" />
 
     <!-- Bottom Navigation -->
 
     <ListView
         android:id="@+id/hList"
-        android:layout_width="369dp"
-        android:layout_height="331dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:background="@color/ux_color_surface"
         android:divider="@color/ux_color_outline"
@@ -84,17 +87,19 @@
     <!-- FAB: Haushalt/mitglied hinzufügen -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/hAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:contentDescription="Hinzufügen"
         app:srcCompat="@android:drawable/ic_input_add"
         app:backgroundTint="@color/ux_color_accent"
         app:tint="@color/ux_color_on_primary"
         app:elevation="8dp"
         app:borderWidth="0dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView2"
+        app:fabCustomSize="40dp"
+        app:shapeAppearanceOverlay="@style/FabShape"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

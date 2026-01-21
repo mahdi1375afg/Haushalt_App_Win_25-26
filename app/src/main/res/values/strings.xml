@@ -74,4 +74,7 @@
     <string name="edit_product_button">Produkt bearbeiten</string>
     <string name="delete_product_button">Produkt löschen</string>
 
+    <string name="tooltip_zielbestand">Menge des Produkts, die nach dem Einkauf vorhanden sein soll. Kann beim Hinzufügen auf die Einkaufsliste verwendet werden.</string>
+    <string name="tooltip_schrittweite">Menge, um die das Produkt in der Vorrats- und Einkaufsliste bei Klicken auf Plus erhöht und bei Klicken auf Minus verringert wird.</string>
+
 </resources>

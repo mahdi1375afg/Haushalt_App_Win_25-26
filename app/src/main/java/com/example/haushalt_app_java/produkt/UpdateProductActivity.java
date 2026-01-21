@@ -4,11 +4,13 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -30,7 +32,8 @@ public class UpdateProductActivity extends AppCompatActivity {
 
     private EditText productName, productMinStock, productTargetStock, productStepSize;
     private Spinner productCategorySpinner, productUnitSpinner;
-    private Button btnUpdate, btnDelete;
+    private Button btnUpdate, btnDelete, btnCancel;
+    private TextView labelTargetStock, labelStepSize;
 
     private ProductRepository productRepository;
     private String produktId;
@@ -60,6 +63,9 @@ public class UpdateProductActivity extends AppCompatActivity {
         productUnitSpinner = findViewById(R.id.product_unit_spinner);
         btnUpdate = findViewById(R.id.button_update);
         btnDelete = findViewById(R.id.button_delete);
+        btnCancel = findViewById(R.id.button_cancel);
+        labelTargetStock = findViewById(R.id.label_product_target_stock);
+        labelStepSize = findViewById(R.id.label_product_step_size);
 
         // Populate Spinners and set initial values
         populateAndSetSpinners();
@@ -72,6 +78,18 @@ public class UpdateProductActivity extends AppCompatActivity {
 
         btnUpdate.setOnClickListener(v -> updateProduct());
         btnDelete.setOnClickListener(v -> deleteProduct());
+        btnCancel.setOnClickListener(v -> finish());
+
+        labelTargetStock.setOnClickListener(v -> showTooltip("Zielbestand", getString(R.string.tooltip_zielbestand)));
+        labelStepSize.setOnClickListener(v -> showTooltip("Schrittweite", getString(R.string.tooltip_schrittweite)));
+    }
+
+    private void showTooltip(String fieldName, String text) {
+        new AlertDialog.Builder(this, R.style.AlertDialogCustom)
+                .setTitle("Information: " + fieldName)
+                .setMessage(text)
+                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private void populateAndSetSpinners() {
