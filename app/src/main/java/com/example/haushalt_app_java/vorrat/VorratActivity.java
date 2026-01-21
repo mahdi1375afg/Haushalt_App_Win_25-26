@@ -3,13 +3,16 @@ package com.example.haushalt_app_java.vorrat;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +38,7 @@ import com.example.haushalt_app_java.produkt.ProductRepository;
 import com.example.haushalt_app_java.produkt.Produkt;
 import com.example.haushalt_app_java.profile.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseError;
 
 import java.util.ArrayList;
@@ -58,6 +62,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
     private List<ListenEintrag> selectedItems = new ArrayList<>();
     private LinearLayout selectionActionBar;
     private Button buttonCancel, buttonAdd, buttonDelete;
+    private FloatingActionButton fabMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +103,7 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
         setupSearchView();
         setupSortSpinner();
         setupSelectionActionBar();
+        setupFabMenu();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_vorrat);
@@ -132,6 +138,54 @@ public class VorratActivity extends AppCompatActivity implements ProductListAdap
             }
             return false;
         });
+    }
+
+    private void setupFabMenu() {
+        fabMenu = findViewById(R.id.pAddScreen);
+        fabMenu.setOnClickListener(this::showPopupMenu);
+    }
+
+    private void showPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view, Gravity.END);
+        popupMenu.getMenuInflater().inflate(R.menu.vorrat_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_activate_selection_mode) {
+                if (!isSelectionMode) {
+                    toggleSelectionMode();
+                }
+                return true;
+            } else if (itemId == R.id.action_fill_below_min) {
+                fillItems(false);
+                return true;
+            } else if (itemId == R.id.action_fill_empty) {
+                fillItems(true);
+                return true;
+            }
+            return false;
+        });
+        popupMenu.show();
+    }
+
+    private void fillItems(boolean emptyOnly) {
+        selectedItems.clear();
+        for (ListenEintrag eintrag : alleEintraege) {
+            if (emptyOnly) {
+                if (eintrag.getMengeImVorrat() == 0) {
+                    selectedItems.add(eintrag);
+                }
+            } else {
+                if (eintrag.getMengeImVorrat() <= eintrag.getMindestmenge()) {
+                    selectedItems.add(eintrag);
+                }
+            }
+        }
+
+        if (selectedItems.isEmpty()) {
+            Toast.makeText(this, "Keine Produkte zum Auffüllen gefunden.", Toast.LENGTH_SHORT).show();
+        } else {
+            showAddDialog();
+        }
     }
 
     private void setupSortSpinner() {

@@ -17,7 +17,8 @@
     <!--Definition des Popup-Menü-Styles -->
     <style name="Widget.Haushalt.PopupMenu" parent="Widget.Material3.PopupMenu">
         <!-- Hintergrund des Popups -->
-        <item name="android:popupBackground">@color/ux_color_surface</item>
+        <item name="android:popupBackground">@drawable/popup_menu_background</item>
+        <item name="overlapAnchor">false</item>
 
         <!-- Textfarbe der Einträge -->
         <item name="android:textColor">@color/ux_color_on_surface</item>

@@ -183,6 +183,17 @@ public class EinkaufslisteRepository {
                 .addOnFailureListener(e -> listener.onFailure(e));
     }
 
+    public void removeShoppingListItems(String haushaltId, List<String> produktIds, final OnShoppingListItemsRemovedListener listener) {
+        DatabaseReference einkaufslisteRef = databaseReference.child("Haushalte").child(haushaltId).child("einkaufsliste");
+        Map<String, Object> updates = new HashMap<>();
+        for (String produktId : produktIds) {
+            updates.put(produktId, null);
+        }
+        einkaufslisteRef.updateChildren(updates)
+                .addOnSuccessListener(aVoid -> listener.onSuccess())
+                .addOnFailureListener(e -> listener.onFailure(e));
+    }
+
     public void fillToTargetStock(String haushaltId, String produktId, final OnShoppingListItemListener listener) {
         DatabaseReference produktRef = databaseReference.child("Haushalte").child(haushaltId).child("produkte").child(produktId);
         produktRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -232,20 +243,23 @@ public class EinkaufslisteRepository {
 
 
 
-    // TODO Jonas unify & simplify Listeners
-    public interface OnEinkaufslisteDataChangedListener {
-        void onEinkaufslisteDataChanged(List<ListenEintrag> einkaufsliste);
-        void onError(DatabaseError error);
-    }
-
     public interface OnShoppingListItemListener {
         void onSuccess();
         void onFailure(Exception e);
     }
 
-
     public interface OnShoppingListItemRemovedListener {
         void onSuccess();
         void onFailure(Exception e);
+    }
+
+    public interface OnShoppingListItemsRemovedListener {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
+    public interface OnEinkaufslisteDataChangedListener {
+        void onEinkaufslisteDataChanged(List<ListenEintrag> einkaufsliste);
+        void onError(DatabaseError error);
     }
 }

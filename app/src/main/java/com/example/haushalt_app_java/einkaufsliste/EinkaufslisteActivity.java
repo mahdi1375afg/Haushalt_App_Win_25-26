@@ -2,12 +2,17 @@ package com.example.haushalt_app_java.einkaufsliste;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,13 +37,14 @@ import com.example.haushalt_app_java.haushalt.HaushaltActivity;
 import com.example.haushalt_app_java.produkt.ProductActivity;
 import com.example.haushalt_app_java.profile.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseError;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class EinkaufslisteActivity extends AppCompatActivity implements ProductListAdapter.OnItemClickListener, EinkaufslisteRepository.OnEinkaufslisteDataChangedListener {
+public class EinkaufslisteActivity extends AppCompatActivity implements ProductListAdapter.OnItemClickListener, ProductListAdapter.OnItemLongClickListener, EinkaufslisteRepository.OnEinkaufslisteDataChangedListener {
 
     private EinkaufslisteRepository einkaufslisteRepository;
     private VorratRepository vorratRepository;
@@ -52,6 +58,11 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
     private String searchQuery = "";
     private Spinner spinnerSort;
     private String selectedSort = "Alphabet";
+    private boolean isSelectionMode = false;
+    private List<ListenEintrag> selectedItems = new ArrayList<>();
+    private LinearLayout selectionActionBar;
+    private Button buttonCancel, buttonAdd, buttonDelete;
+    private FloatingActionButton fabMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +82,7 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
         RecyclerView recyclerView = findViewById(R.id.einkaufslisteRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         einkaufslisteAdapter = new ProductListAdapter(new ArrayList<>(), this, true);
+        einkaufslisteAdapter.setOnItemLongClickListener(this);
         recyclerView.setAdapter(einkaufslisteAdapter);
 
         einkaufslisteRepository = new EinkaufslisteRepository();
@@ -89,6 +101,8 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
         setupKategorieSpinner();
         setupSearchView();
         setupSortSpinner();
+        setupSelectionActionBar();
+        setupFabMenu();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.nav_einkaufslisten);
@@ -123,6 +137,87 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
             }
             return false;
         });
+    }
+
+    private void setupFabMenu() {
+        fabMenu = findViewById(R.id.pAddScreen);
+        fabMenu.setOnClickListener(this::showPopupMenu);
+    }
+
+    private void showPopupMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view, Gravity.END);
+        popupMenu.getMenuInflater().inflate(R.menu.einkaufsliste_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_activate_selection_mode) {
+                if (!isSelectionMode) {
+                    toggleSelectionMode();
+                }
+                return true;
+            } else if (itemId == R.id.action_all_items_bought) {
+                for (ListenEintrag eintrag : alleEintraege) {
+                    onMoveToVorratClick(eintrag);
+                }
+                return true;
+            }
+            return false;
+        });
+        popupMenu.show();
+    }
+
+    private void setupSelectionActionBar() {
+        selectionActionBar = findViewById(R.id.selection_action_bar);
+        buttonCancel = findViewById(R.id.button_cancel);
+        buttonAdd = findViewById(R.id.button_add);
+        buttonDelete = findViewById(R.id.button_delete);
+
+        buttonAdd.setText("Gekauft");
+
+        buttonCancel.setOnClickListener(v -> toggleSelectionMode());
+        buttonAdd.setOnClickListener(v -> {
+            for (ListenEintrag eintrag : selectedItems) {
+                onMoveToVorratClick(eintrag);
+            }
+            toggleSelectionMode();
+        });
+        buttonDelete.setOnClickListener(v -> {
+            List<String> itemIds = new ArrayList<>();
+            for (ListenEintrag eintrag : selectedItems) {
+                itemIds.add(eintrag.getProduktId());
+            }
+            einkaufslisteRepository.removeShoppingListItems(currentHaushaltId, itemIds, new EinkaufslisteRepository.OnShoppingListItemsRemovedListener() {
+                @Override
+                public void onSuccess() {
+                    Toast.makeText(EinkaufslisteActivity.this, "Ausgewählte Elemente gelöscht", Toast.LENGTH_SHORT).show();
+                    toggleSelectionMode();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(EinkaufslisteActivity.this, "Fehler beim Löschen: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
+
+    private void toggleSelectionMode() {
+        isSelectionMode = !isSelectionMode;
+        einkaufslisteAdapter.setSelectionMode(isSelectionMode);
+        selectionActionBar.setVisibility(isSelectionMode ? View.VISIBLE : View.GONE);
+        findViewById(R.id.bottomNavigationView).setVisibility(isSelectionMode ? View.GONE : View.VISIBLE);
+        if (!isSelectionMode) {
+            selectedItems.clear();
+        }
+        einkaufslisteAdapter.notifyDataSetChanged();
+    }
+
+    private void toggleItemSelection(ListenEintrag eintrag) {
+        if (selectedItems.contains(eintrag)) {
+            selectedItems.remove(eintrag);
+        } else {
+            selectedItems.add(eintrag);
+        }
+        einkaufslisteAdapter.setSelectedItems(selectedItems);
     }
 
     private void setupKategorieSpinner() {
@@ -346,7 +441,17 @@ public class EinkaufslisteActivity extends AppCompatActivity implements ProductL
 
     @Override
     public void onItemClick(ListenEintrag eintrag) {
-        // Handle item click if needed, for now it can be empty.
+        if (isSelectionMode) {
+            toggleItemSelection(eintrag);
+        }
+    }
+
+    @Override
+    public void onItemLongClick(ListenEintrag eintrag) {
+        if (!isSelectionMode) {
+            toggleSelectionMode();
+        }
+        toggleItemSelection(eintrag);
     }
 
     private void showEditQuantityDialog(ListenEintrag eintrag) {
